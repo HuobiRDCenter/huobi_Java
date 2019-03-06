@@ -45,8 +45,8 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
     - [Reply loan](#reply-loan)
     - [Loan history](#loan-history)
 - [Subscription example](#Subscription-example)
-  - [Implement the listener](#Implement the listener)
-  - [Subscribe market data](#Subscribe market data)
+  - [Subscribe trade update](#Subscribe-trade-update)
+  - [Subscribe candlestick/KLine update](#Subscribe-candlestick/KLine-update)
   - [Subscribe order update](#subscribe-order-update)
   - [Subscribe account change](#subscribe-account-change)
   - [Unsubscribe](#unsubscribe)
@@ -282,7 +282,7 @@ subscriptionClient.subscribeTradeEvent("btcusdt,ethusdt", (tradeEvent) -> {
 
 ### Error handling
 
-####For synchronous
+#### For synchronous
 
 In error case, such as you set the invalid symbol to ```getBestQuote()```. The ```HuobiApiException``` will be thrown. See below example:
 
@@ -299,7 +299,7 @@ try {
 }
 ```
 
-####For asynchronous
+#### For asynchronous
 
 If the invoking failed, you can get the ```HuobiApiException``` in the resultset. See below example:
 
@@ -315,7 +315,7 @@ asyncClient.getPriceDepth("btcusdt", 5, (priceDepthResult) -> {
 });
 ```
 
-####For Subscription
+#### For Subscription
 
 If you want to check the error, you should implement your ```SubscriptionErrorHandler```. See below example:
 
@@ -685,7 +685,7 @@ asyncClient.getHistoricalOrders(request, (orderResult) ->{
 
 ### Margin Loan
 
-####Apply loan
+#### Apply loan
 
 *Authentication is required.*
 
@@ -723,7 +723,7 @@ asyncClient.applyLoan("btcusdt", "btc", new BigDecimal(10.0), (loanResult) -> {
 });
 ```
 
-####Loan history
+#### Loan history
 
 *Authentication is required.*
 
