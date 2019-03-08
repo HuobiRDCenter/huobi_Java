@@ -2,7 +2,6 @@ package com.huobi.client;
 
 
 import com.huobi.client.exception.HuobiApiException;
-import com.sun.istack.internal.Nullable;
 
 
 /**
@@ -18,7 +17,6 @@ public interface AsyncResult<T> {
    *
    * @return The exception of the invoking.
    */
-  @Nullable
   HuobiApiException getException();
 
   /**
@@ -33,6 +31,5 @@ public interface AsyncResult<T> {
    *
    * @return Any type you incoming.
    */
-  @Nullable
   T getData();
 }

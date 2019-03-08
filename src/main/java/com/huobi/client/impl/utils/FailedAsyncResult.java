@@ -2,7 +2,6 @@ package com.huobi.client.impl.utils;
 
 import com.huobi.client.AsyncResult;
 import com.huobi.client.exception.HuobiApiException;
-import com.sun.istack.internal.Nullable;
 
 public class FailedAsyncResult<T> implements AsyncResult<T> {
 
@@ -13,8 +12,7 @@ public class FailedAsyncResult<T> implements AsyncResult<T> {
   }
 
   @Override
-  public @Nullable
-  HuobiApiException getException() {
+  public HuobiApiException getException() {
     return exception;
   }
 
