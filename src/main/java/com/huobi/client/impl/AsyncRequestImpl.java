@@ -78,7 +78,7 @@ public class AsyncRequestImpl implements AsyncRequestClient {
 
   @Override
   public void getPriceDepth(String symbol, ResponseCallback<AsyncResult<PriceDepth>> callback) {
-    RestApiInvoker.callASync(requestImpl.getPriceDepth(symbol, null), callback);
+    RestApiInvoker.callASync(requestImpl.getPriceDepth(symbol, 20), callback);
   }
 
   @Override

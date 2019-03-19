@@ -226,7 +226,7 @@ public class WebSocketConnection extends WebSocketListener {
       request.updateCallback.onReceive(obj);
     } catch (Exception e) {
       onError("Process error: " + e.getMessage()
-          + " You should capture the exception in your SubscriptionListener", e);
+          + " You should capture the exception in your error handler", e);
     }
   }
 

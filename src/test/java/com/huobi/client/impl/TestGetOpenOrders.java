@@ -127,8 +127,8 @@ public class TestGetOpenOrders {
     PowerMockito.when(AccountsInfoMap.getUser("12345")).thenReturn(testUser);
     PowerMockito.when(AccountsInfoMap.getAccount("12345", 123L)).thenReturn(testAccount1);
     PowerMockito.when(AccountsInfoMap.getAccount("12345", 456L)).thenReturn(testAccount2);
-    OpenOrderRequest openOrderRequest = new OpenOrderRequest("btcusdt", AccountType.SPOT, 10,
-        OrderSide.BUY);
+    OpenOrderRequest openOrderRequest = new OpenOrderRequest("btcusdt", AccountType.SPOT,
+        OrderSide.BUY, 10);
     RestApiRequest<List<Order>> restApiRequest = impl.getOpenOrders(openOrderRequest);
     Request request = restApiRequest.request;
     assertEquals("GET", request.method());
@@ -150,6 +150,7 @@ public class TestGetOpenOrders {
     assertEquals("GET", request.method());
     assertTrue(request.url().toString().contains("/v1/order/openOrders"));
     assertEquals("btcusdt", request.url().queryParameter("symbol"));
+    assertEquals("123", request.url().queryParameter("account-id"));
     assertNull(request.url().queryParameter("size"));
     assertNull(request.url().queryParameter("side"));
   }

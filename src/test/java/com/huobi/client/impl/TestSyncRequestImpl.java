@@ -84,7 +84,7 @@ public class TestSyncRequestImpl {
     RestApiRequest<PriceDepth> restApiRequest1 = new RestApiRequest<>();
     RestApiRequest<PriceDepth> restApiRequest2 = new RestApiRequest<>();
     when(restApiRequestImpl.getPriceDepth("abc", 11)).thenReturn(restApiRequest1);
-    when(restApiRequestImpl.getPriceDepth("abc", null)).thenReturn(restApiRequest2);
+    when(restApiRequestImpl.getPriceDepth("abc", 20)).thenReturn(restApiRequest2);
     PriceDepth result1 = new PriceDepth();
     PriceDepth result2 = new PriceDepth();
     PowerMockito.mockStatic(RestApiInvoker.class);

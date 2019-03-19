@@ -26,17 +26,16 @@ public class MatchResultRequest {
    * @param type The types of order to include in the search (optional, can be null).
    * @param startDate Search starts date (optional, can be null).
    * @param endDate Search ends date (optional, can be null).
-   * @param accountType Search order id to begin with (optional, can be null).
-   * @param size The number of orders to return (optional, can be null).
-   * @param from The from which id (optional, can be null).
+   * @param size The number of orders to return, range [1-100] default is 100. (optional, can be
+   * null).
+   * @param from Search order id to begin with. (optional, can be null).
    */
   public MatchResultRequest(String symbol, OrderType type, Date startDate, Date endDate,
-      AccountType accountType, Integer size, String from) {
+      Integer size, String from) {
     this.symbol = symbol;
     this.type = type;
     this.startDate = startDate;
     this.endDate = endDate;
-    this.accountType = accountType;
     this.size = size;
     this.from = from;
   }
@@ -48,8 +47,6 @@ public class MatchResultRequest {
   private Date startDate = null;
 
   private Date endDate = null;
-
-  private AccountType accountType = null;
 
   private Integer size = null;
 
@@ -69,10 +66,6 @@ public class MatchResultRequest {
 
   public Date getEndDate() {
     return endDate;
-  }
-
-  public AccountType getAccountType() {
-    return accountType;
   }
 
   public Integer getSize() {

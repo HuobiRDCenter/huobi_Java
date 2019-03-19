@@ -11,7 +11,7 @@ public class GetHistoricalTrade {
     SyncRequestClient syncRequestClient = SyncRequestClient.create();
     List<Trade> tradeList = syncRequestClient.getHistoricalTrade(
         "btcusdt", 5);
-    System.out.println("---- 1 min candlestick for btcusdt ----");
+    System.out.println("---- Historical trade for btcusdt ----");
     for (Trade trade : tradeList) {
       System.out.println();
       System.out.println("Trade at: " + trade.getTimestamp());
@@ -25,7 +25,7 @@ public class GetHistoricalTrade {
     AsyncRequestClient asyncRequestClient = AsyncRequestClient.create();
     asyncRequestClient.getHistoricalTrade("btcusdt", 5, (tradeResult) -> {
       if (tradeResult.succeeded()) {
-        System.out.println("---- 1 min candlestick for btcusdt ----");
+        System.out.println("---- Historical trade for btcusdt ----");
         for (Trade trade : tradeResult.getData()) {
           System.out.println();
           System.out.println("Trade at: " + trade.getTimestamp());

@@ -26,13 +26,14 @@ public class OpenOrderRequest {
    * @param symbol The symbol, like "btcusdt". (mandatory)
    * @param accountType The order side, buy or sell. If no side defined, will return all open orders
    * of the account. (mandatory)
-   * @param size The number of orders to return. Range is [1, 500]. Default is 10. (optional, can be
-   * null)
    * @param side The order side, buy or sell. If no side defined, will return all open orders of the
    * account. (optional can be null)
+   * @param size The number of orders to return. Range is [1, 500]. Default is 10. (optional, can be
+   * null)
    */
-  public OpenOrderRequest(String symbol, AccountType accountType, Integer size,
-      OrderSide side) {
+  public OpenOrderRequest(String symbol, AccountType accountType,
+      OrderSide side,
+      Integer size) {
     this.symbol = symbol;
     this.accountType = accountType;
     this.size = size;

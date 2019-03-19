@@ -35,7 +35,7 @@ public class TesWithdraw {
   public void Initialize() {
     impl = new RestApiRequestImpl("12345", "67890", new RequestOptions());
     withdrawRequest = new WithdrawRequest("0xde709f2102306220921060314715629080e2fb77",
-        new BigDecimal("0.05"), "eth");
+        new BigDecimal("0.05"), "eth", new BigDecimal("1.00"), "aaa");
   }
 
   @Test
@@ -49,6 +49,8 @@ public class TesWithdraw {
         querier.jsonWrapper.getString("address"));
     assertEquals("eth", querier.jsonWrapper.getString("currency"));
     assertEquals("0.05", querier.jsonWrapper.getString("amount"));
+    assertEquals("1.00", querier.jsonWrapper.getString("fee"));
+    assertEquals("aaa", querier.jsonWrapper.getString("addr-tag"));
   }
 
   @Test

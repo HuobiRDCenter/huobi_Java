@@ -11,7 +11,7 @@ public class MatchResult {
 
   private long createdTimestamp;
   private BigDecimal filledAmount;
-  private BigDecimal filledFeeds;
+  private BigDecimal filledFees;
   private long id;
   private long matchId;
   private long orderId;
@@ -43,8 +43,8 @@ public class MatchResult {
    *
    * @return The fee.
    */
-  public BigDecimal getFilledFeeds() {
-    return filledFeeds;
+  public BigDecimal getFilledFees() {
+    return filledFees;
   }
 
   /**
@@ -119,8 +119,8 @@ public class MatchResult {
     this.filledAmount = filledAmount;
   }
 
-  public void setFilledFeeds(BigDecimal filledFeeds) {
-    this.filledFeeds = filledFeeds;
+  public void setFilledFees(BigDecimal filledFees) {
+    this.filledFees = filledFees;
   }
 
   public void setId(long id) {

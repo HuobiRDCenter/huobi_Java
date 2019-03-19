@@ -103,7 +103,7 @@ public interface SyncRequestClient {
    * Get the most recent trades with their price, volume and direction.
    *
    * @param symbol The symbol, like "btcusdt". (mandatory)
-   * @param size The  number of historical trade requested, range [1 - 2000] (mandatory)
+   * @param size The number of historical trade requested, range [1 - 2000] (mandatory)
    * @return The list of trade, see {@link Trade}
    */
   List<Trade> getHistoricalTrade(String symbol, int size);
@@ -133,7 +133,7 @@ public interface SyncRequestClient {
   BestQuote getBestQuote(String symbol);
 
   /**
-   * Get the withdraw records of an account
+   * Get the withdraw records of an account.
    *
    * @param currency The currency, like "btc". (mandatory)
    * @param fromId The beginning withdraw record id. (mandatory)
@@ -143,7 +143,7 @@ public interface SyncRequestClient {
   List<Withdraw> getWithdrawHistory(String currency, long fromId, int size);
 
   /**
-   * Get the deposit records of an account
+   * Get the deposit records of an account.
    *
    * @param currency The currency, like "btc". (mandatory)
    * @param fromId The beginning deposit record id. (mandatory)
@@ -162,7 +162,7 @@ public interface SyncRequestClient {
   Long transfer(TransferRequest transferRequest);
 
   /**
-   * Submit a request to borrow with margin account
+   * Submit a request to borrow with margin account.
    *
    * @param symbol The trading symbol to borrow margin, e.g. "btcusdt", "bccbtc". (mandatory)
    * @param currency The currency to borrow,like "btc". (mandatory)
@@ -176,12 +176,12 @@ public interface SyncRequestClient {
    *
    * @param loadId The previously returned order id when loan order was created. (mandatory)
    * @param amount The amount of currency to repay. (mandatory)
-   * @return The margin order id
+   * @return The margin order id.
    */
   long repayLoan(long loadId, BigDecimal amount);
 
   /**
-   * Get the margin loan records
+   * Get the margin loan records.
    *
    * @param loanOrderRequest The information of order request, including symbol, start-date,
    * end-date etc, see {@link LoanOrderRequest}
@@ -198,22 +198,22 @@ public interface SyncRequestClient {
   LastTradeAndBestQuote getLastTradeAndBestQuote(String symbol);
 
   /**
-   * Get the balance of a margin account.
+   * Get the balance of a all accounts.
    *
    * @return The information of account balance.
    */
   List<Account> getAccountBalance();
 
   /**
-   * Get the account of the specified  type
+   * Get the account of the specified type
    *
-   * @param accountType The specified account  type
+   * @param accountType The specified account type. (mandatory)
    * @return The information of the account that is specified type.
    */
   Account getAccountBalance(AccountType accountType);
 
   /**
-   * Make an order in huobi
+   * Make an order in huobi.
    *
    * @param newOrderRequest The request of an order ,including account-id,amount , price ,etc.
    * @return The order id.
@@ -231,23 +231,23 @@ public interface SyncRequestClient {
   List<Order> getOpenOrders(OpenOrderRequest openOrderRequest);
 
   /**
-   * Submit cancel request for cancelling an order
+   * Submit cancel request for cancelling an order.
    *
-   * @param symbol The symbol, like "btcusdt".
-   * @param orderId The order id.
+   * @param symbol The symbol, like "btcusdt". (mandatory)
+   * @param orderId The order id. (mandatory)
    */
   void cancelOrder(String symbol, long orderId);
 
   /**
-   * Submit cancel request for cancelling an order
+   * Submit cancel request for cancelling multiple orders.
    *
-   * @param symbol The symbol, like "btcusdt".
-   * @param orderIds The list of order id.
+   * @param symbol The symbol, like "btcusdt". (mandatory)
+   * @param orderIds The list of order id. the max size is 50. (mandatory)
    */
   void cancelOrders(String symbol, List<Long> orderIds);
 
   /**
-   * request to cancel open orders.
+   * Request to cancel open orders.
    *
    * @param request The request for cancel open order.
    * @return Status of batch cancel result.
@@ -255,25 +255,25 @@ public interface SyncRequestClient {
   BatchCancelResult cancelOpenOrders(CancelOpenOrderRequest request);
 
   /**
-   * Get the details of an order
+   * Get the details of an order.
    *
-   * @param symbol The symbol, like "btcusdt".
-   * @param orderId The order id
-   * @return The information of order
+   * @param symbol The symbol, like "btcusdt". (mandatory)
+   * @param orderId The order id. (mandatory)
+   * @return The information of order.
    */
   Order getOrder(String symbol, long orderId);
 
   /**
-   * Get detail match results of an order
+   * Get detail match results of an order.
    *
-   * @param symbol The symbol, like "btcusdt".
-   * @param orderId order id
-   * @return The list of match result
+   * @param symbol The symbol, like "btcusdt". (mandatory)
+   * @param orderId The order id. (mandatory)
+   * @return The list of match result.
    */
   List<MatchResult> getMatchResults(String symbol, long orderId);
 
   /**
-   * Search for the trade records of an account
+   * Search for the trade records of an account.
    *
    * @param matchResultRequest A specific account information, including symbols, types etc.
    * @return The list of match result.
@@ -281,18 +281,18 @@ public interface SyncRequestClient {
   List<MatchResult> getMatchResults(MatchResultRequest matchResultRequest);
 
   /**
-   * Submit a request to withdraw some asset from an account
+   * Submit a request to withdraw some asset from an account.
    *
-   * @param withdrawRequest The withdraw request, including address, amount, etc
-   * @return Withdraw id
+   * @param withdrawRequest The withdraw request, including address, amount, etc.
+   * @return Withdraw id.
    */
   long withdraw(WithdrawRequest withdrawRequest);
 
   /**
-   * Cancel an withdraw request
+   * Cancel an withdraw request.
    *
-   * @param currency The currency, like "btc".
-   * @param withdrawId withdraw id
+   * @param currency The currency, like "btc". (mandatory)
+   * @param withdrawId withdraw id (mandatory)
    */
   void cancelWithdraw(String currency, long withdrawId);
 
@@ -306,7 +306,7 @@ public interface SyncRequestClient {
 
 
   /**
-   * Transfer Asset between Parent and Sub Account
+   * Transfer Asset between Parent and Sub Account.
    *
    * @param req The request for transferring in master.
    * @return order id.
@@ -314,14 +314,14 @@ public interface SyncRequestClient {
   long transferBetweenParentAndSub(TransferMasterRequest req);
 
   /**
-   * Get the Aggregated Balance of all Sub-accounts of the Current User
+   * Get the aggregated balance of all sub-accounts of the current user.
    *
-   * @return the balance of all the sub-account aggregated.
+   * @return The balance of all the sub-account aggregated.
    */
   List<Balance> getCurrentUserAggregatedBalance();
 
   /**
-   * Get Account Balance of a Sub-Account
+   * Get account balance of a sub-account.
    *
    * @param subId the specified sub account id to get balance for.
    * @return the balance of a sub-account specified by sub-account uid.
@@ -363,11 +363,11 @@ public interface SyncRequestClient {
    *
    * @param etfSymbol The symbol, currently only support hb10. (mandatory)
    * @param interval The candlestick/kline interval, MIN1, MIN5, DAY1 etc. (mandatory)
-   * @param limit The maximum number of candlestick/kline requested. Range [1 - 2000] (optional)
+   * @param size The maximum number of candlestick/kline requested. Range [1 - 2000] (optional)
    * @return The list of candlestick/kline data, see {@link Candlestick}
    */
   List<Candlestick> getEtfCandlestick(String etfSymbol, CandlestickInterval interval,
-      Integer limit);
+      Integer size);
 
   /**
    * Create the synchronous client. All interfaces defined in synchronous client are implemented by

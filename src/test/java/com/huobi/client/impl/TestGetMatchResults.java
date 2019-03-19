@@ -118,7 +118,7 @@ public class TestGetMatchResults {
     Date Startdate = new Date();
     Date Enddate = new Date();
     MatchResultRequest matchResultRequest = new MatchResultRequest("btcht",
-        OrderType.SELL_LIMIT, Startdate, Enddate, AccountType.SPOT, 150, "hh");
+        OrderType.SELL_LIMIT, Startdate, Enddate, 50, "hh");
     RestApiRequest<List<MatchResult>> restApiRequest = impl.getMatchResults(matchResultRequest);
 
     assertTrue(restApiRequest.request.url().toString().contains("/v1/order/matchresults"));
@@ -136,7 +136,7 @@ public class TestGetMatchResults {
         restApiRequest.request.url().queryParameter("end-date"));
 
     assertEquals("hh", restApiRequest.request.url().queryParameter("from"));
-    assertEquals("150", restApiRequest.request.url().queryParameter("size"));
+    assertEquals("50", restApiRequest.request.url().queryParameter("size"));
   }
 
 
@@ -152,7 +152,7 @@ public class TestGetMatchResults {
     assertEquals(100047251154L, matchResults.get(1).getMatchId());
     assertEquals(24966984923L, matchResults.get(1).getOrderId());
     assertEquals(new BigDecimal("1.89"), matchResults.get(1).getFilledAmount());
-    assertEquals(new BigDecimal("0.00000061508"), matchResults.get(1).getFilledFeeds());
+    assertEquals(new BigDecimal("0.00000061508"), matchResults.get(1).getFilledFees());
     assertEquals(new BigDecimal("0.00030754"), matchResults.get(1).getPrice());
     assertEquals("spot-api", matchResults.get(1).getSource().toString());
     assertEquals("htbtc", matchResults.get(1).getSymbol());

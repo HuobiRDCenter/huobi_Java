@@ -102,7 +102,7 @@ public class TestGetMatchResult {
     assertEquals(100047251154L, matchResults.get(0).getMatchId());
     assertEquals(24966984923L, matchResults.get(0).getOrderId());
     assertEquals(new BigDecimal("1"), matchResults.get(0).getFilledAmount());
-    assertEquals(new BigDecimal("0.00000061508"), matchResults.get(0).getFilledFeeds());
+    assertEquals(new BigDecimal("0.00000061508"), matchResults.get(0).getFilledFees());
     assertEquals(new BigDecimal("0.00030754"), matchResults.get(0).getPrice());
     assertEquals("spot-api", matchResults.get(0).getSource().toString());
     assertEquals("htbtc", matchResults.get(0).getSymbol());

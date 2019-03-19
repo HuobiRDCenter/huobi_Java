@@ -80,7 +80,7 @@ public class TestSubscribeOrderUpdateEvent {
     assertNull(request.connectionHandler);
     request.authHandler.handle(websocketConnection);
     String subscription = websocketConnection.getWebsocket().popOutputMessage();
-    assertTrue(subscription.contains("orders"));
+    assertTrue(subscription.contains("orders.btcusdt"));
   }
 
   @Test

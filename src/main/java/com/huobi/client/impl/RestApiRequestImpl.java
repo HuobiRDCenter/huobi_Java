@@ -344,9 +344,9 @@ class RestApiRequestImpl {
     return request;
   }
 
-  private RestApiRequest<List<Withdraw>> withdrawHistory(
-      String currency, Long fromId, Integer size) {
-    InputChecker.checker().checkSymbol(currency).shouldNotNull(fromId, "fromTd")
+  RestApiRequest<List<Withdraw>> getWithdrawHistory(String currency, Long fromId,
+      Integer size) {
+    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromTd")
         .shouldNotNull(size, "size");
     RestApiRequest<List<Withdraw>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -379,9 +379,9 @@ class RestApiRequestImpl {
     return request;
   }
 
-  private RestApiRequest<List<Deposit>> depositHistory(
-      String currency, Long fromId, Integer size) {
-    InputChecker.checker().checkSymbol(currency).shouldNotNull(fromId, "fromTd")
+  RestApiRequest<List<Deposit>> getDepositHistory(String currency, Long fromId,
+      Integer size) {
+    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromTd")
         .shouldNotNull(size, "size");
     RestApiRequest<List<Deposit>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -414,16 +414,6 @@ class RestApiRequestImpl {
     return request;
   }
 
-  RestApiRequest<List<Withdraw>> getWithdrawHistory(String currency, Long fromId,
-      Integer size) {
-    return withdrawHistory(currency, fromId, size);
-  }
-
-  RestApiRequest<List<Deposit>> getDepositHistory(String currency, Long fromId,
-      Integer size) {
-    return depositHistory(currency, fromId, size);
-  }
-
   RestApiRequest<List<Balance>> getBalance(Account account) {
     RestApiRequest<List<Balance>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
@@ -447,7 +437,10 @@ class RestApiRequestImpl {
 
   RestApiRequest<Long> transfer(TransferRequest transferRequest) {
     InputChecker.checker().checkSymbol(transferRequest.symbol)
-        .checkSymbol(transferRequest.currency);
+        .checkCurrency(transferRequest.currency)
+        .shouldNotNull(transferRequest.from, "from")
+        .shouldNotNull(transferRequest.to, "to")
+        .shouldNotNull(transferRequest.amount, "amount");
     String address;
     if (transferRequest.from == AccountType.SPOT && transferRequest.to == AccountType.MARGIN) {
       address = "/v1/dw/transfer-in/margin";
@@ -475,7 +468,7 @@ class RestApiRequestImpl {
 
 
   RestApiRequest<Long> applyLoan(String symbol, String currency, BigDecimal amount) {
-    InputChecker.checker().checkSymbol(symbol).checkSymbol(currency)
+    InputChecker.checker().checkSymbol(symbol).checkCurrency(currency)
         .shouldNotNull(amount, "amount");
     RestApiRequest<Long> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -493,6 +486,7 @@ class RestApiRequestImpl {
 
   RestApiRequest<Long> repayLoan(long loadId, BigDecimal amount) {
 
+    InputChecker.checker().shouldNotNull(amount, "amount");
     RestApiRequest<Long> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToPost("amount", amount);
@@ -529,7 +523,6 @@ class RestApiRequestImpl {
         loan.setCurrency(item.getString("currency"));
         loan.setId(item.getLong("id"));
         loan.setState(LoanOrderStates.lookup(item.getString("state")));
-        item.getString("account-id");
         loan.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         loan.setUserId(item.getLong("user-id"));
@@ -589,19 +582,16 @@ class RestApiRequestImpl {
 
   RestApiRequest<List<Order>> getOpenOrders(OpenOrderRequest openOrderRequest) {
     InputChecker.checker().checkSymbol(openOrderRequest.getSymbol())
+        .shouldNotNull(openOrderRequest.getAccountType(), "accountType")
         .checkRange(openOrderRequest.getSize(), 1, 2000, "size");
-    String accountId = null;
     AccountType accountType = openOrderRequest.getAccountType();
-    if (accountType != null) {
-      Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType);
-      if (account == null) {
-        throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
-      }
-      accountId = Long.toString(account.getId());
+    Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType);
+    if (account == null) {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
     RestApiRequest<List<Order>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("account-id", accountId)
+        .putToUrl("account-id", account.getId())
         .putToUrl("symbol", openOrderRequest.getSymbol())
         .putToUrl("side", openOrderRequest.getSide())
         .putToUrl("size", openOrderRequest.getSize());
@@ -733,7 +723,7 @@ class RestApiRequestImpl {
         matchResult.setCreatedTimestamp(
             TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
         matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
-        matchResult.setFilledFeeds(item.getBigDecimal("filled-fees"));
+        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
         matchResult.setMatchId(item.getLong("match-id"));
         matchResult.setOrderId(item.getLong("order-id"));
         matchResult.setPrice(item.getBigDecimal("price"));
@@ -748,7 +738,8 @@ class RestApiRequestImpl {
   }
 
   RestApiRequest<List<MatchResult>> getMatchResults(MatchResultRequest matchResultRequest) {
-    InputChecker.checker().checkSymbol(matchResultRequest.getSymbol());
+    InputChecker.checker().checkSymbol(matchResultRequest.getSymbol())
+        .checkRange(matchResultRequest.getSize(), 1, 100, "size");
     RestApiRequest<List<MatchResult>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", matchResultRequest.getSymbol())
@@ -768,7 +759,7 @@ class RestApiRequestImpl {
         matchResult.setCreatedTimestamp(
             TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
         matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
-        matchResult.setFilledFeeds(item.getBigDecimal("filled-fees"));
+        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
         matchResult.setMatchId(item.getLong("match-id"));
         matchResult.setOrderId(item.getLong("order-id"));
         matchResult.setPrice(item.getBigDecimal("price"));
@@ -784,8 +775,7 @@ class RestApiRequestImpl {
 
   RestApiRequest<Long> withdraw(WithdrawRequest withdrawRequest) {
     InputChecker.checker()
-        .shouldNotNull(withdrawRequest.getCurrency(), "currency")
-        .checkSymbol(withdrawRequest.getCurrency())
+        .checkCurrency(withdrawRequest.getCurrency())
         .shouldNotNull(withdrawRequest.getAddress(), "address")
         .shouldNotNull(withdrawRequest.getAmount(), "amount");
     RestApiRequest<Long> request = new RestApiRequest<>();
@@ -855,7 +845,7 @@ class RestApiRequestImpl {
 
   RestApiRequest<Long> transferBetweenParentAndSub(TransferMasterRequest req) {
     InputChecker.checker()
-        .checkSymbol(req.getCurrency())
+        .checkCurrency(req.getCurrency())
         .shouldNotNull(req.getAmount(), "amount")
         .shouldNotNull(req.getSubUid(), "sub-uid")
         .shouldNotNull(req.getType(), "type");
@@ -922,7 +912,7 @@ class RestApiRequestImpl {
     InputChecker.checker()
         .checkETF(symbol)
         .checkRange(size, 1, 2000, "size")
-        .shouldNotNull(interval, "CandlestickInterval");
+        .shouldNotNull(interval, "interval");
 
     RestApiRequest<List<Candlestick>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -983,7 +973,7 @@ class RestApiRequestImpl {
   }
 
   RestApiRequest<Void> etfSwap(String etfSymbol, int amount, EtfSwapType swapType) {
-    InputChecker.checker().checkSymbol(etfSymbol);
+    InputChecker.checker().checkSymbol(etfSymbol).shouldNotNull(swapType, "swapType");
     RestApiRequest<Void> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToPost("etf_name", etfSymbol)

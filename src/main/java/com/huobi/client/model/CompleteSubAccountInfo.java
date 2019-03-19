@@ -44,7 +44,7 @@ public class CompleteSubAccountInfo {
    *
    * @return The balance list.
    */
-  public List<Balance> getSubAccountList() {
+  public List<Balance> getBalanceList() {
     return balances;
   }
 

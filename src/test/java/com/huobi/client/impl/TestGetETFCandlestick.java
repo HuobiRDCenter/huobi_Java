@@ -32,12 +32,12 @@ public class TestGetETFCandlestick {
       "  \"data\": [\n" +
       "{\n" +
       "    \"id\": 1499184000,\n" +
-      "    \"amount\": 0,\n" +
-      "    \"open\": 0.7694,\n" +
-      "    \"close\": 0.769,\n" +
+      "    \"amount\": 123.123,\n" +
+      "    \"open\": 0.7794,\n" +
+      "    \"close\": 0.779,\n" +
       "    \"low\": 0.769,\n" +
       "    \"high\": 0.7694,\n" +
-      "    \"vol\": 0\n" +
+      "    \"vol\": 456.456\n" +
       "  },\n" +
       "]\n" +
       "}\n";
@@ -48,8 +48,8 @@ public class TestGetETFCandlestick {
       "  \"data\": [\n" +
       "{\n" +
       "    \"amount\": 0,\n" +
-      "    \"open\": 0.7694,\n" +
-      "    \"close\": 0.769,\n" +
+      "    \"open\": 0.7794,\n" +
+      "    \"close\": 0.779,\n" +
       "    \"low\": 0.769,\n" +
       "    \"high\": 0.7694,\n" +
       "    \"vol\": 0\n" +
@@ -131,10 +131,10 @@ public class TestGetETFCandlestick {
     assertEquals(TimeService.convertCSTInSecondToUTC(1499184000L), candlestickList.get(0).getTimestamp());
     assertEquals(new BigDecimal("0.7694"), candlestickList.get(0).getHigh());
     assertEquals(new BigDecimal("0.769"), candlestickList.get(0).getLow());
-    assertEquals(new BigDecimal("0.7694"), candlestickList.get(0).getOpen());
-    assertEquals(new BigDecimal("0.769"), candlestickList.get(0).getClose());
-    assertEquals(new BigDecimal("0"), candlestickList.get(0).getAmount());
-    assertEquals(new BigDecimal("0"), candlestickList.get(0).getVolume());
+    assertEquals(new BigDecimal("0.7794"), candlestickList.get(0).getOpen());
+    assertEquals(new BigDecimal("0.779"), candlestickList.get(0).getClose());
+    assertEquals(new BigDecimal("123.123"), candlestickList.get(0).getAmount());
+    assertEquals(new BigDecimal("456.456"), candlestickList.get(0).getVolume());
     assertEquals(0, candlestickList.get(0).getCount());
 
     }

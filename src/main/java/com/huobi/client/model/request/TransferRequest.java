@@ -10,13 +10,14 @@ import java.math.BigDecimal;
 public class TransferRequest {
 
   /**
-   * The request of transfer(in or out)
+   * The request of transfer(in or out), currently the transfer interface only supports the
+   * transformation between SPOT and MARGIN.
    *
-   * @param symbol   The symbol, like "btcusdt". (mandatory)
-   * @param from     The type, transfer from which account. (mandatory)
-   * @param to       The type, transfer to which account. (mandatory)
+   * @param symbol The symbol, like "btcusdt". (mandatory)
+   * @param from The type, transfer from which account, could be SPOT or MARGIN. (mandatory)
+   * @param to The type, transfer to which account, could be SPOT or MARGIN. (mandatory)
    * @param currency The currency of transfer. (mandatory)
-   * @param amount   The amount of transfer. (mandatory)
+   * @param amount The amount of transfer. (mandatory)
    */
   public TransferRequest(
       String symbol,

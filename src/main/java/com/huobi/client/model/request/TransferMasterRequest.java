@@ -13,10 +13,10 @@ public class TransferMasterRequest {
   /**
    * The request of transfer asset between parent and sub account.
    *
-   * @param subUid   The target sub account uid to transfer to or from.
-   * @param currency The crypto currency to transfer.
-   * @param amount   The amount of asset to transfer.
-   * @param type     The type of transfer, see {@link TransferMasterType}
+   * @param subUid   The target sub account uid to transfer to or from. (mandatory)
+   * @param currency The crypto currency to transfer. (mandatory)
+   * @param amount   The amount of asset to transfer. (mandatory)
+   * @param type     The type of transfer, see {@link TransferMasterType} (mandatory)
    */
   public TransferMasterRequest(
       Long subUid,

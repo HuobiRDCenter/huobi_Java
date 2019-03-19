@@ -55,6 +55,18 @@ class InputChecker {
     return checkerInst;
   }
 
+  InputChecker checkCurrency(String currency) {
+    if (currency == null || "".equals(currency)) {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR,
+          "[Input] Currency is mandatory");
+    }
+    if (isSpecialChar(currency)) {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR,
+          "[Input] " + currency + " is invalid currency");
+    }
+    return checkerInst;
+  }
+
   InputChecker checkETF(String symbol) {
     if (!"hb10".equals(symbol)) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR,

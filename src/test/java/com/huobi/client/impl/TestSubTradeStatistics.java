@@ -61,7 +61,7 @@ public class TestSubTradeStatistics {
     StubWebsocketConnection websocketConnection = new StubWebsocketConnection(request);
     request.connectionHandler.handle(websocketConnection);
     String subscription = websocketConnection.getWebsocket().popOutputMessage();
-    assertTrue(subscription.contains(".detail"));
+    assertTrue(subscription.contains("btcusdt.detail"));
   }
 
   @Test

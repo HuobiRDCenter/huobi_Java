@@ -11,7 +11,7 @@ public enum WithdrawState {
 
   SUBMITTED("submitted"),
   REEXAMINE("reexamine"),
-  CANCLED("canceled"),
+  CANCELED("canceled"),
   PASS("pass"),
   REJECT("reject"),
   PRETRANSFER("pre-transfer"),

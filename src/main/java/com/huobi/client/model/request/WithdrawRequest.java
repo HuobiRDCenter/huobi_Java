@@ -3,12 +3,12 @@ package com.huobi.client.model.request;
 import java.math.BigDecimal;
 
 /**
- * The criteria for a withdraw request
+ * The criteria for a withdraw request.
  */
 public class WithdrawRequest {
 
   /**
-   * The criteria for a withdraw request
+   * The criteria for a withdraw request.
    *
    * @param address The destination address of this withdraw. (mandatory)
    * @param amount The amount of currency to withdraw. (mandatory)
@@ -21,7 +21,7 @@ public class WithdrawRequest {
   }
 
   /**
-   * The criteria for a withdraw request
+   * The criteria for a withdraw request.
    *
    * @param address The destination address of this withdraw. (mandatory)
    * @param amount The amount of currency to withdraw. (mandatory)

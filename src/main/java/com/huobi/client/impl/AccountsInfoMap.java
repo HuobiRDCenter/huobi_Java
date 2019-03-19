@@ -21,7 +21,7 @@ public class AccountsInfoMap {
   static User getUser(String key) {
     if ("".equals(key) || key == null) {
       throw new HuobiApiException(
-          HuobiApiException.RUNTIME_ERROR, "[User] Key is empty or null");
+          HuobiApiException.KEY_MISSING, "[User] Key is empty or null");
     }
     if (!userMap.containsKey(key)) {
       throw new HuobiApiException(

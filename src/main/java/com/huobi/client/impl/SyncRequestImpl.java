@@ -70,7 +70,7 @@ public class SyncRequestImpl implements SyncRequestClient {
 
   @Override
   public PriceDepth getPriceDepth(String symbol) {
-    return RestApiInvoker.callSync(requestImpl.getPriceDepth(symbol, null));
+    return RestApiInvoker.callSync(requestImpl.getPriceDepth(symbol, 20));
   }
 
   @Override
