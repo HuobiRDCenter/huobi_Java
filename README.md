@@ -62,7 +62,7 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
 
 *The maven installation will be supported in final version.*
 
-For Beta version, please imoprt the source code in java IDE (idea or eclipse)
+For Beta version, please import the source code in java IDE (idea or eclipse)
 
 The example code is in huobi-api-sdk/java/src/test/java/com/huobi/client/examples.
 
@@ -465,7 +465,7 @@ asyncClient.getBestQuote("btcusdt", (bestQuoteResult) -> {
 ```java
 //Synchronous
 List<Trade> tradeList = syncClient.getHistoricalTrade("btcusdt", 5);
-System.out.println(trade.getPrice());
+System.out.println(tradeList.get(0).getPrice());
 ```
 
 ```java
@@ -543,7 +543,7 @@ asyncClient.withdraw(request, (withdrawResult) -> {
 
 ```java
 //Synchronous
-syncClient.cancelWithdraw(id);
+syncClient.cancelWithdraw("btc", id);
 ```
 
 ```java
