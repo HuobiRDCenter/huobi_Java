@@ -125,6 +125,7 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       watchDog.onClosedNormally(connection);
       connection.close();
     }
+    connections.clear();
   }
 
   @Override

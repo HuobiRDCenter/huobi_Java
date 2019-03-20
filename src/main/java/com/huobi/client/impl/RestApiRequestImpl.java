@@ -1007,6 +1007,7 @@ class RestApiRequestImpl {
         etfSwapHistory.setCurrency(dataItem.getString("currency"));
         etfSwapHistory.setAmount(dataItem.getBigDecimal("amount"));
         etfSwapHistory.setType(EtfSwapType.lookup(dataItem.getString("type")));
+        etfSwapHistory.setStatus(dataItem.getInteger("status"));
         JsonWrapper detail = dataItem.getJsonObject("detail");
         etfSwapHistory.setRate(detail.getBigDecimal("rate"));
         etfSwapHistory.setFee(detail.getBigDecimal("fee"));

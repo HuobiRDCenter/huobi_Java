@@ -144,6 +144,7 @@ public class TestGetEtfSwapHistory {
     assertEquals(1, etfSwapHistoryList.get(0).getObtainCurrencyList().size());
     assertEquals("hb10", etfSwapHistoryList.get(0).getObtainCurrencyList().get(0).getCurrency());
     assertEquals(new BigDecimal("1000"), etfSwapHistoryList.get(0).getObtainCurrencyList().get(0).getAmount());
+    assertEquals(2, etfSwapHistoryList.get(0).getStatus());
   }
 
   @Test

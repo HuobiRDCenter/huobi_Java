@@ -3,7 +3,7 @@ package com.huobi.client.model.event;
 import com.huobi.client.model.Order;
 
 /**
- * The order update received by subscription of candlestick/kline.
+ * The order update received by subscription of order update.
  */
 public class OrderUpdateEvent {
 
