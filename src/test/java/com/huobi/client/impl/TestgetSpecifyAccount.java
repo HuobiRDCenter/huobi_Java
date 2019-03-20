@@ -108,15 +108,15 @@ public class TestgetSpecifyAccount {
 
     assertEquals(9910050L, completeSubAccountInfos.get(1).getId());
     assertEquals(AccountType.POINT, completeSubAccountInfos.get(1).getType());
-    assertEquals("btc", completeSubAccountInfos.get(0).getSubAccountList().get(0).getCurrency());
-    assertEquals(BalanceType.TRADE, completeSubAccountInfos.get(0).getSubAccountList().get(0).getType());
-    assertEquals(new BigDecimal("1"), completeSubAccountInfos.get(0).getSubAccountList().get(0).getBalance());
-    assertEquals("eth", completeSubAccountInfos.get(0).getSubAccountList().get(1).getCurrency());
-    assertEquals(BalanceType.TRADE, completeSubAccountInfos.get(0).getSubAccountList().get(1).getType());
-    assertEquals(new BigDecimal("1934"), completeSubAccountInfos.get(0).getSubAccountList().get(1).getBalance());
+    assertEquals("btc", completeSubAccountInfos.get(0).getBalanceList().get(0).getCurrency());
+    assertEquals(BalanceType.TRADE, completeSubAccountInfos.get(0).getBalanceList().get(0).getType());
+    assertEquals(new BigDecimal("1"), completeSubAccountInfos.get(0).getBalanceList().get(0).getBalance());
+    assertEquals("eth", completeSubAccountInfos.get(0).getBalanceList().get(1).getCurrency());
+    assertEquals(BalanceType.TRADE, completeSubAccountInfos.get(0).getBalanceList().get(1).getType());
+    assertEquals(new BigDecimal("1934"), completeSubAccountInfos.get(0).getBalanceList().get(1).getBalance());
 
-    assertEquals(0, completeSubAccountInfos.get(1).getSubAccountList().size());
-    assertEquals(2, completeSubAccountInfos.get(0).getSubAccountList().size());
+    assertEquals(0, completeSubAccountInfos.get(1).getBalanceList().size());
+    assertEquals(2, completeSubAccountInfos.get(0).getBalanceList().size());
   }
 
   @Test
