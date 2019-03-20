@@ -11,7 +11,7 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
 - [Beginning](#Beginning)
   - [Installation](#Installation)
   - [Quick Start](#Quick-Start)
-  - [Create service](#Create-service)
+  - [Request vs. Subscription](#request-vs.-subscription)
   - [Clients](#Clients)
   - [Create client](#create-client)
   - [Custom host](#custom-host)
@@ -19,7 +19,10 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
   - [Synchronous](#Synchronous)
   - [Asynchronous](#Asynchronous)
   - [Subscription](#Subscription)
+  - [Errir handling](error-handling)
+
 - [Request example](#Request-example)
+
   - [Reference data](#Reference-data)
     - [Exchange timestamp](#Exchange-timestamp)
     - [Symbol and currencies](#symbol-and-currencies)
@@ -40,6 +43,7 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
     - [Cancel order](#cancel-order)
     - [Cancel open orders](#cancel-open-orders)
     - [Get order info](#get-order-info)
+    - [Historical orders](#historical_orders)
   - [Margin Loan](#margin-loan)
     - [Apply loan](#apply-loan)
     - [Reply loan](#reply-loan)
@@ -50,7 +54,8 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
   - [Subscribe order update](#subscribe-order-update)
   - [Subscribe account change](#subscribe-account-change)
   - [Unsubscribe](#unsubscribe)
-- [License](#license)
+
+  
 
 ## Beginning
 
