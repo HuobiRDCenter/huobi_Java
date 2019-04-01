@@ -13,6 +13,7 @@ import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
+import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -264,5 +265,10 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public EtfSwapConfig getEtfSwapConfig(String etfSymbol) {
     return RestApiInvoker.callSync(requestImpl.getEtfSwapConfig(etfSymbol));
+  }
+
+  @Override
+  public List<MarginBalanceDetail> getMarginBalanceDetail(String symbol) {
+    return RestApiInvoker.callSync(requestImpl.getMarginBalanceDetail(symbol));
   }
 }

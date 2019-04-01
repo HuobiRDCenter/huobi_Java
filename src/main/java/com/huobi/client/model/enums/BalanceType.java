@@ -6,7 +6,11 @@ public enum BalanceType {
   TRADE("trade"),
   FROZEN("frozen"),
   LOAN("loan"),
-  INTEREST("interest");
+  INTEREST("interest"),
+  LOAN_AVAILABLE("loan-available"),
+  TRANSFER_OUT_AVAILABLE("transfer-out-available");
+
+
 
   private final String code;
 

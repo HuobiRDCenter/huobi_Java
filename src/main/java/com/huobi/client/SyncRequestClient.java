@@ -13,6 +13,7 @@ import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
+import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -368,6 +369,14 @@ public interface SyncRequestClient {
    */
   List<Candlestick> getEtfCandlestick(String etfSymbol, CandlestickInterval interval,
       Integer size);
+
+  /**
+   * Get the Balance of the Margin Loan Account
+   *
+   * @param symbol The currency, like "btc". (mandatory)
+   * @return The margin loan account detail.
+   */
+  List<MarginBalanceDetail> getMarginBalanceDetail(String symbol);
 
   /**
    * Create the synchronous client. All interfaces defined in synchronous client are implemented by

@@ -17,6 +17,7 @@ import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.Loan;
+import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -507,7 +508,9 @@ class RestApiRequestImpl {
         .putToUrl("end-date", loanOrderRequest.getEndDate(), "yyyy-MM-dd")
         .putToUrl("states", loanOrderRequest.getStates())
         .putToUrl("from", loanOrderRequest.getFromId())
-        .putToUrl("size", loanOrderRequest.getSize());
+        .putToUrl("size", loanOrderRequest.getSize())
+        .putToUrl("direct", loanOrderRequest.getDirection());
+
     request.request = createRequestByGetWithSignature("/v1/margin/loan-orders", builder);
     request.jsonParser = (jsonWrapper -> {
       List<Loan> loans = new LinkedList<>();
@@ -1035,5 +1038,41 @@ class RestApiRequestImpl {
       return etfSwapHistoryList;
     });
     return request;
+  }
+
+  RestApiRequest<List<MarginBalanceDetail>> getMarginBalanceDetail(String symbol) {
+    InputChecker.checker().checkSymbol(symbol);
+    RestApiRequest<List<MarginBalanceDetail>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbol", symbol);
+    request.request = createRequestByGetWithSignature("/v1/margin/accounts/balance", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<MarginBalanceDetail> marginBalanceDetailList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((itemInData) -> {
+        MarginBalanceDetail marginBalanceDetail = new MarginBalanceDetail();
+        marginBalanceDetail.setId(itemInData.getLong("id"));
+        marginBalanceDetail.setType(AccountType.lookup(itemInData.getString("type")));
+        marginBalanceDetail.setSymbol(itemInData.getString("symbol"));
+        marginBalanceDetail.setFlPrice(itemInData.getBigDecimal("fl-price"));
+        marginBalanceDetail.setFlType(itemInData.getString("fl-type"));
+        marginBalanceDetail.setState(AccountState.lookup(itemInData.getString("state")));
+        marginBalanceDetail.setRiskRate(itemInData.getBigDecimal("risk-rate"));
+        List<Balance> balanceList = new LinkedList<>();
+        JsonWrapperArray listArray = itemInData.getJsonArray("list");
+        listArray.forEach((itemInList) -> {
+          Balance balance = new Balance();
+          balance.setCurrency(itemInList.getString("currency"));
+          balance.setType(BalanceType.lookup(itemInList.getString("type")));
+          balance.setBalance(itemInList.getBigDecimal("balance"));
+          balanceList.add(balance);
+        });
+        marginBalanceDetail.setSubAccountBalance(balanceList);
+        marginBalanceDetailList.add(marginBalanceDetail);
+      });
+      return marginBalanceDetailList;
+    });
+    return request;
+
   }
 }

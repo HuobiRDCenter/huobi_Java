@@ -1,6 +1,7 @@
 package com.huobi.client.model.request;
 
 import com.huobi.client.model.enums.LoanOrderStates;
+import com.huobi.client.model.enums.QueryDirection;
 import java.util.Date;
 
 /**
@@ -27,15 +28,17 @@ public class LoanOrderRequest {
    * (optional, can be null).
    * @param fromId Search order id to begin with (optional, can be null).
    * @param size The number of orders to return. (optional, can be null).
+   * @param direction The query direction, prev or next. (optional, can be null)
    */
   public LoanOrderRequest(String symbol, Date startDate, Date endDate,
-      LoanOrderStates states, Long fromId, Long size) {
+      LoanOrderStates states, Long fromId, Long size, QueryDirection direction) {
     this.symbol = symbol;
     this.startDate = startDate;
     this.endDate = endDate;
     this.states = states;
     this.fromId = fromId;
     this.size = size;
+    this.direction = direction;
   }
 
   private final String symbol;
@@ -49,6 +52,8 @@ public class LoanOrderRequest {
   private Long fromId = null;
 
   private Long size = null;
+
+  private QueryDirection direction = null;
 
   public String getSymbol() {
     return symbol;
@@ -72,5 +77,9 @@ public class LoanOrderRequest {
 
   public Long getSize() {
     return size;
+  }
+
+  public QueryDirection getDirection() {
+    return direction;
   }
 }

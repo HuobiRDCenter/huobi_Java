@@ -1,6 +1,7 @@
 package com.huobi.client.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.huobi.client.RequestOptions;
@@ -27,6 +28,7 @@ public class TestEtfSwap {
     RestApiRequest<Void> restApiRequest = impl.etfSwap("hb10", 123, EtfSwapType.ETF_SWAP_IN);
     assertEquals("POST", restApiRequest.request.method());
     assertTrue(restApiRequest.request.url().toString().contains("/etf/swap/in"));
+    assertNotNull(restApiRequest.request.url().queryParameter("Signature"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("hb10", querier.jsonWrapper.getString("etf_name"));
     assertEquals(123, querier.jsonWrapper.getInteger("amount"));

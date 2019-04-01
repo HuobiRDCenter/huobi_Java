@@ -10,9 +10,14 @@ public enum OrderSource {
   WEB("web"),
   API("api"),
   APP("app"),
-  MARGINAPI("margin-api"),
+  FLSYS("fl-sys"),
+  FLMGT("fl-mgt"),
+  SPOTWEB("spot-web"),
   SPOTAPI("spot-api"),
-  INVALID("invalid");
+  SPOTAPP("spot-app"),
+  MARGINAPI("margin-api"),
+  MARGINWEB("margin-web"),
+  MARGINAPP("margin-app");
 
   private final String code;
 

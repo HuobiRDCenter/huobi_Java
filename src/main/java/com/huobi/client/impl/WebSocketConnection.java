@@ -76,7 +76,7 @@ public class WebSocketConnection extends WebSocketListener {
     try {
       String host = new URI(options.getUri()).getHost();
       this.tradingHost = host;
-      if (host.indexOf("api.") == 0) {
+      if (host.indexOf("api") == 0) {
         this.subscriptionMarketUrl = "wss://" + host + "/ws";
         this.subscriptionTradingUrl = "wss://" + host + "/ws/v1";
       } else {

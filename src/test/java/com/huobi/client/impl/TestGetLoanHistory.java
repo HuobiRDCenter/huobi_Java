@@ -14,6 +14,7 @@ import com.huobi.client.model.Loan;
 import com.huobi.client.model.User;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.LoanOrderStates;
+import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.LoanOrderRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -121,7 +122,8 @@ public class TestGetLoanHistory {
           sdf.parse("2019-02-03"),
           LoanOrderStates.CREATED,
           23456L,
-          123L);
+          123L,
+          QueryDirection.NEXT);
     } catch (Exception e) {
       fail("data format error");
     }
@@ -135,7 +137,7 @@ public class TestGetLoanHistory {
     assertEquals("created", request.url().queryParameter("states"));
     assertEquals("23456", request.url().queryParameter("from"));
     assertEquals("123", request.url().queryParameter("size"));
-    assertNull(request.url().queryParameter("direct"));
+    assertEquals("next", request.url().queryParameter("direct"));
   }
 
   @Test

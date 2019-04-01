@@ -13,6 +13,7 @@ import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
+import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -398,6 +399,16 @@ public interface AsyncRequestClient {
    */
   void getEtfCandlestick(String etfSymbol, CandlestickInterval interval,
       Integer limit, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
+
+  /**
+   * Get the Balance of the Margin Loan Account
+   *
+   * @param symbol The currency, like "btc". (mandatory)
+   * @param callback The callback you should implemented.
+   * @return The Margin Loan Account.
+   */
+   void getMarginBalanceDetail(
+       String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
 
   /**
    * Create the asynchronous client. All interfaces defined in asynchronous client are implemented
