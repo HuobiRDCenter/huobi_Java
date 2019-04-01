@@ -403,7 +403,7 @@ public interface AsyncRequestClient {
   /**
    * Get the Balance of the Margin Loan Account
    *
-   * @param symbol The currency, like "btc". (mandatory)
+   * @param symbol The symbol, like "btcusdt". (mandatory)
    * @param callback The callback you should implemented.
    * @return The Margin Loan Account.
    */

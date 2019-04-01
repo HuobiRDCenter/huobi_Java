@@ -373,7 +373,7 @@ public interface SyncRequestClient {
   /**
    * Get the Balance of the Margin Loan Account
    *
-   * @param symbol The currency, like "btc". (mandatory)
+   * @param symbol The symbol, like "btcusdt". (mandatory)
    * @return The margin loan account detail.
    */
   List<MarginBalanceDetail> getMarginBalanceDetail(String symbol);
