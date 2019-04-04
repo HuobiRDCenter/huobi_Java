@@ -156,7 +156,9 @@ class WebsocketRequestImpl {
       priceDepthEvent.setTimestamp(
           TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
       priceDepthEvent.setSymbol(parser.getSymbol());
+      PriceDepth priceDepth = new PriceDepth();
       JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      priceDepth.setTimestamp(TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts")));
       List<DepthEntry> bidList = new LinkedList<>();
       JsonWrapperArray bids = tick.getJsonArray("bids");
       bids.forEachAsArray((item) -> {
@@ -173,7 +175,6 @@ class WebsocketRequestImpl {
         depthEntry.setAmount(item.getBigDecimalAt(1));
         askList.add(depthEntry);
       });
-      PriceDepth priceDepth = new PriceDepth();
       priceDepth.setAsks(askList);
       priceDepth.setBids(bidList);
       priceDepthEvent.setData(priceDepth);

@@ -70,7 +70,7 @@ class RestApiRequestImpl {
     try {
       String host = new URL(this.options.getUrl()).getHost();
       this.tradingHost = host;
-      if (host.indexOf("api.") == 0) {
+      if (host.indexOf("api") == 0) {
         this.marketQueryUrl = "https://" + host;
         this.tradingUrl = "https://" + host;
       } else {
