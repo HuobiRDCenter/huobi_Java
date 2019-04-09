@@ -63,29 +63,9 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
 
 *The SDK is compiled by Java8*
 
-#### Maven
-
-*The maven installation will be supported in final version.*
-
 For Beta version, please import the source code in java IDE (idea or eclipse)
 
 The example code is in huobi-api-sdk/java/src/test/java/com/huobi/client/examples.
-
-
-
-<TBD>
-
-Add the following dependency to ```pom.xml``` in your project. 
-
-```xml
-<dependency>
-  <groupId>xxx</groupId>
-  <artifactId>xxx</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-
 
 ### Quick Start
 
