@@ -50,8 +50,10 @@ import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import okhttp3.Request;
 
 class RestApiRequestImpl {
@@ -1073,6 +1075,29 @@ class RestApiRequestImpl {
       return marginBalanceDetailList;
     });
     return request;
+  }
 
+  RestApiRequest<Map<String, TradeStatistics>> getTickers() {
+    RestApiRequest<Map<String, TradeStatistics>> request = new RestApiRequest<>();
+    request.request = createRequestByGet("/market/tickers", UrlParamsBuilder.build());
+    request.jsonParser = (jsonWrapper -> {
+      Map<String, TradeStatistics> map = new HashMap<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      dataArray.forEach(item -> {
+        TradeStatistics statistics = new TradeStatistics();
+        statistics.setTimestamp(ts);
+        statistics.setAmount(item.getBigDecimal("amount"));
+        statistics.setOpen(item.getBigDecimal("open"));
+        statistics.setClose(item.getBigDecimal("close"));
+        statistics.setHigh(item.getBigDecimal("high"));
+        statistics.setLow(item.getBigDecimal("low"));
+        statistics.setCount(item.getLong("count"));
+        statistics.setVolume(item.getBigDecimal("vol"));
+        map.put(item.getString("symbol"), statistics);
+      });
+      return map;
+    });
+    return request;
   }
 }

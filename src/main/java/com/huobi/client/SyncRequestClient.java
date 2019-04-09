@@ -37,6 +37,7 @@ import com.huobi.client.model.request.WithdrawRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -377,6 +378,13 @@ public interface SyncRequestClient {
    * @return The margin loan account detail.
    */
   List<MarginBalanceDetail> getMarginBalanceDetail(String symbol);
+
+  /**
+   * Get Latest Tickers for All Pairs.
+   *
+   * @return The statistics of all symbols
+   */
+  Map<String, TradeStatistics> getTickers();
 
   /**
    * Create the synchronous client. All interfaces defined in synchronous client are implemented by

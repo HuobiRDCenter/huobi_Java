@@ -36,6 +36,7 @@ import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 public class SyncRequestImpl implements SyncRequestClient {
@@ -174,6 +175,11 @@ public class SyncRequestImpl implements SyncRequestClient {
       }
     }
     return null;
+  }
+
+  @Override
+  public Map<String, TradeStatistics> getTickers() {
+    return RestApiInvoker.callSync(requestImpl.getTickers());
   }
 
   @Override

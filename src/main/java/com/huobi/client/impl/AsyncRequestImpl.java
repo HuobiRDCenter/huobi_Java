@@ -41,6 +41,7 @@ import com.huobi.client.model.request.WithdrawRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public class AsyncRequestImpl implements AsyncRequestClient {
 
@@ -225,6 +226,11 @@ public class AsyncRequestImpl implements AsyncRequestClient {
         callback.onResponse(new FailedAsyncResult<>(accountResult.getException()));
       }
     });
+  }
+
+  @Override
+  public void getTickers(ResponseCallback<AsyncResult<Map<String, TradeStatistics>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getTickers(), callback);
   }
 
   @Override

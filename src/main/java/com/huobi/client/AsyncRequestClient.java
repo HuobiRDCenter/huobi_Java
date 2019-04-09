@@ -36,6 +36,7 @@ import com.huobi.client.model.request.WithdrawRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Asynchronous request interface, invoking Huobi RestAPI via asynchronous method. All methods in
@@ -405,10 +406,16 @@ public interface AsyncRequestClient {
    *
    * @param symbol The symbol, like "btcusdt". (mandatory)
    * @param callback The callback you should implemented.
-   * @return The Margin Loan Account.
    */
    void getMarginBalanceDetail(
        String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
+
+  /**
+   * Get Latest Tickers for All Pairs.
+   *
+   * @param callback The callback you should implemented.
+   */
+  void getTickers(ResponseCallback<AsyncResult<Map<String, TradeStatistics>>> callback);
 
   /**
    * Create the asynchronous client. All interfaces defined in asynchronous client are implemented
