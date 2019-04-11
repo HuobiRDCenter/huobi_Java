@@ -52,5 +52,4 @@ public abstract class Channels {
     json.put("id", TimeService.getCurrentTimeStamp() + "");
     return json.toJSONString();
   }
-
 }
