@@ -32,7 +32,7 @@ public class HistoricalOrdersRequest {
    * @param size The size of orders.  (optional, can be null)
    */
   public HistoricalOrdersRequest(String symbol, OrderState state,
-      OrderType type, Date startDate, Date endDate, Integer startId, Integer size) {
+      OrderType type, Date startDate, Date endDate, Long startId, Integer size) {
     this.symbol = symbol;
     this.state = state;
     this.type = type;
@@ -47,7 +47,7 @@ public class HistoricalOrdersRequest {
   private OrderType type = null;
   private Date startDate = null;
   private Date endDate = null;
-  private Integer startId = null;
+  private Long startId = null;
   private Integer size = null;
 
   public String getSymbol() {
@@ -70,7 +70,7 @@ public class HistoricalOrdersRequest {
     return endDate;
   }
 
-  public Integer getStartId() {
+  public Long getStartId() {
     return startId;
   }
 
