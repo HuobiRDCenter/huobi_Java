@@ -9,6 +9,9 @@ import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.SucceededAsyncResult;
 import com.huobi.client.model.enums.EtfStatus;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -22,7 +25,7 @@ import org.slf4j.LoggerFactory;
 abstract class RestApiInvoker {
 
   private static final Logger log = LoggerFactory.getLogger(RestApiInvoker.class);
-  private static final OkHttpClient client = new OkHttpClient();
+  private static final OkHttpClient client = new OkHttpClient().newBuilder().proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("", 1080))).build();
 
   static void checkResponse(JsonWrapper json) {
     try {
