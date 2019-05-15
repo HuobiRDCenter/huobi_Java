@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 abstract class RestApiInvoker {
 
   private static final Logger log = LoggerFactory.getLogger(RestApiInvoker.class);
-  private static final OkHttpClient client = new OkHttpClient().newBuilder().proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("", 1080))).build();
+  private static final OkHttpClient client = new OkHttpClient().newBuilder().proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1080)) ).build();
 
   static void checkResponse(JsonWrapper json) {
     try {
