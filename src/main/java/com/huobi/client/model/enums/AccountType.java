@@ -10,6 +10,8 @@ public enum AccountType {
   MARGIN("margin"),
   OTC("otc"),
   POINT("point"),
+  MINEPOOL("minepool"),
+  ETF("etf"),
   UNKNOWN("unknown");
 
   private final String code;
