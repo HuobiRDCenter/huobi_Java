@@ -4,9 +4,12 @@ import java.util.Date;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
 
+import lombok.Data;
+
 /**
  * The request of historical orders.
  */
+@Data
 public class HistoricalOrdersRequest {
 
   /**
@@ -19,7 +22,6 @@ public class HistoricalOrdersRequest {
     this.symbol = symbol;
     this.state = state;
   }
-
   /**
    * The request of historical orders.
    *
@@ -50,31 +52,4 @@ public class HistoricalOrdersRequest {
   private Long startId = null;
   private Integer size = null;
 
-  public String getSymbol() {
-    return symbol;
-  }
-
-  public OrderState getState() {
-    return state;
-  }
-
-  public OrderType getType() {
-    return type;
-  }
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public Date getEndDate() {
-    return endDate;
-  }
-
-  public Long getStartId() {
-    return startId;
-  }
-
-  public Integer getSize() {
-    return size;
-  }
 }
