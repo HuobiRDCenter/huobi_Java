@@ -10,7 +10,7 @@ public class Subscribe24HTradeStatistics {
     SubscriptionOptions options = new SubscriptionOptions();
     options.setUri("wss://api.huobi.pro");
     SubscriptionClient subscriptionClient = SubscriptionClient.create("", "", options);
-    subscriptionClient.subscribe24HTradeStatisticsEvent("btcusdt", (statisticsEvent) -> {
+    subscriptionClient.subscribe24HTradeStatisticsEvent("gxcusdt", (statisticsEvent) -> {
       System.out.println();
       System.out.println("Timestamp: " + statisticsEvent.getData().getTimestamp());
       System.out.println("High: " + statisticsEvent.getData().getHigh());

@@ -7,7 +7,7 @@ import com.huobi.client.model.enums.CandlestickInterval;
 public class SubscribeMarketDepth {
     public static void main(String[] args) {
         SubscriptionClient subscriptionClient = SubscriptionClient.create();
-        subscriptionClient.subscribePriceDepthEvent("btcusdt",  (priceDepthEvent) -> {
+        subscriptionClient.subscribePriceDepthEvent("gxcusdt",  (priceDepthEvent) -> {
             System.out.println();
             System.out.println("bids 0 price: " + priceDepthEvent.getData().getBids().get(0).getPrice());
             System.out.println("bids 0 volume: " + priceDepthEvent.getData().getBids().get(0).getAmount());
