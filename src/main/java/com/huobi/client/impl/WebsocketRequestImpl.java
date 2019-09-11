@@ -12,6 +12,7 @@ import com.huobi.client.model.AccountChange;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.Order;
+import com.huobi.client.model.OrderUpdate;
 import com.huobi.client.model.PriceDepth;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -19,6 +20,7 @@ import com.huobi.client.model.enums.AccountChangeType;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.BalanceType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
@@ -26,6 +28,7 @@ import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
+import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
@@ -226,6 +229,50 @@ class WebsocketRequestImpl {
       order.setState(OrderState.lookup(data.getString("order-state")));
       order.setSource(OrderSource.lookup(data.getString("order-source")));
       orderUpdateEvent.setData(order);
+      return orderUpdateEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<OrderUpdateNewEvent> subscribeOrderUpdateNewEvent(
+      List<String> symbols,
+      SubscriptionListener<OrderUpdateNewEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+    WebsocketRequest<OrderUpdateNewEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "OrderUpdateNew for " + symbols;
+    } else {
+      request.name = "OrderUpdateNew for " + symbols + " ...";
+    }
+    request.authHandler = (connection) ->
+        symbols.stream()
+            .map(Channels::ordersChannelNew)
+            .forEach(req -> {
+              connection.send(req);
+              await(1);
+            });
+    request.jsonParser = (jsonWrapper) -> {
+      OrderUpdateNewEvent orderUpdateEvent = new OrderUpdateNewEvent();
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      String symbol = data.getString("symbol");
+      orderUpdateEvent.setSymbol(symbol);
+      orderUpdateEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      orderUpdateEvent.setData(OrderUpdate.builder()
+          .matchId(data.getLong("match-id"))
+          .orderId(data.getLong("order-id"))
+          .symbol(symbol)
+          .state(OrderState.lookup(data.getString("order-state")))
+          .type(OrderType.lookup(data.getString("order-type")))
+          .role(DealRole.find(data.getString("role")))
+          .price(data.getBigDecimal("price"))
+          .filledAmount(data.getBigDecimal("filled-amount"))
+          .filledCashAmount(data.getBigDecimal("filled-cash-amount"))
+          .unfilledAmount(data.getBigDecimal("unfilled-amount"))
+          .clientOrderId(data.getStringOrDefault("client-order-id", null))
+          .build());
       return orderUpdateEvent;
     };
     return request;

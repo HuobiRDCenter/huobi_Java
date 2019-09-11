@@ -6,6 +6,7 @@ import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
+import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
@@ -134,6 +135,8 @@ public interface SubscriptionClient {
    */
   void subscribeOrderUpdateEvent(String symbols, SubscriptionListener<OrderUpdateEvent> callback);
 
+  void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback);
+
   /**
    * Subscribe order changing event. If a order is created, canceled etc, server will send the data
    * to client and onReceive in callback will be called.
@@ -146,6 +149,9 @@ public interface SubscriptionClient {
    * between client and Huobi server.
    */
   void subscribeOrderUpdateEvent(String symbols, SubscriptionListener<OrderUpdateEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback,
       SubscriptionErrorHandler errorHandler);
 
   /**

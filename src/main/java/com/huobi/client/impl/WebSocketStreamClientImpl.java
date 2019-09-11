@@ -9,6 +9,7 @@ import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
+import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
@@ -111,12 +112,23 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
   @Override
+  public void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback) {
+    subscribeOrderUpdateNewEvent(symbols, callback, null);
+  }
+
+  @Override
   public void subscribeOrderUpdateEvent(
       String symbols,
       SubscriptionListener<OrderUpdateEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribeOrderUpdateEvent(
         parseSymbols(symbols), subscriptionListener, errorHandler));
+  }
+
+  @Override
+  public void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback, SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.subscribeOrderUpdateNewEvent(
+        parseSymbols(symbols), callback, errorHandler));
   }
 
   @Override
