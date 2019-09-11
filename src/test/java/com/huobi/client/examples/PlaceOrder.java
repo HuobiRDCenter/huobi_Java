@@ -1,42 +1,167 @@
 package com.huobi.client.examples;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.huobi.client.SyncRequestClient;
+import com.huobi.client.examples.constants.Constants;
+import com.huobi.client.model.FeeRate;
+import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
+import com.huobi.client.model.request.HistoricalOrdersRequest;
+import com.huobi.client.model.request.MatchResultRequest;
 import com.huobi.client.model.request.NewOrderRequest;
-import java.math.BigDecimal;
+import com.huobi.client.model.request.OpenOrderRequest;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
 
 public class PlaceOrder {
+
   public static void main(String[] args) {
+
+    String symbol = "htusdt";
+
     SyncRequestClient syncRequestClient = SyncRequestClient.create(
-        "xxxxxx", "xxxxxx");
+        Constants.API_KEY,Constants.SECRET_KEY);
+
+    // General Place Order
+    String clientOrderId = "T" + System.nanoTime();
     NewOrderRequest newOrderRequest = new NewOrderRequest(
-        "htbtc",
+        symbol,
         AccountType.SPOT,
         OrderType.SELL_LIMIT,
         BigDecimal.valueOf(1.0),
-        BigDecimal.valueOf(1.0));
+        BigDecimal.valueOf(4.04),
+        clientOrderId,
+        null,
+        null
+    );
 
-    // Place a new limit order.
-    long orderId = syncRequestClient.createOrder(newOrderRequest);
-    System.out.println("---- The new order created ----");
+    long o1 = syncRequestClient.createOrder(newOrderRequest);
+    System.out.println("--- The new order created ---");
+    System.out.println("--- " + o1 + " ---");
+    System.out.println("--- " + clientOrderId + " ---");
 
-    // Get the order detail for order created above.
-    Order orderInfo = syncRequestClient.getOrder("htbtc", orderId);
-    System.out.println("Id: " + orderInfo.getOrderId());
-    System.out.println("Type: " + orderInfo.getType());
-    System.out.println("Status: " + orderInfo.getState());
-    System.out.println("Amount: " + orderInfo.getAmount());
-    System.out.println("Price: " + orderInfo.getPrice());
+    // Create Buy Limit Order
+    NewOrderRequest requestLimitBuy = NewOrderRequest.spotBuyLimit(symbol, new BigDecimal("3.98"), new BigDecimal("1"));
+    long orderBuyId = syncRequestClient.createOrder(requestLimitBuy);
+    System.out.println("--- The new order created ---");
+    System.out.println("--- " + orderBuyId + " ---");
 
-    // Cancel above order.
-    syncRequestClient.cancelOrder("htbtc", orderId);
+    // Create Sell Limit Order
+    NewOrderRequest requestLimitSell = NewOrderRequest.spotSellLimit(symbol, new BigDecimal("4.04"), new BigDecimal("1"));
+    long orderSellId = syncRequestClient.createOrder(requestLimitSell);
+    System.out.println("--- The new order created ---");
+    System.out.println("--- " + orderSellId + " ---");
 
-    // Confirm the order status after cancel.
-    Order canceledOrderInfo = syncRequestClient.getOrder("htbtc", orderId);
-    System.out.println("---- The order detail after cancel ----");
-    System.out.println("Id: " + orderInfo.getOrderId());
-    System.out.println("Status :" + canceledOrderInfo.getState());
+    // Create Buy Market Order
+    NewOrderRequest requestMarketBuy = NewOrderRequest.spotBuyMarket(symbol, new BigDecimal("5"));
+    long marketBuyId = syncRequestClient.createOrder(requestMarketBuy);
+    System.out.println("--- The new order created ---");
+    System.out.println("--- " + marketBuyId + " ---");
+
+    // Create Sell Market Order
+    NewOrderRequest requestMarketSell = NewOrderRequest.spotSellMarket(symbol, new BigDecimal("1"));
+    long marketSellId = syncRequestClient.createOrder(requestMarketSell);
+    System.out.println("--- The new order created ---");
+    System.out.println("--- " + marketSellId + " ---");
+
+    NewOrderRequest buyStopLimit = NewOrderRequest.spotBuyStopOrder(symbol,
+        new BigDecimal("4.6"),
+        new BigDecimal("4.6"),
+        new BigDecimal("1"),
+        StopOrderOperator.GTE);
+
+    long buyStopLimitId = syncRequestClient.createOrder(buyStopLimit);
+    System.out.println("--- The new stop limit order created ---");
+    System.out.println("--- " + buyStopLimitId + " ---");
+
+    NewOrderRequest sellStopLimit = NewOrderRequest.spotSellStopOrder(symbol,
+        new BigDecimal("3.5"),
+        new BigDecimal("3.4"),
+        new BigDecimal("1"),
+        StopOrderOperator.LTE);
+    long sellStopLimitId = syncRequestClient.createOrder(sellStopLimit);
+    System.out.println("--- The new stop limit order created ---");
+    System.out.println("--- " + sellStopLimitId + " ---");
+
+    // Get the order detail use order id
+    Order orderInfo = syncRequestClient.getOrder(symbol, o1);
+    System.out.println("GetById Id: " + orderInfo.getOrderId());
+    System.out.println("GetById Type: " + orderInfo.getType());
+    System.out.println("GetById Status: " + orderInfo.getState());
+    System.out.println("GetById Amount: " + orderInfo.getAmount());
+    System.out.println("GetById Price: " + orderInfo.getPrice());
+
+    // Get the order detail use client order id
+    Order orderInfo1 = syncRequestClient.getOrderByClientOrderId(symbol, clientOrderId);
+    System.out.println("GetByClientOrderId Id: " + orderInfo1.getOrderId());
+    System.out.println("GetByClientOrderId Type: " + orderInfo1.getType());
+    System.out.println("GetByClientOrderId Status: " + orderInfo1.getState());
+    System.out.println("GetByClientOrderId Amount: " + orderInfo1.getAmount());
+    System.out.println("GetByClientOrderId Price: " + orderInfo1.getPrice());
+
+    // Get the order match result use order id
+    List<MatchResult> matchResults = syncRequestClient.getMatchResults(symbol,marketBuyId);
+    matchResults.forEach(matchResult -> {
+      System.out.println("Order Match Result : "+ matchResult.toString());
+    });
+
+    matchResults = syncRequestClient.getMatchResults(new MatchResultRequest(symbol));
+    matchResults.forEach(matchResult -> {
+      System.out.println("Match Result list : "+ matchResult.toString());
+    });
+
+
+    // Cancel order use order id
+    syncRequestClient.cancelOrder(symbol, o1);
+
+    // Cancel order use client order id
+    syncRequestClient.cancelOrderByClientOrderId(symbol, clientOrderId);
+
+    List<Long> cancelOrderList = new ArrayList<>();
+    // Get current open orders
+    List<Order> openOrderList = syncRequestClient.getOpenOrders(new OpenOrderRequest(symbol, AccountType.SPOT));
+
+    openOrderList.forEach(order -> {
+      System.out.println("Open Order :: "+order.toString());
+      cancelOrderList.add(order.getOrderId());
+    });
+
+    // Batch cancel orders
+    if (cancelOrderList.size() > 0) {
+      syncRequestClient.cancelOrders(symbol, cancelOrderList);
+    }
+
+
+    // Get all the orders
+    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.CANCELED));
+    orderList.forEach(order -> {
+      System.out.println("Orders :: "+ order.toString());
+    });
+
+    // Get all the orders
+    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol,OrderState.CANCELED));
+    orderList1.forEach(order -> {
+      System.out.println("Orders :: "+ order.toString());
+    });
+
+
+    // Get order history
+    List<Order> orderHistoryList = syncRequestClient.getOrderHistory(new OrdersHistoryRequest(symbol));
+    orderHistoryList.forEach(order -> {
+      System.out.println("History Order :: " + order.toString());
+    });
+
+    // Get fee rate about symbol
+    List<FeeRate> feeRateList = syncRequestClient.getFeeRate("htusdt,ethusdt");
+    feeRateList.forEach(feeRate -> {
+      System.out.println("FeeRate : "+ feeRate.toString());
+    });
   }
 }

@@ -8,7 +8,7 @@ import java.net.URL;
  */
 public class RequestOptions {
 
-  private String url = "https://api.huobi.pro";
+  private String url = "https://api.huobi.so";
 
   public RequestOptions() {
   }

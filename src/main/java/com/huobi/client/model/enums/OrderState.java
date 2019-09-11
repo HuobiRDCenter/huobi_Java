@@ -7,6 +7,7 @@ import com.huobi.client.impl.utils.EnumLookup;
  */
 public enum OrderState {
   SUBMITTED("submitted"),
+  CREATE("created"),
   PARTIALFILLED("partial-filled"),
   CANCELLING("cancelling"),
   PARTIALCANCELED("partial-canceled"),

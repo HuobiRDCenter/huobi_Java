@@ -11,6 +11,7 @@ import com.huobi.client.model.Deposit;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
+import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
@@ -18,11 +19,13 @@ import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
 
+import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
@@ -31,6 +34,9 @@ import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
 import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
@@ -127,6 +133,18 @@ public interface SyncRequestClient {
   ExchangeInfo getExchangeInfo();
 
   /**
+   * Get all the trading currencies supported in Huobi.
+   * @return The name of trading currencies .
+   */
+  List<String> getCurrencies();
+
+  /**
+   * Get all the trading symbol supported in Huobi.
+   * @return The information of trading symbol .
+   */
+  List<Symbol> getSymbols();
+
+  /**
    * Get the best bid and ask.
    *
    * @param symbol The symbol, like "btcusdt". (mandatory)
@@ -144,6 +162,8 @@ public interface SyncRequestClient {
    */
   List<Withdraw> getWithdrawHistory(String currency, long fromId, int size);
 
+  List<Withdraw> getWithdrawHistory(String currency, long fromId, int size, QueryDirection queryDirection);
+
   /**
    * Get the deposit records of an account.
    *
@@ -154,7 +174,7 @@ public interface SyncRequestClient {
    */
   List<Deposit> getDepositHistory(String currency, long fromId, int size);
 
-
+  List<Deposit> getDepositHistory(String currency, long fromId, int size, QueryDirection queryDirection);
   /**
    * Transfer asset from specified account to another account.
    *
@@ -162,6 +182,8 @@ public interface SyncRequestClient {
    * @return The transfer id.
    */
   Long transfer(TransferRequest transferRequest);
+
+  Long transferFutures(TransferFuturesRequest request);
 
   /**
    * Submit a request to borrow with margin account.
@@ -240,6 +262,8 @@ public interface SyncRequestClient {
    */
   void cancelOrder(String symbol, long orderId);
 
+  void cancelOrderByClientOrderId(String symbol, String clientOrderId);
+
   /**
    * Submit cancel request for cancelling multiple orders.
    *
@@ -264,6 +288,8 @@ public interface SyncRequestClient {
    * @return The information of order.
    */
   Order getOrder(String symbol, long orderId);
+
+  Order getOrderByClientOrderId(String symbol, String clientOrderId);
 
   /**
    * Get detail match results of an order.
@@ -306,7 +332,11 @@ public interface SyncRequestClient {
    */
   List<Order> getHistoricalOrders(HistoricalOrdersRequest req);
 
+  List<Order> getOrders(OrdersRequest req);
 
+  List<Order> getOrderHistory(OrdersHistoryRequest req);
+
+  List<FeeRate> getFeeRate(String symbol);
   /**
    * Transfer Asset between Parent and Sub Account.
    *

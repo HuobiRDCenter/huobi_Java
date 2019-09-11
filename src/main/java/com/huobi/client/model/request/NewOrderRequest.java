@@ -2,11 +2,18 @@ package com.huobi.client.model.request;
 
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
+
 import java.math.BigDecimal;
+
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * The request of placing a new order.
  */
+@Getter
+@ToString
 public class NewOrderRequest {
 
   /**
@@ -16,8 +23,8 @@ public class NewOrderRequest {
    * @param accountType Account type. (mandatory)
    * @param type The order type. (mandatory)
    * @param amount The amount to buy (quote currency) or to sell (base currency). (mandatory)
-   * @param price The limit price of limit order, only needed for limit order. (mandatory for
-   * buy-limit, sell-limit, buy-limit-maker and sell-limit-maker)
+   * @param price The limit price of limit order, only needed for limit order. (mandatory for buy-limit, sell-limit, buy-limit-maker and
+   * sell-limit-maker)
    */
   public NewOrderRequest(String symbol, AccountType accountType, OrderType type, BigDecimal amount,
       BigDecimal price) {
@@ -28,33 +35,87 @@ public class NewOrderRequest {
     this.type = type;
   }
 
-  private final AccountType accountType;
-
-  private final String symbol;
-
-  private final BigDecimal amount;
-
-  private final BigDecimal price;
-
-  private final OrderType type;
-
-  public AccountType getAccountType() {
-    return accountType;
+  public NewOrderRequest(String symbol, AccountType accountType, OrderType type, BigDecimal amount,
+      BigDecimal price, String clientOrderId, BigDecimal stopPrice, StopOrderOperator operator) {
+    this.accountType = accountType;
+    this.symbol = symbol;
+    this.amount = amount;
+    this.price = price;
+    this.type = type;
+    this.clientOrderId = clientOrderId;
+    this.stopPrice = stopPrice;
+    this.operator = operator;
   }
 
-  public String getSymbol() {
-    return symbol;
+  public static NewOrderRequest spotBuyLimit(String symbol, BigDecimal price, BigDecimal amount) {
+    return spotBuyLimit(null, symbol, price, amount);
   }
 
-  public BigDecimal getAmount() {
-    return amount;
+  public static NewOrderRequest spotBuyLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.BUY_LIMIT, amount, price, clientOrderId, null, null);
   }
 
-  public BigDecimal getPrice() {
-    return price;
+  public static NewOrderRequest spotSellLimit(String symbol, BigDecimal price, BigDecimal amount) {
+    return spotSellLimit(null, symbol, price, amount);
   }
 
-  public OrderType getType() {
-    return type;
+  public static NewOrderRequest spotSellLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.SELL_LIMIT, amount, price, clientOrderId, null, null);
   }
+
+  public static NewOrderRequest spotBuyMarket(String symbol, BigDecimal amount) {
+    return spotBuyMarket(null, symbol, amount);
+  }
+
+  public static NewOrderRequest spotBuyMarket(String clientOrderId, String symbol, BigDecimal amount) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.BUY_MARKET, amount, null, clientOrderId, null, null);
+  }
+
+  public static NewOrderRequest spotSellMarket(String symbol, BigDecimal amount) {
+    return spotSellMarket(null, symbol, amount);
+  }
+
+  public static NewOrderRequest spotSellMarket(String clientOrderId, String symbol, BigDecimal amount) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.SELL_MARKET, amount, null, clientOrderId, null, null);
+  }
+
+  public static NewOrderRequest spotBuyStopOrder(String symbol, BigDecimal stopPrice, BigDecimal price, BigDecimal amount,
+      StopOrderOperator operator) {
+    return spotBuyStopOrder(null, symbol, stopPrice, price, amount, operator);
+  }
+
+  public static NewOrderRequest spotBuyStopOrder(String clientOrderId, String symbol, BigDecimal stopPrice, BigDecimal price, BigDecimal amount,
+      StopOrderOperator operator) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.BUY_STOP_LIMIT, amount, price, clientOrderId, stopPrice, operator);
+  }
+
+  public static NewOrderRequest spotSellStopOrder(String symbol, BigDecimal stopPrice, BigDecimal price, BigDecimal amount,
+      StopOrderOperator operator) {
+    return spotSellStopOrder(null, symbol, stopPrice, price, amount, operator);
+  }
+
+  public static NewOrderRequest spotSellStopOrder(String clientOrderId, String symbol, BigDecimal stopPrice, BigDecimal price, BigDecimal amount,
+      StopOrderOperator operator) {
+    return new NewOrderRequest(symbol, AccountType.SPOT, OrderType.SELL_STOP_LIMIT, amount, price, clientOrderId, stopPrice, operator);
+  }
+
+
+
+
+  private AccountType accountType;
+
+  private String symbol;
+
+  private BigDecimal amount;
+
+  private BigDecimal price;
+
+  private OrderType type;
+
+  private String clientOrderId;
+
+  private BigDecimal stopPrice;
+
+  private StopOrderOperator operator;
+
 }

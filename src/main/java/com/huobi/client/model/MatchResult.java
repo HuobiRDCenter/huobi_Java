@@ -1,12 +1,16 @@
 package com.huobi.client.model;
 
+import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderType;
 import java.math.BigDecimal;
 
+import lombok.ToString;
+
 /**
  * The match result information.
  */
+@ToString
 public class MatchResult {
 
   private long createdTimestamp;
@@ -19,6 +23,9 @@ public class MatchResult {
   private OrderSource source;
   private String symbol;
   private OrderType type;
+  private BigDecimal filledPoints;
+  private String feeDeductCurrency;
+  private DealRole role;
 
   /**
    * Get the UNIX formatted timestamp in UTC when the match and fill is done.
@@ -111,6 +118,30 @@ public class MatchResult {
     return type;
   }
 
+  /**
+   * Get the order fee use currency, if user open the switch of 'Use HT deduction' or 'Use Point Card to deduct' ,this filed may like 'ht or htpoints'
+   * @return
+   */
+  public String getFeeDeductCurrency() {
+    return feeDeductCurrency;
+  }
+
+  /**
+   * Get the order fee quantity.
+   * @return
+   */
+  public BigDecimal getFilledPoints() {
+    return filledPoints;
+  }
+
+  /**
+   * Get the roles in the deal
+   * @return
+   */
+  public DealRole getRole() {
+    return role;
+  }
+
   public void setCreatedTimestamp(long createdTimestamp) {
     this.createdTimestamp = createdTimestamp;
   }
@@ -149,5 +180,17 @@ public class MatchResult {
 
   public void setType(OrderType type) {
     this.type = type;
+  }
+
+  public void setFilledPoints(BigDecimal filledPoints) {
+    this.filledPoints = filledPoints;
+  }
+
+  public void setFeeDeductCurrency(String feeDeductCurrency) {
+    this.feeDeductCurrency = feeDeductCurrency;
+  }
+
+  public void setRole(DealRole role) {
+    this.role = role;
   }
 }

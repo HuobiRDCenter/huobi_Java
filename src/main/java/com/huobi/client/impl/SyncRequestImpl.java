@@ -11,6 +11,7 @@ import com.huobi.client.model.Deposit;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
+import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
@@ -23,6 +24,7 @@ import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
@@ -31,9 +33,13 @@ import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
 import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +125,15 @@ public class SyncRequestImpl implements SyncRequestClient {
     return exchangeInfo;
   }
 
+  public List<Symbol> getSymbols() {
+    return RestApiInvoker.callSync(requestImpl.getSymbols());
+  }
+
+  public List<String> getCurrencies() {
+    return RestApiInvoker.callSync(requestImpl.getCurrencies());
+  }
+
+
   @Override
   public BestQuote getBestQuote(String symbol) {
     return RestApiInvoker.callSync(requestImpl.getBestQuote(symbol));
@@ -126,12 +141,21 @@ public class SyncRequestImpl implements SyncRequestClient {
 
   @Override
   public List<Withdraw> getWithdrawHistory(String currency, long fromId, int size) {
-    return RestApiInvoker.callSync(requestImpl.getWithdrawHistory(currency, fromId, size));
+    return getWithdrawHistory(currency, fromId, size, null);
+  }
+
+  @Override
+  public List<Withdraw> getWithdrawHistory(String currency, long fromId, int size, QueryDirection direction) {
+    return RestApiInvoker.callSync(requestImpl.getWithdrawHistory(currency, fromId, size, direction));
   }
 
   @Override
   public List<Deposit> getDepositHistory(String currency, long fromId, int size) {
-    return RestApiInvoker.callSync(requestImpl.getDepositHistory(currency, fromId, size));
+    return getDepositHistory(currency, fromId, size, null);
+  }
+
+  public List<Deposit> getDepositHistory(String currency, long fromId, int size, QueryDirection direction) {
+    return RestApiInvoker.callSync(requestImpl.getDepositHistory(currency, fromId, size, direction));
   }
 
   @Override
@@ -139,6 +163,10 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.transfer(transferRequest));
   }
 
+  @Override
+  public Long transferFutures(TransferFuturesRequest request) {
+    return RestApiInvoker.callSync(requestImpl.transferFutures(request));
+  }
   @Override
   public long applyLoan(String symbol, String currency, BigDecimal amount) {
     return RestApiInvoker.callSync(requestImpl.applyLoan(symbol, currency, amount));
@@ -198,6 +226,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public void cancelOrderByClientOrderId(String symbol, String clientOrderId) {
+    RestApiInvoker.callSync(requestImpl.cancelOrderByClientOrderId(symbol, clientOrderId));
+  }
+
+  @Override
   public void cancelOrders(String symbol, List<Long> orderIds) {
     RestApiInvoker.callSync(requestImpl.cancelOrders(symbol, orderIds));
   }
@@ -211,6 +244,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public Order getOrder(String symbol, long orderId) {
     return RestApiInvoker.callSync(requestImpl.getOrder(symbol, orderId));
+  }
+
+  @Override
+  public Order getOrderByClientOrderId(String symbol, String clientOrderId) {
+    return RestApiInvoker.callSync(requestImpl.getOrderByClientOrderId(symbol, clientOrderId));
   }
 
   @Override
@@ -236,6 +274,21 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<Order> getHistoricalOrders(HistoricalOrdersRequest req) {
     return RestApiInvoker.callSync(requestImpl.getHistoricalOrders(req));
+  }
+
+  @Override
+  public List<Order> getOrders(OrdersRequest req) {
+    return RestApiInvoker.callSync(requestImpl.getOrders(req));
+  }
+
+  @Override
+  public List<Order> getOrderHistory(OrdersHistoryRequest req) {
+    return RestApiInvoker.callSync(requestImpl.getOrderHistory(req));
+  }
+
+  @Override
+  public List<FeeRate> getFeeRate(String symbol) {
+    return RestApiInvoker.callSync(requestImpl.getFeeRate(symbol));
   }
 
   @Override
