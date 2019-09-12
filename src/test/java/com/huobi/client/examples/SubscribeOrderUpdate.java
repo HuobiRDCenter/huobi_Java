@@ -12,9 +12,9 @@ public class SubscribeOrderUpdate {
 
     String symbol = "htusdt";
     SubscriptionClient client = SubscriptionClient.create(Constants.API_KEY,Constants.SECRET_KEY);
-//    client.subscribeOrderUpdateEvent(symbol,(event ->{
-//      log.info(event.getData().toString());
-//    }));
+    client.subscribeOrderUpdateEvent(symbol,(event ->{
+      log.info(event.getData().toString());
+    }));
 
     client.subscribeOrderUpdateNewEvent(symbol,(event ->{
       log.info(event.getData().toString());
