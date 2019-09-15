@@ -1,6 +1,5 @@
 package com.huobi.client.examples;
 
-import java.math.BigDecimal;
 
 import com.huobi.client.SubscriptionClient;
 import com.huobi.client.model.enums.TradeDirection;
@@ -19,7 +18,6 @@ public class SubscribeTradeEvent {
 						item.getDirection() == TradeDirection.BUY ? "买入" : "卖出", item.getAmount(),
 						tradeEvent.getSymbol(), item.getPrice());
 			});
-			;
 		});
 	}
 
