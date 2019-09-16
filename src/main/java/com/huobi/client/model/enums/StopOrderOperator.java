@@ -8,7 +8,9 @@ import com.huobi.client.impl.utils.EnumLookup;
 @AllArgsConstructor
 @Getter
 public enum  StopOrderOperator {
-
+  /**
+   * GTE,greater than and equal (>=) ,LTE  less than and equal (<=)
+   */
   GTE("gte","greater than and equal (>=)"),
   LTE("lte","less than and equal (<=)");
 

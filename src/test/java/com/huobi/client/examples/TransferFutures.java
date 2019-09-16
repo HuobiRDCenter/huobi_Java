@@ -14,6 +14,9 @@ public class TransferFutures {
     String currency = "ltc";
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
+    /**
+     * transfer from pro to futures
+     */
     long transferToFuturesId = syncRequestClient.transferFutures(TransferFuturesRequest.builder()
         .currency(currency)
         .amount(new BigDecimal("0.1"))
@@ -22,6 +25,9 @@ public class TransferFutures {
 
     System.out.println(" transfer to futures result:" + transferToFuturesId);
 
+    /**
+     * transfer from futures to pro
+     */
     long transferToProId = syncRequestClient.transferFutures(TransferFuturesRequest.builder()
         .currency(currency)
         .amount(new BigDecimal("0.1"))

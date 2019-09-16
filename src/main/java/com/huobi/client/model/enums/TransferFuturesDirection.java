@@ -7,6 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  TransferFuturesDirection {
 
+  /**
+   * FUTURES_TO_PRO,PRO_TO_FUTURES
+   */
   FUTURES_TO_PRO("futures-to-pro"),
   PRO_TO_FUTURES("pro-to-futures")
   ;

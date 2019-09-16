@@ -12,10 +12,16 @@ public class SubscribeOrderUpdate {
 
     String symbol = "htusdt";
     SubscriptionClient client = SubscriptionClient.create(Constants.API_KEY,Constants.SECRET_KEY);
+    /**
+     * subscribe order updateEvent ,old interface
+     */
     client.subscribeOrderUpdateEvent(symbol,(event ->{
       log.info(event.getData().toString());
     }));
 
+    /**
+     * subscribe order updateEvent ,new interface (recommend)
+     */
     client.subscribeOrderUpdateNewEvent(symbol,(event ->{
       log.info(event.getData().toString());
     }));

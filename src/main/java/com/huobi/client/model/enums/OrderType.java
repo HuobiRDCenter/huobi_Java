@@ -3,7 +3,8 @@ package com.huobi.client.model.enums;
 import com.huobi.client.impl.utils.EnumLookup;
 
 /**
- * buy-market, sell-market, buy-limit, buy-ioc, sell-ioc, buy-limit-maker, sell-limit-maker.
+ * buy-market, sell-market, buy-limit, buy-ioc, sell-ioc,
+ * buy-limit-maker, sell-limit-maker, buy-stop-limit, sell-stop-limit.
  */
 public enum OrderType {
   BUY_MARKET("buy-market"),

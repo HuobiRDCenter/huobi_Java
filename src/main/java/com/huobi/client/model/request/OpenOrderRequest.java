@@ -16,7 +16,7 @@ public class OpenOrderRequest {
    * The request of get open orders.
    *
    * @param symbol The symbol, like "btcusdt". (mandatory)
-   * @param accountType The order side, buy or sell. If no side defined, will return all open orders of the account. (mandatory)
+   * @param accountType The account type, margin,otc,point,spot (mandatory)
    */
   public OpenOrderRequest(String symbol, AccountType accountType) {
     this.symbol = symbol;
@@ -27,7 +27,7 @@ public class OpenOrderRequest {
    * The request of get open orders.
    *
    * @param symbol The symbol, like "btcusdt". (mandatory)
-   * @param accountType The order side, buy or sell. If no side defined, will return all open orders of the account. (mandatory)
+   * @param accountType The account type, margin,otc,point,spot (mandatory)
    * @param side The order side, buy or sell. If no side defined, will return all open orders of the account. (optional can be null)
    * @param size The number of orders to return. Range is [1, 500]. Default is 10. (optional, can be null)
    */
@@ -40,6 +40,15 @@ public class OpenOrderRequest {
     this.side = side;
   }
 
+  /**
+   *
+   * @param symbol  The symbol, like "btcusdt". (mandatory)
+   * @param accountType  The account type, margin,otc,point,spot (mandatory)
+   * @param side The order side, buy or sell. If no side defined, will return all open orders of the account. (optional can be null)
+   * @param size The number of orders to return. Range is [1, 500]. Default is 10. (optional, can be null)
+   * @param from The query start id.
+   * @param direct The direction of query .pre or next
+   */
   public OpenOrderRequest(String symbol,
       AccountType accountType,
       OrderSide side,

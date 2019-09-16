@@ -7,6 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  SymbolState {
 
+  /**
+   * ONLINE, OFFLINE, SUSPEND.
+   */
   ONLINE("online"),
   OFFLINE("offline"),
   SUSPEND("suspend")

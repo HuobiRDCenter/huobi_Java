@@ -170,6 +170,14 @@ public interface AsyncRequestClient {
       String currency, long fromId, int size,
       ResponseCallback<AsyncResult<List<Withdraw>>> callback);
 
+  /**
+   *
+   * @param currency The currency, like "btc". (mandatory)
+   * @param fromId The beginning withdraw record id. (mandatory)
+   *  @param size The size of record. (mandatory)
+   * @param queryDirection The direction of query ,pre or next
+   * @param callback  The callback you should implemented.
+   */
   void getWithdrawHistory(String currency, long fromId, int size, QueryDirection queryDirection,
       ResponseCallback<AsyncResult<List<Withdraw>>> callback);
 
@@ -178,7 +186,7 @@ public interface AsyncRequestClient {
    *
    * @param currency The currency, like "btc". (mandatory)
    * @param fromId The beginning deposit record id. (mandatory)
-   * @param size The size of record. (mandatory)
+   * @param size The beginning deposit record id. (mandatory)
    * @param callback The callback you should implemented.
    */
   void getDepositHistory(
@@ -187,6 +195,14 @@ public interface AsyncRequestClient {
       int size,
       ResponseCallback<AsyncResult<List<Deposit>>> callback);
 
+  /**
+   *
+   * @param currency The currency, like "btc". (mandatory)
+   * @param fromId The beginning deposit record id. (mandatory)
+   * @param size  The beginning deposit record id. (mandatory)
+   * @param direction  The direction of query ,pre or next
+   * @param callback    The callback you should implemented.
+   */
   void getDepositHistory(
       String currency,
       long fromId,
@@ -202,6 +218,11 @@ public interface AsyncRequestClient {
    */
   void transfer(TransferRequest transferRequest, ResponseCallback<AsyncResult<Long>> callback);
 
+  /**
+   *
+   * @param request The request of transfer between futures and pro
+   * @param callback The callback you should implemented.
+   */
   void transferFutures(TransferFuturesRequest request, ResponseCallback<AsyncResult<Long>> callback);
   /**
    * Submit a request to borrow with margin account
@@ -284,6 +305,12 @@ public interface AsyncRequestClient {
    */
   void cancelOrder(String symbol, long orderId, ResponseCallback<AsyncResult<Void>> callback);
 
+  /**
+   *
+   * @param symbol The symbol, like "btcusdt"
+   * @param clientOrderId The client order id defined by client
+   * @param callback  The callback you should implemented.
+   */
   void cancelOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Void>> callback);
   /**
    * Submit cancel request for cancelling an order
@@ -313,6 +340,12 @@ public interface AsyncRequestClient {
    */
   void getOrder(String symbol, long orderId, ResponseCallback<AsyncResult<Order>> callback);
 
+  /**
+   *
+   * @param symbol  The symbol, like "btcusdt"
+   * @param clientOrderId  The client order id defined by client
+   * @param callback  The callback you should implemented.
+   */
   void getOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Order>> callback);
 
   /**
@@ -362,10 +395,25 @@ public interface AsyncRequestClient {
   void getHistoricalOrders(
       HistoricalOrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
 
+  /**
+   *
+   * @param req The order request
+   * @param callback  The callback you should implemented.
+   */
   void getOrders(OrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
 
+  /**
+   *
+   * @param req  The request of historical orders
+   * @param callback  The callback you should implemented.
+   */
   void getOrderHistory(OrdersHistoryRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
 
+  /**
+   *
+   * @param symbol  The currency, like "btcusdt"
+   * @param callback The callback you should implemented.
+   */
   void getFeeRate(String symbol, ResponseCallback<AsyncResult<List<FeeRate>>> callback);
   /**
    * Transfer Asset between Parent and Sub Account

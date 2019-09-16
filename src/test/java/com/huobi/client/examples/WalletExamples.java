@@ -13,6 +13,9 @@ public class WalletExamples {
     String currency = "usdt";
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY,Constants.SECRET_KEY);
+    /**
+     * Get withdraw history
+     */
     List<Withdraw> list = syncRequestClient.getWithdrawHistory(currency,0,10);
     list.forEach(withdraw -> {
       System.out.println("Withdraw History:"+withdraw.toString());

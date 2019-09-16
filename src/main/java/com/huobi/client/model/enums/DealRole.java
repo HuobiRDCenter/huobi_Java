@@ -7,6 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DealRole {
 
+  /**
+   * TAKER,MAKER
+   */
+
   TAKER("taker"),
   MAKER("maker")
   ;

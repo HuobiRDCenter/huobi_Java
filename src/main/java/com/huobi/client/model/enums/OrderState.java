@@ -3,11 +3,11 @@ package com.huobi.client.model.enums;
 import com.huobi.client.impl.utils.EnumLookup;
 
 /**
- * SUBMITTED, PARTIALFILLED, CANCELLING. PARTIALCANCELED FILLED CANCELED
+ * SUBMITTED, PARTIALFILLED, CANCELLING. PARTIALCANCELED FILLED CANCELED CREATED
  */
 public enum OrderState {
   SUBMITTED("submitted"),
-  CREATE("created"),
+  CREATED("created"),
   PARTIALFILLED("partial-filled"),
   CANCELLING("cancelling"),
   PARTIALCANCELED("partial-canceled"),

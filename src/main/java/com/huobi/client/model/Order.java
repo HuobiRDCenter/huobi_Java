@@ -219,6 +219,10 @@ public class Order {
     this.state = state;
   }
 
+  /**
+   * Get stop price
+   * @return The stop price
+   */
   public BigDecimal getStopPrice() {
     return stopPrice;
   }
@@ -227,6 +231,10 @@ public class Order {
     this.stopPrice = stopPrice;
   }
 
+  /**
+   * Get the operaror
+   * @return gte ,lte
+   */
   public StopOrderOperator getOperator() {
     return operator;
   }
