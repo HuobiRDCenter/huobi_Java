@@ -118,6 +118,8 @@ public interface AsyncRequestClient {
   void getHistoricalTrade(String symbol, int size,
       ResponseCallback<AsyncResult<List<Trade>>> callback);
 
+  void getTrade(String symbol, ResponseCallback<AsyncResult<List<Trade>>> callback);
+
   /**
    * Get trade statistics in 24 hours.
    *

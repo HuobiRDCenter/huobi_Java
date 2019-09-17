@@ -63,6 +63,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import okhttp3.Request;
 
@@ -267,6 +268,31 @@ class RestApiRequestImpl {
           trade.setDirection(TradeDirection.lookup(itemIn.getString("direction")));
           res.add(trade);
         });
+      });
+      return res;
+    });
+    return request;
+  }
+
+  RestApiRequest<List<Trade>> getTrade(String symbol) {
+    InputChecker.checker().checkSymbol(symbol);
+    RestApiRequest<List<Trade>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbol", symbol);
+    request.request = createRequestByGet("/market/trade", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<Trade> res = new LinkedList<>();
+
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      JsonWrapperArray dataArray = tick.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Trade trade = new Trade();
+        trade.setPrice(item.getBigDecimal("price"));
+        trade.setAmount(item.getBigDecimal("amount"));
+        trade.setTradeId(item.getString("id"));
+        trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("ts")));
+        trade.setDirection(TradeDirection.lookup(item.getString("direction")));
+        res.add(trade);
       });
       return res;
     });
@@ -1236,7 +1262,7 @@ class RestApiRequestImpl {
         matchResult.setType(OrderType.lookup(item.getString("type")));
         matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
         matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
-        matchResult.setRole(DealRole.find(item.getStringOrDefault("role",null)));
+        matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
         matchResultList.add(matchResult);
       });
       return matchResultList;

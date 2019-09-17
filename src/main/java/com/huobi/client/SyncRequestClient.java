@@ -116,6 +116,8 @@ public interface SyncRequestClient {
    */
   List<Trade> getHistoricalTrade(String symbol, int size);
 
+  List<Trade> getTrade(String symbol);
+
   /**
    * Get trade statistics in 24 hours.
    *

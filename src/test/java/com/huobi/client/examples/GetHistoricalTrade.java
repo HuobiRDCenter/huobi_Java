@@ -3,9 +3,11 @@ package com.huobi.client.examples;
 import com.huobi.client.AsyncRequestClient;
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.model.Trade;
+
 import java.util.List;
 
 public class GetHistoricalTrade {
+
   public static void main(String[] args) {
     // Synchronization mode
     SyncRequestClient syncRequestClient = SyncRequestClient.create();
@@ -36,5 +38,18 @@ public class GetHistoricalTrade {
         }
       }
     });
+
+    List<Trade> tradeList1 = syncRequestClient.getTrade("htusdt");
+    System.out.println("---- Get trade for htusdt ----");
+    for (Trade trade : tradeList1) {
+      System.out.println();
+      System.out.println("Trade at: " + trade.getTimestamp());
+      System.out.println("Id: " + trade.getTradeId());
+      System.out.println("Price: " + trade.getPrice());
+      System.out.println("Amount: " + trade.getAmount());
+      System.out.println("Direction: " + trade.getDirection().toString());
+    }
+    System.out.println();
+
   }
 }

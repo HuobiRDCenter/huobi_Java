@@ -114,6 +114,11 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   }
 
   @Override
+  public void getTrade(String symbol, ResponseCallback<AsyncResult<List<Trade>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getTrade(symbol), callback);
+  }
+
+  @Override
   public void get24HTradeStatistics(String symbol,
                                     ResponseCallback<AsyncResult<TradeStatistics>> callback) {
     RestApiInvoker.callASync(requestImpl.get24HTradeStatistics(symbol), callback);
