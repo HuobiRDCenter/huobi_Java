@@ -1236,7 +1236,7 @@ class RestApiRequestImpl {
         matchResult.setType(OrderType.lookup(item.getString("type")));
         matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
         matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
-        matchResult.setRole(DealRole.find(item.getString("role")));
+        matchResult.setRole(DealRole.find(item.getStringOrDefault("role",null)));
         matchResultList.add(matchResult);
       });
       return matchResultList;
