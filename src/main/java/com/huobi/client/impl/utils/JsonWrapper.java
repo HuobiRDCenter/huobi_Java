@@ -81,6 +81,18 @@ public class JsonWrapper {
     }
   }
 
+  public Integer getIntegerOrDefault(String name, Integer defValue) {
+    try {
+      if (!containKey(name)) {
+        return defValue;
+      }
+      return json.getInteger(name);
+    } catch (Exception e) {
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+          "[Json] Get integer error: " + name + " " + e.getMessage());
+    }
+  }
+
   public long getLong(String name) {
     checkMandatoryField(name);
     try {
@@ -105,6 +117,18 @@ public class JsonWrapper {
 
   public BigDecimal getBigDecimal(String name) {
     checkMandatoryField(name);
+    try {
+      return new BigDecimal(json.getBigDecimal(name).stripTrailingZeros().toPlainString());
+    } catch (Exception e) {
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+          "[Json] Get decimal error: " + name + " " + e.getMessage());
+    }
+  }
+
+  public BigDecimal getBigDecimalOrDefault(String name, BigDecimal defValue) {
+    if (!containKey(name)) {
+      return defValue;
+    }
     try {
       return new BigDecimal(json.getBigDecimal(name).stripTrailingZeros().toPlainString());
     } catch (Exception e) {

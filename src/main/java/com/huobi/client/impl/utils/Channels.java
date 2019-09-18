@@ -1,6 +1,7 @@
 package com.huobi.client.impl.utils;
 
 import com.alibaba.fastjson.JSONObject;
+
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 
@@ -43,6 +44,14 @@ public abstract class Channels {
     json.put("op", "sub");
     json.put("cid", TimeService.getCurrentTimeStamp() + "");
     json.put("topic", "orders." + symbol);
+    return json.toJSONString();
+  }
+
+  public static String ordersChannelNew(String symbol) {
+    JSONObject json = new JSONObject();
+    json.put("op", "sub");
+    json.put("cid", TimeService.getCurrentTimeStamp() + "");
+    json.put("topic", "orders." + symbol + ".update");
     return json.toJSONString();
   }
 

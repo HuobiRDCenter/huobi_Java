@@ -8,7 +8,7 @@ import java.net.URI;
  */
 public class SubscriptionOptions {
 
-  private String uri = "wss://api.huobi.pro/";
+  private String uri = "wss://api.huobi.so/";
   private boolean isAutoReconnect = true;
   private int receiveLimitMs = 60_000;
   private int connectionDelayOnFailure = 15;

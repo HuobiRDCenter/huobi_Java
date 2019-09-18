@@ -16,6 +16,7 @@ import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
+import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
@@ -30,12 +31,15 @@ import com.huobi.client.model.enums.AccountState;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.DepositState;
 import com.huobi.client.model.enums.EtfStatus;
 import com.huobi.client.model.enums.LoanOrderStates;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.enums.WithdrawState;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
@@ -45,15 +49,22 @@ import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
 import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
+
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import okhttp3.Request;
 
 class RestApiRequestImpl {
@@ -263,6 +274,31 @@ class RestApiRequestImpl {
     return request;
   }
 
+  RestApiRequest<List<Trade>> getTrade(String symbol) {
+    InputChecker.checker().checkSymbol(symbol);
+    RestApiRequest<List<Trade>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbol", symbol);
+    request.request = createRequestByGet("/market/trade", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<Trade> res = new LinkedList<>();
+
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      JsonWrapperArray dataArray = tick.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Trade trade = new Trade();
+        trade.setPrice(item.getBigDecimal("price"));
+        trade.setAmount(item.getBigDecimal("amount"));
+        trade.setTradeId(item.getString("id"));
+        trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("ts")));
+        trade.setDirection(TradeDirection.lookup(item.getString("direction")));
+        res.add(trade);
+      });
+      return res;
+    });
+    return request;
+  }
+
   RestApiRequest<TradeStatistics> get24HTradeStatistics(String symbol) {
     InputChecker.checker().checkSymbol(symbol);
     RestApiRequest<TradeStatistics> request = new RestApiRequest<>();
@@ -303,6 +339,11 @@ class RestApiRequestImpl {
         symbol.setAmountPrecision(item.getInteger("amount-precision"));
         symbol.setSymbolPartition(item.getString("symbol-partition"));
         symbol.setSymbol(item.getString("symbol"));
+        symbol.setValuePrecision(item.getIntegerOrDefault("value-precision", null));
+        symbol.setMinOrderAmt(item.getBigDecimalOrDefault("min-order-amt", null));
+        symbol.setMaxOrderAmt(item.getBigDecimalOrDefault("max-order-amt", null));
+        symbol.setMinOrderValue(item.getBigDecimalOrDefault("min-order-value", null));
+        symbol.setLeverageRatio(item.getIntegerOrDefault("leverage-ratio", null));
         symbolList.add(symbol);
 
       });
@@ -347,16 +388,21 @@ class RestApiRequestImpl {
     return request;
   }
 
+  RestApiRequest<List<Withdraw>> getWithdrawHistory(String currency, Long fromId, Integer size) {
+    return getWithdrawHistory(currency, fromId, size, null);
+  }
+
   RestApiRequest<List<Withdraw>> getWithdrawHistory(String currency, Long fromId,
-      Integer size) {
-    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromTd")
+      Integer size, QueryDirection queryDirection) {
+    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromId")
         .shouldNotNull(size, "size");
     RestApiRequest<List<Withdraw>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("currency", currency)
         .putToUrl("type", "withdraw")
         .putToUrl("from", fromId)
-        .putToUrl("size", size);
+        .putToUrl("size", size)
+        .putToUrl("direct", queryDirection);
     request.request = createRequestByGetWithSignature("/v1/query/deposit-withdraw", builder);
     request.jsonParser = (jsonWrapper -> {
       List<Withdraw> withdraws = new LinkedList<>();
@@ -382,16 +428,21 @@ class RestApiRequestImpl {
     return request;
   }
 
+  RestApiRequest<List<Deposit>> getDepositHistory(String currency, Long fromId, Integer size) {
+    return getDepositHistory(currency, fromId, size, null);
+  }
+
   RestApiRequest<List<Deposit>> getDepositHistory(String currency, Long fromId,
-      Integer size) {
-    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromTd")
+      Integer size, QueryDirection queryDirection) {
+    InputChecker.checker().checkCurrency(currency).shouldNotNull(fromId, "fromId")
         .shouldNotNull(size, "size");
     RestApiRequest<List<Deposit>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("currency", currency)
         .putToUrl("type", "deposit")
         .putToUrl("from", fromId)
-        .putToUrl("size", size);
+        .putToUrl("size", size)
+        .putToUrl("direct", queryDirection);
     request.request = createRequestByGetWithSignature("/v1/query/deposit-withdraw", builder);
     request.jsonParser = (jsonWrapper -> {
       List<Deposit> deposits = new LinkedList<>();
@@ -469,6 +520,26 @@ class RestApiRequestImpl {
 
   }
 
+  RestApiRequest<Long> transferFutures(TransferFuturesRequest transferRequest) {
+    InputChecker.checker()
+        .checkCurrency(transferRequest.getCurrency())
+        .shouldNotNull(transferRequest.getAmount(), "amount");
+
+    RestApiRequest<Long> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("currency", transferRequest.getCurrency())
+        .putToPost("amount", transferRequest.getAmount())
+        .putToPost("type", transferRequest.getDirection().getDirection());
+    request.request = createRequestByPostWithSignature("/v1/futures/transfer", builder);
+    request.jsonParser = (jsonWrapper -> {
+      if ("ok".equals(jsonWrapper.getString("status"))) {
+        return jsonWrapper.getLong("data");
+      }
+      return null;
+    });
+    return request;
+
+  }
 
   RestApiRequest<Long> applyLoan(String symbol, String currency, BigDecimal amount) {
     InputChecker.checker().checkSymbol(symbol).checkCurrency(currency)
@@ -570,13 +641,17 @@ class RestApiRequestImpl {
     if (newOrderRequest.getAccountType() == AccountType.MARGIN) {
       source = "margin-api";
     }
+    String stopOp = newOrderRequest.getOperator() != null ? newOrderRequest.getOperator().getOperator() : "";
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToPost("account-id", account.getId())
         .putToPost("amount", newOrderRequest.getAmount())
         .putToPost("price", newOrderRequest.getPrice())
         .putToPost("symbol", newOrderRequest.getSymbol())
         .putToPost("type", newOrderRequest.getType())
-        .putToPost("source", source);
+        .putToPost("source", source)
+        .putToPost("client-order-id", newOrderRequest.getClientOrderId())
+        .putToPost("stop-price", newOrderRequest.getStopPrice())
+        .putToPost("operator", stopOp);
     request.request = createRequestByPostWithSignature("/v1/order/orders/place", builder);
     request.jsonParser = (json -> {
       String data = json.getString("data");
@@ -599,7 +674,10 @@ class RestApiRequestImpl {
         .putToUrl("account-id", account.getId())
         .putToUrl("symbol", openOrderRequest.getSymbol())
         .putToUrl("side", openOrderRequest.getSide())
-        .putToUrl("size", openOrderRequest.getSize());
+        .putToUrl("size", openOrderRequest.getSize())
+        .putToUrl("direct", openOrderRequest.getDirect())
+        .putToUrl("from", openOrderRequest.getFrom());
+
     request.request = createRequestByGetWithSignature("/v1/order/openOrders", builder);
     request.jsonParser = (jsonWrapper -> {
       List<Order> orderList = new LinkedList<>();
@@ -620,6 +698,8 @@ class RestApiRequestImpl {
         order.setFilledFees(item.getBigDecimal("filled-fees"));
         order.setSource(OrderSource.lookup(item.getString("source")));
         order.setState(OrderState.lookup(item.getString("state")));
+        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
         orderList.add(order);
       });
       return orderList;
@@ -632,6 +712,17 @@ class RestApiRequestImpl {
     RestApiRequest<Void> request = new RestApiRequest<>();
     String url = String.format("/v1/order/orders/%d/submitcancel", orderId);
     request.request = createRequestByPostWithSignature(url, UrlParamsBuilder.build());
+    request.jsonParser = (json -> (null));
+    return request;
+  }
+
+  RestApiRequest<Void> cancelOrderByClientOrderId(String symbol, String clientOrderId) {
+    InputChecker.checker().checkSymbol(symbol);
+    RestApiRequest<Void> request = new RestApiRequest<>();
+    String url = "/v1/order/orders/submitCancelClientOrder";
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    builder.putToPost("client-order-id", clientOrderId);
+    request.request = createRequestByPostWithSignature(url, builder);
     request.jsonParser = (json -> (null));
     return request;
   }
@@ -687,29 +778,18 @@ class RestApiRequestImpl {
     String url = String.format("/v1/order/orders/%d", orderId);
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = (jsonWrapper -> {
-      JsonWrapper data = jsonWrapper.getJsonObject("data");
-      Order order = new Order();
-      order.setSymbol(data.getString("symbol"));
-      order.setOrderId(data.getLong("id"));
-      order
-          .setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
-      order.setAmount(data.getBigDecimal("amount"));
-      order.setCanceledTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("canceled-at")));
-      order.setCreatedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
-      order.setFinishedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("finished-at")));
-      order.setFilledAmount(data.getBigDecimal("field-amount"));
-      order.setFilledCashAmount(data.getBigDecimal("field-cash-amount"));
-      order.setFilledFees(data.getBigDecimal("field-fees"));
-      order.setPrice(data.getBigDecimal("price"));
-      order.setSource(OrderSource.lookup(data.getString("source")));
-      order.setState(OrderState.lookup(data.getString("state")));
-      order.setType(OrderType.lookup(data.getString("type")));
-      return order;
-    });
+    request.jsonParser = getOrderParser();
+    return request;
+  }
+
+  RestApiRequest<Order> getOrderByClientOrderId(String symbol, String clientOrderId) {
+    InputChecker.checker().checkSymbol(symbol);
+    RestApiRequest<Order> request = new RestApiRequest<>();
+    String url = "/v1/order/orders/getClientOrder";
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    builder.putToUrl("clientOrderId", clientOrderId);
+    request.request = createRequestByGetWithSignature(url, builder);
+    request.jsonParser = getOrderParser();
     return request;
   }
 
@@ -719,26 +799,7 @@ class RestApiRequestImpl {
     String url = String.format("/v1/order/orders/%d/matchresults", orderId);
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<MatchResult> matchResultList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        MatchResult matchResult = new MatchResult();
-        matchResult.setId(item.getLong("id"));
-        matchResult.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
-        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
-        matchResult.setMatchId(item.getLong("match-id"));
-        matchResult.setOrderId(item.getLong("order-id"));
-        matchResult.setPrice(item.getBigDecimal("price"));
-        matchResult.setSource(OrderSource.lookup(item.getString("source")));
-        matchResult.setSymbol(item.getString("symbol"));
-        matchResult.setType(OrderType.lookup(item.getString("type")));
-        matchResultList.add(matchResult);
-      });
-      return matchResultList;
-    });
+    request.jsonParser = getMatchResultListParser();
     return request;
   }
 
@@ -755,26 +816,7 @@ class RestApiRequestImpl {
         //.putToUrl("direct", "prev")
         .putToUrl("size", matchResultRequest.getSize());
     request.request = createRequestByGetWithSignature("/v1/order/matchresults", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<MatchResult> matchResultList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        MatchResult matchResult = new MatchResult();
-        matchResult.setId(item.getLong("id"));
-        matchResult.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
-        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
-        matchResult.setMatchId(item.getLong("match-id"));
-        matchResult.setOrderId(item.getLong("order-id"));
-        matchResult.setPrice(item.getBigDecimal("price"));
-        matchResult.setSource(OrderSource.lookup(item.getString("source")));
-        matchResult.setSymbol(item.getString("symbol"));
-        matchResult.setType(OrderType.lookup(item.getString("type")));
-        matchResultList.add(matchResult);
-      });
-      return matchResultList;
-    });
+    request.jsonParser = getMatchResultListParser();
     return request;
   }
 
@@ -806,6 +848,10 @@ class RestApiRequestImpl {
   }
 
   RestApiRequest<List<Order>> getHistoricalOrders(HistoricalOrdersRequest req) {
+    return getOrders(new OrdersRequest(req));
+  }
+
+  RestApiRequest<List<Order>> getOrders(OrdersRequest req) {
     InputChecker.checker().checkSymbol(req.getSymbol())
         .shouldNotNull(req.getState(), "state");
     RestApiRequest<List<Order>> request = new RestApiRequest<>();
@@ -816,7 +862,8 @@ class RestApiRequestImpl {
         .putToUrl("end-date", req.getEndDate(), "yyyy-MM-dd")
         .putToUrl("from", req.getStartId())
         .putToUrl("states", req.getState())
-        .putToUrl("size", req.getSize());
+        .putToUrl("size", req.getSize())
+        .putToUrl("direct", req.getDirect());
     request.request = createRequestByGetWithSignature("/v1/order/orders", builder);
     request.jsonParser = (jsonWrapper -> {
       List<Order> orderList = new LinkedList<>();
@@ -841,9 +888,75 @@ class RestApiRequestImpl {
         order.setFilledFees(item.getBigDecimal("field-fees"));
         order.setSource(OrderSource.lookup(item.getString("source")));
         order.setState(OrderState.lookup(item.getString("state")));
+        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
         orderList.add(order);
       });
       return orderList;
+    });
+    return request;
+  }
+
+
+  RestApiRequest<List<Order>> getOrderHistory(OrdersHistoryRequest req) {
+    RestApiRequest<List<Order>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbol", req.getSymbol())
+        .putToUrl("start-date", req.getStartDate(), "yyyy-MM-dd")
+        .putToUrl("end-date", req.getEndDate(), "yyyy-MM-dd")
+        .putToUrl("size", req.getSize())
+        .putToUrl("direct", req.getDirect());
+    request.request = createRequestByGetWithSignature("/v1/order/history", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<Order> orderList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Order order = new Order();
+        order.setAccountType(
+            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+        order.setAmount(item.getBigDecimal("amount"));
+        order.setCanceledTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
+        order.setFinishedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+        order.setOrderId(item.getLong("id"));
+        order.setSymbol(item.getString("symbol"));
+        order.setPrice(item.getBigDecimal("price"));
+        order.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setType(OrderType.lookup(item.getString("type")));
+        order.setFilledAmount(item.getBigDecimal("field-amount"));
+        order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
+        order.setFilledFees(item.getBigDecimal("field-fees"));
+        order.setSource(OrderSource.lookup(item.getString("source")));
+        order.setState(OrderState.lookup(item.getString("state")));
+        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
+        orderList.add(order);
+      });
+      return orderList;
+    });
+    return request;
+  }
+
+
+  RestApiRequest<List<FeeRate>> getFeeRate(String symbol) {
+    RestApiRequest<List<FeeRate>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbols", symbol);
+    request.request = createRequestByGetWithSignature("/v1/fee/fee-rate/get", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<FeeRate> rateList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+
+        rateList.add(FeeRate.builder()
+            .symbol(item.getString("symbol"))
+            .makerFee(item.getBigDecimalOrDefault("maker-fee", null))
+            .takerFee(item.getBigDecimalOrDefault("taker-fee", null))
+            .build());
+      });
+      return rateList;
     });
     return request;
   }
@@ -1100,4 +1213,61 @@ class RestApiRequestImpl {
     });
     return request;
   }
+
+
+  public RestApiJsonParser<Order> getOrderParser() {
+    return (jsonWrapper -> {
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      Order order = new Order();
+      order.setSymbol(data.getString("symbol"));
+      order.setOrderId(data.getLong("id"));
+      order
+          .setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
+      order.setAmount(data.getBigDecimal("amount"));
+      order.setCanceledTimestamp(
+          TimeService.convertCSTInMillisecondToUTC(data.getLong("canceled-at")));
+      order.setCreatedTimestamp(
+          TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
+      order.setFinishedTimestamp(
+          TimeService.convertCSTInMillisecondToUTC(data.getLong("finished-at")));
+      order.setFilledAmount(data.getBigDecimal("field-amount"));
+      order.setFilledCashAmount(data.getBigDecimal("field-cash-amount"));
+      order.setFilledFees(data.getBigDecimal("field-fees"));
+      order.setPrice(data.getBigDecimal("price"));
+      order.setSource(OrderSource.lookup(data.getString("source")));
+      order.setState(OrderState.lookup(data.getString("state")));
+      order.setType(OrderType.lookup(data.getString("type")));
+      order.setStopPrice(data.getBigDecimalOrDefault("stop-price", null));
+      order.setOperator(StopOrderOperator.find(data.getStringOrDefault("operator", null)));
+      return order;
+    });
+  }
+
+  public RestApiJsonParser<List<MatchResult>> getMatchResultListParser() {
+    return (jsonWrapper -> {
+      List<MatchResult> matchResultList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        MatchResult matchResult = new MatchResult();
+        matchResult.setId(item.getLong("id"));
+        matchResult.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
+        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
+        matchResult.setMatchId(item.getLong("match-id"));
+        matchResult.setOrderId(item.getLong("order-id"));
+        matchResult.setPrice(item.getBigDecimal("price"));
+        matchResult.setSource(OrderSource.lookup(item.getString("source")));
+        matchResult.setSymbol(item.getString("symbol"));
+        matchResult.setType(OrderType.lookup(item.getString("type")));
+        matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
+        matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
+        matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
+        matchResultList.add(matchResult);
+      });
+      return matchResultList;
+    });
+  }
+
+
 }

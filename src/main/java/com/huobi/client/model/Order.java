@@ -4,11 +4,16 @@ import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
+
 import java.math.BigDecimal;
+
+import lombok.ToString;
 
 /**
  * The detail order information.
  */
+@ToString
 public class Order {
 
   private AccountType accountType;
@@ -19,12 +24,15 @@ public class Order {
   private long finishedTimestamp = 0;
   private long orderId = 0;
   private String symbol;
+  private BigDecimal stopPrice;
   private OrderType type = null;
   private BigDecimal filledAmount;
   private BigDecimal filledCashAmount;
   private BigDecimal filledFees;
   private OrderSource source = null;
   private OrderState state = null;
+  private StopOrderOperator operator = null;
+
 
   /**
    * Get the account type which created this order.
@@ -209,5 +217,29 @@ public class Order {
 
   public void setState(OrderState state) {
     this.state = state;
+  }
+
+  /**
+   * Get stop price
+   * @return The stop price
+   */
+  public BigDecimal getStopPrice() {
+    return stopPrice;
+  }
+
+  public void setStopPrice(BigDecimal stopPrice) {
+    this.stopPrice = stopPrice;
+  }
+
+  /**
+   * Get the operaror
+   * @return gte ,lte
+   */
+  public StopOrderOperator getOperator() {
+    return operator;
+  }
+
+  public void setOperator(StopOrderOperator operator) {
+    this.operator = operator;
   }
 }
