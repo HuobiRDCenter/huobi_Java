@@ -6,8 +6,10 @@ import com.huobi.client.SubscriptionListener;
 import com.huobi.client.SubscriptionOptions;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.CandlestickEvent;
+import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
@@ -73,6 +75,24 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
   @Override
+  public void requestCandlestickEvent(
+      String symbols, Long from, Long to,
+      CandlestickInterval interval,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener) {
+    requestCandlestickEvent(symbols, from, to, interval, subscriptionListener, null);
+  }
+
+  @Override
+  public void requestCandlestickEvent(
+      String symbols, Long from, Long to,
+      CandlestickInterval interval,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestCandlestickEvent(
+        parseSymbols(symbols), from, to, interval, subscriptionListener, errorHandler));
+  }
+
+  @Override
   public void subscribePriceDepthEvent(
       String symbols,
       SubscriptionListener<PriceDepthEvent> subscriptionListener) {
@@ -84,8 +104,32 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       String symbols,
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
+    subscribePriceDepthEvent(symbols,DepthStep.STEP0,subscriptionListener,errorHandler);
+  }
+
+  @Override
+  public void subscribePriceDepthEvent(
+      String symbols, DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribePriceDepthEvent(
-        parseSymbols(symbols), subscriptionListener, errorHandler));
+        parseSymbols(symbols),step, subscriptionListener, errorHandler));
+  }
+
+  @Override
+  public void requestPriceDepthEvent(
+      String symbols,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener) {
+    requestPriceDepthEvent(symbols, DepthStep.STEP0, subscriptionListener, null);
+  }
+
+  @Override
+  public void requestPriceDepthEvent(
+      String symbols,DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestPriceDepthEvent(
+        parseSymbols(symbols),step, subscriptionListener, errorHandler));
   }
 
   @Override
@@ -101,6 +145,22 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionListener<TradeEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribeTradeEvent(
+        parseSymbols(symbols), subscriptionListener, errorHandler));
+  }
+
+  @Override
+  public void requestTradeEvent(
+      String symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener) {
+    requestTradeEvent(symbols, subscriptionListener, null);
+  }
+
+  @Override
+  public void requestTradeEvent(
+      String symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestTradeEvent(
         parseSymbols(symbols), subscriptionListener, errorHandler));
   }
 
@@ -126,7 +186,8 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
   @Override
-  public void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback, SubscriptionErrorHandler errorHandler) {
+  public void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback,
+      SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribeOrderUpdateNewEvent(
         parseSymbols(symbols), callback, errorHandler));
   }
@@ -144,7 +205,7 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   public void subscribeAccountEvent(
       BalanceMode mode,
       SubscriptionListener<AccountEvent> subscriptionListener) {
-    subscribeAccountEvent(mode,subscriptionListener,null);
+    subscribeAccountEvent(mode, subscriptionListener, null);
   }
 
   @Override
@@ -157,8 +218,8 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
 
   @Override
   public void subscribe24HTradeStatisticsEvent(String symbols,
-                                              SubscriptionListener<TradeStatisticsEvent> subscriptionListener) {
-    subscribe24HTradeStatisticsEvent(symbols,subscriptionListener,null);
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener) {
+    subscribe24HTradeStatisticsEvent(symbols, subscriptionListener, null);
   }
 
   @Override
@@ -166,6 +227,20 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribe24HTradeStatisticsEvent(
+        parseSymbols(symbols), subscriptionListener, errorHandler));
+  }
+
+  @Override
+  public void request24HTradeStatisticsEvent(String symbols,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener) {
+    request24HTradeStatisticsEvent(symbols, subscriptionListener, null);
+  }
+
+  @Override
+  public void request24HTradeStatisticsEvent(String symbols,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.request24HTradeStatisticsEvent(
         parseSymbols(symbols), subscriptionListener, errorHandler));
   }
 }

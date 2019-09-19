@@ -173,6 +173,7 @@ public class WebSocketConnection extends WebSocketListener {
         closeOnError();
         return;
       }
+      log.debug("[On Message]{}", data);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
       if (jsonWrapper.containKey("status") && !"ok".equals(jsonWrapper.getString("status"))) {
         String errorCode = jsonWrapper.getStringOrDefault("err-code", "");
@@ -192,7 +193,7 @@ public class WebSocketConnection extends WebSocketListener {
             request.authHandler.handle(this);
           }
         }
-      } else if (jsonWrapper.containKey("ch")) {
+      } else if (jsonWrapper.containKey("ch") || jsonWrapper.containKey("rep")) {
         onReceive(jsonWrapper);
       } else if (jsonWrapper.containKey("ping")) {
         processPingOnMarketLine(jsonWrapper, webSocket);

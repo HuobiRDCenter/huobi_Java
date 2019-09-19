@@ -3,8 +3,10 @@ package com.huobi.client;
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.CandlestickEvent;
+import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
@@ -48,6 +50,17 @@ public interface SubscriptionClient {
       SubscriptionListener<CandlestickEvent> callback,
       SubscriptionErrorHandler errorHandler);
 
+  void requestCandlestickEvent(
+      String symbols,Long from, Long to,
+      CandlestickInterval interval,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener);
+
+  void requestCandlestickEvent(
+      String symbols,Long from, Long to,
+      CandlestickInterval interval,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
   /**
    * Subscribe price depth event. If the price depth is updated, server will send the data to client
    * and onReceive in callback will be called.
@@ -74,6 +87,20 @@ public interface SubscriptionClient {
       SubscriptionListener<PriceDepthEvent> callback,
       SubscriptionErrorHandler errorHandler);
 
+  void subscribePriceDepthEvent(
+      String symbols, DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestPriceDepthEvent(
+      String symbols,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener) ;
+
+  void requestPriceDepthEvent(
+      String symbols,DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
   /**
    * Subscribe price depth event. If the price depth is updated server will send the data to client
    * and onReceive in callback will be called.
@@ -98,6 +125,16 @@ public interface SubscriptionClient {
    */
   void subscribeTradeEvent(String symbols,
       SubscriptionListener<TradeEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestTradeEvent(
+      String symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener);
+
+
+  void requestTradeEvent(
+      String symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
   /**
@@ -179,6 +216,13 @@ public interface SubscriptionClient {
    */
   void subscribe24HTradeStatisticsEvent(String symbols,
       SubscriptionListener<TradeStatisticsEvent> callback, SubscriptionErrorHandler errorHandler);
+
+  void request24HTradeStatisticsEvent(String symbols,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener);
+
+  void request24HTradeStatisticsEvent(String symbols,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
 
   /**
    * Unsubscribe all subscription.
