@@ -134,6 +134,7 @@ public class WebSocketConnection extends WebSocketListener {
 
   void send(String str) {
     boolean result = false;
+    log.debug("[Send]{}", str);
     if (webSocket != null) {
       result = webSocket.send(str);
     }
@@ -192,6 +193,8 @@ public class WebSocketConnection extends WebSocketListener {
           if (request.authHandler != null) {
             request.authHandler.handle(this);
           }
+        } else if (op.equals("req")) {
+          onReceive(jsonWrapper);
         }
       } else if (jsonWrapper.containKey("ch") || jsonWrapper.containKey("rep")) {
         onReceive(jsonWrapper);

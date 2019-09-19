@@ -1,7 +1,6 @@
 package com.huobi.client.impl;
 
 import static com.huobi.client.impl.utils.InternalUtils.await;
-import static com.huobi.client.impl.utils.InternalUtils.decode;
 
 import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
@@ -9,7 +8,9 @@ import com.huobi.client.impl.utils.Channels;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.impl.utils.TimeService;
+import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountChange;
+import com.huobi.client.model.Balance;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.Order;
@@ -18,6 +19,8 @@ import com.huobi.client.model.PriceDepth;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.enums.AccountChangeType;
+import com.huobi.client.model.enums.AccountState;
+import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.BalanceType;
 import com.huobi.client.model.enums.CandlestickInterval;
@@ -28,6 +31,7 @@ import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.event.AccountEvent;
+import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
@@ -554,6 +558,46 @@ class WebsocketRequestImpl {
       tradeStatisticsEvent.setData(statistics);
       return tradeStatisticsEvent;
     };
+    return request;
+  }
+
+  WebsocketRequest<AccountListEvent> requestAccountListEvent(
+      SubscriptionListener<AccountListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler){
+
+    WebsocketRequest<AccountListEvent> request = new WebsocketRequest<AccountListEvent>(subscriptionListener,errorHandler);
+    request.authHandler = (connection) ->{
+      connection.send(Channels.requestAccountListChannel());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      JsonWrapperArray array = jsonWrapper.getJsonArray("data");
+      List<Account> accountList = new ArrayList<>();
+      array.forEach(accountItem ->{
+        Account account = new Account();
+        account.setId(accountItem.getLong("id"));
+        account.setType(AccountType.lookup(accountItem.getString("type")));
+        account.setState(AccountState.lookup(accountItem.getString("state")));
+        List<Balance> balanceList = new ArrayList<>();
+        JsonWrapperArray balanceArray = accountItem.getJsonArray("list");
+        balanceArray.forEach(balanceItem ->{
+          Balance balance = new Balance();
+          balance.setBalance(balanceItem.getBigDecimal("balance"));
+          balance.setCurrency(balanceItem.getString("currency"));
+          balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+          balanceList.add(balance);
+        });
+
+        account.setBalances(balanceList);
+        accountList.add(account);
+      });
+
+      return AccountListEvent.builder()
+          .timestamp(ts)
+          .accountList(accountList)
+          .build();
+    };
+
     return request;
   }
 }

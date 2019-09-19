@@ -89,4 +89,12 @@ public abstract class Channels {
     json.put("id", TimeService.getCurrentTimeStamp() + "");
     return json.toJSONString();
   }
+
+  public static String requestAccountListChannel(){
+    JSONObject json = new JSONObject();
+    json.put("op", OP_REQ);
+    json.put("cid", TimeService.getCurrentTimeStamp() + "");
+    json.put("topic", "accounts.list");
+    return json.toJSONString();
+  }
 }

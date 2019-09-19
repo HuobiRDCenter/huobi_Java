@@ -8,6 +8,7 @@ import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.event.AccountEvent;
+import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
@@ -243,4 +244,14 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
     createConnection(requestImpl.request24HTradeStatisticsEvent(
         parseSymbols(symbols), subscriptionListener, errorHandler));
   }
+
+  public void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback) {
+    requestAccountListEvent(callback,null);
+  }
+
+  public void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestAccountListEvent(callback,errorHandler));
+  }
+
 }

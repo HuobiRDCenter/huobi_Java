@@ -5,6 +5,7 @@ import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.event.AccountEvent;
+import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
@@ -223,6 +224,10 @@ public interface SubscriptionClient {
   void request24HTradeStatisticsEvent(String symbols,
       SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
+
+  void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback);
+
+  void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback, SubscriptionErrorHandler errorHandler);
 
   /**
    * Unsubscribe all subscription.
