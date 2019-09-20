@@ -3,8 +3,10 @@ logs/
 target
 *.iml
 *.tmp
-/.metadata/
-/.metadata/
+
+.classpath
+
+
 
 .settings/
 
