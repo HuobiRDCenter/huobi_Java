@@ -11,11 +11,13 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.request.OrdersRequest;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -23,8 +25,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class WebSocketStreamClientImpl implements SubscriptionClient {
+
   private final SubscriptionOptions options;
-  private  WebSocketWatchDog watchDog;
+  private WebSocketWatchDog watchDog;
 
   private final WebsocketRequestImpl requestImpl;
 
@@ -105,7 +108,7 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       String symbols,
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
-    subscribePriceDepthEvent(symbols,DepthStep.STEP0,subscriptionListener,errorHandler);
+    subscribePriceDepthEvent(symbols, DepthStep.STEP0, subscriptionListener, errorHandler);
   }
 
   @Override
@@ -114,7 +117,7 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribePriceDepthEvent(
-        parseSymbols(symbols),step, subscriptionListener, errorHandler));
+        parseSymbols(symbols), step, subscriptionListener, errorHandler));
   }
 
   @Override
@@ -126,11 +129,11 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
 
   @Override
   public void requestPriceDepthEvent(
-      String symbols,DepthStep step,
+      String symbols, DepthStep step,
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.requestPriceDepthEvent(
-        parseSymbols(symbols),step, subscriptionListener, errorHandler));
+        parseSymbols(symbols), step, subscriptionListener, errorHandler));
   }
 
   @Override
@@ -178,6 +181,15 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
   @Override
+  public void requestOrderListEvent(OrdersRequest ordersRequest, SubscriptionListener<OrderListEvent> callback) {
+    requestOrderListEvent(ordersRequest, callback, null);
+  }
+
+  public void requestOrderDetailEvent(Long orderId, SubscriptionListener<OrderListEvent> callback) {
+    requestOrderDetailEvent(orderId, callback, null);
+  }
+
+  @Override
   public void subscribeOrderUpdateEvent(
       String symbols,
       SubscriptionListener<OrderUpdateEvent> subscriptionListener,
@@ -192,6 +204,18 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
     createConnection(requestImpl.subscribeOrderUpdateNewEvent(
         parseSymbols(symbols), callback, errorHandler));
   }
+  @Override
+  public void requestOrderListEvent(OrdersRequest ordersRequest, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestOrderListEvent(
+        ordersRequest, callback, errorHandler));
+  }
+
+  public void requestOrderDetailEvent(Long orderId, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.requestOrderDetailEvent(orderId, callback, errorHandler));
+  }
+
 
   @Override
   public void unsubscribeAll() {
@@ -246,12 +270,12 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
   public void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback) {
-    requestAccountListEvent(callback,null);
+    requestAccountListEvent(callback, null);
   }
 
   public void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback,
       SubscriptionErrorHandler errorHandler) {
-    createConnection(requestImpl.requestAccountListEvent(callback,errorHandler));
+    createConnection(requestImpl.requestAccountListEvent(callback, errorHandler));
   }
 
 }

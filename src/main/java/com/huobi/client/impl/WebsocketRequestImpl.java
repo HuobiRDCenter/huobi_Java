@@ -4,6 +4,7 @@ import static com.huobi.client.impl.utils.InternalUtils.await;
 
 import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
+import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.Channels;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.JsonWrapperArray;
@@ -29,20 +30,27 @@ import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.request.OrdersRequest;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
 
 class WebsocketRequestImpl {
 
@@ -533,7 +541,7 @@ class WebsocketRequestImpl {
     }
     request.connectionHandler = (connection) -> {
       for (String symbol : symbols) {
-        String req = Channels.tradeStatisticsChannel(Channels.OP_REQ,symbol);
+        String req = Channels.tradeStatisticsChannel(Channels.OP_REQ, symbol);
         connection.send(req);
       }
     };
@@ -563,24 +571,24 @@ class WebsocketRequestImpl {
 
   WebsocketRequest<AccountListEvent> requestAccountListEvent(
       SubscriptionListener<AccountListEvent> subscriptionListener,
-      SubscriptionErrorHandler errorHandler){
+      SubscriptionErrorHandler errorHandler) {
 
-    WebsocketRequest<AccountListEvent> request = new WebsocketRequest<AccountListEvent>(subscriptionListener,errorHandler);
-    request.authHandler = (connection) ->{
+    WebsocketRequest<AccountListEvent> request = new WebsocketRequest<AccountListEvent>(subscriptionListener, errorHandler);
+    request.authHandler = (connection) -> {
       connection.send(Channels.requestAccountListChannel());
     };
     request.jsonParser = (jsonWrapper) -> {
       long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
       JsonWrapperArray array = jsonWrapper.getJsonArray("data");
       List<Account> accountList = new ArrayList<>();
-      array.forEach(accountItem ->{
+      array.forEach(accountItem -> {
         Account account = new Account();
         account.setId(accountItem.getLong("id"));
         account.setType(AccountType.lookup(accountItem.getString("type")));
         account.setState(AccountState.lookup(accountItem.getString("state")));
         List<Balance> balanceList = new ArrayList<>();
         JsonWrapperArray balanceArray = accountItem.getJsonArray("list");
-        balanceArray.forEach(balanceItem ->{
+        balanceArray.forEach(balanceItem -> {
           Balance balance = new Balance();
           balance.setBalance(balanceItem.getBigDecimal("balance"));
           balance.setCurrency(balanceItem.getString("currency"));
@@ -598,6 +606,131 @@ class WebsocketRequestImpl {
           .build();
     };
 
+    return request;
+  }
+
+
+  WebsocketRequest<OrderListEvent> requestOrderListEvent(
+      OrdersRequest ordersRequest,
+      SubscriptionListener<OrderListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    WebsocketRequest<OrderListEvent> request = new WebsocketRequest<>(subscriptionListener, errorHandler);
+    request.name = "Order List Req for " + ordersRequest.getSymbol();
+
+    request.authHandler = (connection) -> {
+
+      Account account = AccountsInfoMap.getUser(apiKey).getAccount(AccountType.SPOT);
+      if (account == null) {
+        throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
+      }
+
+      String startDateString = ordersRequest.getStartDate() == null
+          ? null : DateFormatUtils.format(ordersRequest.getStartDate(), "yyyy-MM-dd");
+      String endDateString = ordersRequest.getEndDate() == null
+          ? null : DateFormatUtils.format(ordersRequest.getEndDate(), "yyyy-MM-dd");
+      JSONObject requestTopic = new JSONObject();
+      requestTopic.put("op", Channels.OP_REQ);
+      requestTopic.put("topic", "orders.list");
+      requestTopic.put("account-id", account.getId());
+      requestTopic.put("symbol", ordersRequest.getSymbol());
+      requestTopic.put("types", ordersRequest.getTypesString());
+      requestTopic.put("states", ordersRequest.getStatesString());
+      requestTopic.put("start-date", startDateString);
+      requestTopic.put("end-date", endDateString);
+      requestTopic.put("from", ordersRequest.getStartId() != null ? ordersRequest.getStartId()+"" : null);
+      requestTopic.put("direct", ordersRequest.getDirect() != null ? ordersRequest.getDirect().toString() : null);
+      requestTopic.put("size", ordersRequest.getSize() != null ? ordersRequest.getSize()+"" : null);
+
+      connection.send(requestTopic.toJSONString());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<Order> orderList = new ArrayList<>();
+      dataArray.forEach(item -> {
+        Order order = new Order();
+        order.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+        order.setAmount(item.getBigDecimal("amount"));
+        order.setCanceledTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
+        order.setFinishedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+        order.setOrderId(item.getLong("id"));
+        order.setSymbol(item.getString("symbol"));
+        order.setPrice(item.getBigDecimal("price"));
+        order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setType(OrderType.lookup(item.getString("type")));
+        order.setFilledAmount(item.getBigDecimal("filled-amount"));
+        order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
+        order.setFilledFees(item.getBigDecimal("filled-fees"));
+        order.setSource(OrderSource.lookup(item.getString("source")));
+        order.setState(OrderState.lookup(item.getString("state")));
+        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
+
+        orderList.add(order);
+      });
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<OrderListEvent> requestOrderDetailEvent(
+      Long orderId,
+      SubscriptionListener<OrderListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    WebsocketRequest<OrderListEvent> request = new WebsocketRequest<>(subscriptionListener, errorHandler);
+
+    InputChecker.checker().shouldNotNull(orderId,"orderId");
+    request.name = "Order Detail Req for " + orderId;
+
+    request.authHandler = (connection) -> {
+
+      JSONObject requestTopic = new JSONObject();
+      requestTopic.put("op", Channels.OP_REQ);
+      requestTopic.put("topic", "orders.detail");
+      requestTopic.put("order-id", orderId.toString());
+
+      System.out.println("[send]"+ requestTopic.toJSONString());
+      connection.send(requestTopic.toJSONString());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapper item = jsonWrapper.getJsonObject("data");
+      List<Order> orderList = new ArrayList<>();
+
+      Order order = new Order();
+      order.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+      order.setAmount(item.getBigDecimal("amount"));
+      order.setCanceledTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
+      order.setFinishedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+      order.setOrderId(item.getLong("id"));
+      order.setSymbol(item.getString("symbol"));
+      order.setPrice(item.getBigDecimal("price"));
+      order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+      order.setType(OrderType.lookup(item.getString("type")));
+      order.setFilledAmount(item.getBigDecimal("filled-amount"));
+      order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
+      order.setFilledFees(item.getBigDecimal("filled-fees"));
+      order.setSource(OrderSource.lookup(item.getString("source")));
+      order.setState(OrderState.lookup(item.getString("state")));
+      order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+      order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
+
+      orderList.add(order);
+
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
+    };
     return request;
   }
 }

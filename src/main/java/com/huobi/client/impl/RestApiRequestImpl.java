@@ -853,15 +853,16 @@ class RestApiRequestImpl {
 
   RestApiRequest<List<Order>> getOrders(OrdersRequest req) {
     InputChecker.checker().checkSymbol(req.getSymbol())
-        .shouldNotNull(req.getState(), "state");
+        .shouldNotNull(req.getStates(), "states");
     RestApiRequest<List<Order>> request = new RestApiRequest<>();
+
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", req.getSymbol())
-        .putToUrl("types", req.getType())
+        .putToUrl("types", req.getTypesString())
         .putToUrl("start-date", req.getStartDate(), "yyyy-MM-dd")
         .putToUrl("end-date", req.getEndDate(), "yyyy-MM-dd")
         .putToUrl("from", req.getStartId())
-        .putToUrl("states", req.getState())
+        .putToUrl("states", req.getStatesString())
         .putToUrl("size", req.getSize())
         .putToUrl("direct", req.getDirect());
     request.request = createRequestByGetWithSignature("/v1/order/orders", builder);

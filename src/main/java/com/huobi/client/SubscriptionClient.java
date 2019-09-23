@@ -8,11 +8,13 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.request.OrdersRequest;
 
 /***
  * The subscription client interface, it is used for subscribing any market data update and
@@ -175,6 +177,9 @@ public interface SubscriptionClient {
 
   void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback);
 
+  void requestOrderListEvent(OrdersRequest ordersRequest, SubscriptionListener<OrderListEvent> callback);
+
+  void requestOrderDetailEvent(Long orderId, SubscriptionListener<OrderListEvent> callback);
   /**
    * Subscribe order changing event. If a order is created, canceled etc, server will send the data
    * to client and onReceive in callback will be called.
@@ -192,6 +197,11 @@ public interface SubscriptionClient {
   void subscribeOrderUpdateNewEvent(String symbols, SubscriptionListener<OrderUpdateNewEvent> callback,
       SubscriptionErrorHandler errorHandler);
 
+  void requestOrderListEvent(OrdersRequest ordersRequest, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestOrderDetailEvent(Long orderId, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
   /**
    * Subscribe 24 hours trade statistics event. If statistics is generated, server will send the
    * data to client and onReceive in callback will be called.
