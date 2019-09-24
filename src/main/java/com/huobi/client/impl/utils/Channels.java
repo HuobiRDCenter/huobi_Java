@@ -35,6 +35,13 @@ public abstract class Channels {
     return priceDepthChannel(OP_SUB, symbol, step);
   }
 
+  public static String marketBBOChannel(String symbol) {
+    JSONObject json = new JSONObject();
+    json.put("sub","market."+symbol+".bbo");
+    json.put("id",TimeService.getCurrentTimeStamp() + "");
+    return json.toJSONString();
+  }
+
   public static String priceDepthChannel(String op, String symbol, DepthStep step) {
     JSONObject json = new JSONObject();
     json.put(op, "market." + symbol + ".depth." + step.getStep());

@@ -163,4 +163,8 @@ public class JsonWrapper {
     return new JsonWrapperArray(array);
   }
 
+  public JSONObject getJson(){
+    return json;
+  }
+
 }

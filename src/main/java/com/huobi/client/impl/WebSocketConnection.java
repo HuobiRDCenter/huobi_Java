@@ -185,7 +185,7 @@ public class WebSocketConnection extends WebSocketListener {
         closeOnError();
         return;
       }
-      log.info("[On Message][{}] {}", connectionId, data);
+      log.debug("[On Message][{}] {}", connectionId, data);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
       if (jsonWrapper.containKey("status") && !"ok".equals(jsonWrapper.getString("status"))) {
         String errorCode = jsonWrapper.getStringOrDefault("err-code", "");

@@ -11,6 +11,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
@@ -197,6 +198,15 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.requestTradeEvent(
         parseSymbols(symbols), subscriptionListener, errorHandler), autoClose);
+  }
+
+  public void subscribeMarketBBOEvent(String symbols, SubscriptionListener<MarketBBOEvent> subscriptionListener) {
+    subscribeMarketBBOEvent(symbols, subscriptionListener, null);
+  }
+
+  public void subscribeMarketBBOEvent(String symbols, SubscriptionListener<MarketBBOEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.subscribeMarketBBOEvent(parseSymbols(symbols), subscriptionListener, errorHandler));
   }
 
   @Override

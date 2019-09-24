@@ -36,6 +36,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
@@ -50,7 +51,6 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.DateUtils;
 
 class WebsocketRequestImpl {
 
@@ -359,6 +359,34 @@ class WebsocketRequestImpl {
     };
     return request;
   }
+
+
+  WebsocketRequest<MarketBBOEvent> subscribeMarketBBOEvent(
+      List<String> symbols,
+      SubscriptionListener<MarketBBOEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+
+    WebsocketRequest<MarketBBOEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "MarketBBO for " + symbols;
+    } else {
+      request.name = "MarketBBO for " + symbols + " ...";
+    }
+
+    request.connectionHandler = (connection) ->
+        symbols.forEach(symbol -> {
+          String req = Channels.marketBBOChannel(symbol);
+          connection.send(req);
+          await(1);
+        });
+    request.jsonParser = MarketBBOEvent.getParser();
+    return request;
+  }
+
+
 
   WebsocketRequest<OrderUpdateEvent> subscribeOrderUpdateEvent(
       List<String> symbols,

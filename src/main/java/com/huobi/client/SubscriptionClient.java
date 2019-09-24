@@ -8,6 +8,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
@@ -155,6 +156,12 @@ public interface SubscriptionClient {
   void requestTradeEvent(
       String symbols, boolean autoClose,
       SubscriptionListener<TradeEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
+
+  void subscribeMarketBBOEvent(String symbols, SubscriptionListener<MarketBBOEvent> subscriptionListener);
+
+  void subscribeMarketBBOEvent(String symbols, SubscriptionListener<MarketBBOEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
   /**
