@@ -64,6 +64,13 @@ public interface SubscriptionClient {
       SubscriptionListener<CandlestickReqEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
+  void requestCandlestickEvent(
+      String symbols,Long from, Long to,
+      CandlestickInterval interval,
+      boolean autoClose,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
   /**
    * Subscribe price depth event. If the price depth is updated, server will send the data to client
    * and onReceive in callback will be called.
@@ -104,6 +111,11 @@ public interface SubscriptionClient {
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
+  void requestPriceDepthEvent(
+      String symbols,DepthStep step, boolean autoClose,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
   /**
    * Subscribe price depth event. If the price depth is updated server will send the data to client
    * and onReceive in callback will be called.
@@ -137,6 +149,11 @@ public interface SubscriptionClient {
 
   void requestTradeEvent(
       String symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestTradeEvent(
+      String symbols, boolean autoClose,
       SubscriptionListener<TradeEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
@@ -202,6 +219,12 @@ public interface SubscriptionClient {
 
   void requestOrderDetailEvent(Long orderId, SubscriptionListener<OrderListEvent> callback,
       SubscriptionErrorHandler errorHandler);
+
+  void requestOrderListEvent(OrdersRequest ordersRequest, boolean autoClose, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestOrderDetailEvent(Long orderId,boolean autoClose, SubscriptionListener<OrderListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
   /**
    * Subscribe 24 hours trade statistics event. If statistics is generated, server will send the
    * data to client and onReceive in callback will be called.
@@ -235,9 +258,16 @@ public interface SubscriptionClient {
       SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler);
 
+  void request24HTradeStatisticsEvent(String symbols, boolean autoClose,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler);
+
   void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback);
 
   void requestAccountListEvent(SubscriptionListener<AccountListEvent> callback, SubscriptionErrorHandler errorHandler);
+
+  void requestAccountListEvent(boolean autoClose, SubscriptionListener<AccountListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
 
   /**
    * Unsubscribe all subscription.
