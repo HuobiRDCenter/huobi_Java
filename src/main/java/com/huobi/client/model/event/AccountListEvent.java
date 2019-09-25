@@ -10,6 +10,10 @@ import lombok.ToString;
 
 import com.huobi.client.model.Account;
 
+/**
+ * The account list event information received by request of account list.
+ */
+
 @Data
 @Builder
 @AllArgsConstructor

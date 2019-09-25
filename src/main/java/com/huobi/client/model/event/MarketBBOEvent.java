@@ -11,6 +11,10 @@ import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.MarketBBO;
 
+/**
+ * The Market BBO data received by request of market bbo.
+ */
+
 @Data
 @Builder
 @AllArgsConstructor

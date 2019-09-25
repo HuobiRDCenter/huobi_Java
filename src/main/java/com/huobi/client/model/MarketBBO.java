@@ -12,6 +12,9 @@ import lombok.ToString;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.TimeService;
 
+/**
+ * The market bbo.
+ */
 @Data
 @Builder
 @AllArgsConstructor
