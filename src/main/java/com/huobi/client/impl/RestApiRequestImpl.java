@@ -174,6 +174,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
         Candlestick candlestick = new Candlestick();
+        candlestick.setId(item.getLong("id"));
         candlestick.setTimestamp(
             TimeService.convertCSTInSecondToUTC(item.getLong("id")));
         candlestick.setOpen(item.getBigDecimal("open"));
@@ -1044,6 +1045,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
         Candlestick candlestick = new Candlestick();
+        candlestick.setId(item.getLong("id"));
         candlestick.setTimestamp(
             TimeService.convertCSTInSecondToUTC(item.getLong("id")));
         candlestick.setOpen(item.getBigDecimal("open"));
