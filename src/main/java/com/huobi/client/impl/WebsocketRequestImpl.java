@@ -92,7 +92,9 @@ class WebsocketRequestImpl {
       candlestickEvent.setTimestamp(
           TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
       JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      Long id = tick.getLong("id");
       Candlestick data = new Candlestick();
+      data.setId(id);
       data.setTimestamp(TimeService.convertCSTInSecondToUTC(tick.getLong("id")));
       data.setOpen(tick.getBigDecimal("open"));
       data.setClose(tick.getBigDecimal("close"));
@@ -142,8 +144,10 @@ class WebsocketRequestImpl {
 
       List<Candlestick> list = new ArrayList<>();
       dataArray.forEach(dataJson -> {
+        Long id = dataJson.getLong("id");
         Candlestick data = new Candlestick();
-        data.setTimestamp(TimeService.convertCSTInSecondToUTC(dataJson.getLong("id")));
+        data.setId(id);
+        data.setTimestamp(TimeService.convertCSTInSecondToUTC(id));
         data.setOpen(dataJson.getBigDecimal("open"));
         data.setClose(dataJson.getBigDecimal("close"));
         data.setLow(dataJson.getBigDecimal("low"));
