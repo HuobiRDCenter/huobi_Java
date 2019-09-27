@@ -140,13 +140,25 @@ public class PlaceOrder {
 
 
     // Get all the orders
-    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.CANCELED));
+    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.FILLED));
     orderList.forEach(order -> {
       System.out.println("Orders :: "+ order.toString());
     });
 
+    System.out.println("=================");
+
+    List<OrderState> stateList = new ArrayList<>();
+    stateList.add(OrderState.CANCELED);
+    stateList.add(OrderState.FILLED);
+
+    List<OrderType> typeList = new ArrayList<>();
+    typeList.add(OrderType.BUY_LIMIT);
+    typeList.add(OrderType.SELL_LIMIT);
+    typeList.add(OrderType.BUY_MARKET);
+    typeList.add(OrderType.SELL_MARKET);
+
     // Get all the orders
-    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol,OrderState.CANCELED));
+    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol,stateList,typeList,null,null,null,null,null));
     orderList1.forEach(order -> {
       System.out.println("Orders :: "+ order.toString());
     });

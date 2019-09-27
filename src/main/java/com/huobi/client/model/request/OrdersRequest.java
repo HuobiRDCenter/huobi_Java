@@ -1,6 +1,8 @@
 package com.huobi.client.model.request;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Getter;
 
@@ -21,8 +23,12 @@ public class OrdersRequest {
    * @param state Order state , SUBMITTED etc. (mandatory)
    */
   public OrdersRequest(String symbol, OrderState state) {
+    List<OrderState> stateList = new ArrayList<OrderState>();
+    if (state != null) {
+      stateList.add(state);
+    }
     this.symbol = symbol;
-    this.state = state;
+    this.states = stateList;
   }
 
   /**
@@ -38,9 +44,19 @@ public class OrdersRequest {
    */
   public OrdersRequest(String symbol, OrderState state,
       OrderType type, Date startDate, Date endDate, Long startId, Integer size, QueryDirection direct) {
+    List<OrderState> stateList = new ArrayList<OrderState>();
+    if (state != null) {
+      stateList.add(state);
+    }
+
+    List<OrderType> typeList = new ArrayList<>();
+    if (type != null) {
+      typeList.add(type);
+    }
+
     this.symbol = symbol;
-    this.state = state;
-    this.type = type;
+    this.states = stateList;
+    this.types = typeList;
     this.startDate = startDate;
     this.endDate = endDate;
     this.startId = startId;
@@ -48,11 +64,33 @@ public class OrdersRequest {
     this.direct = direct;
   }
 
+  public OrdersRequest(String symbol, List<OrderState> stateList,
+      List<OrderType> typeList, Date startDate, Date endDate, Long startId, Integer size, QueryDirection direct) {
+
+    this.symbol = symbol;
+    this.states = stateList;
+    this.types = typeList;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.startId = startId;
+    this.size = size;
+    this.direct = direct;
+  }
 
   public OrdersRequest(HistoricalOrdersRequest request) {
+    List<OrderState> stateList = new ArrayList<OrderState>();
+    if (request.getState() != null) {
+      stateList.add(request.getState());
+    }
+
+    List<OrderType> typeList = new ArrayList<>();
+    if (request.getType() != null) {
+      typeList.add(request.getType());
+    }
+
     this.symbol = request.getSymbol();
-    this.state = request.getState();
-    this.type = request.getType();
+    this.states = stateList;
+    this.types = typeList;
     this.startDate = request.getStartDate();
     this.endDate = request.getEndDate();
     this.startId = request.getStartId();
@@ -60,13 +98,38 @@ public class OrdersRequest {
   }
 
   private final String symbol;
-  private final OrderState state;
-  private OrderType type = null;
+  private List<OrderState> states;
+  private List<OrderType> types = null;
   private Date startDate = null;
   private Date endDate = null;
   private Long startId = null;
   private Integer size = null;
   private QueryDirection direct;
 
+
+  public String getTypesString(){
+    String typeString = null;
+    if (this.getTypes() != null && this.getTypes().size() > 0) {
+      StringBuffer typeBuffer = new StringBuffer();
+      this.getTypes().forEach(orderType -> {
+        typeBuffer.append(orderType.toString()).append(",");
+      });
+
+      typeString = typeBuffer.substring(0, typeBuffer.length() - 1);
+    }
+    return typeString;
+  }
+
+  public String getStatesString(){
+    String stateString = null;
+    if (this.getStates() != null && this.getStates().size() > 0) {
+      StringBuffer statesBuffer = new StringBuffer();
+      this.getStates().forEach(orderType -> {
+        statesBuffer.append(orderType.toString()).append(",");
+      });
+      stateString = statesBuffer.substring(0, statesBuffer.length() - 1);
+    }
+    return stateString;
+  }
 
 }

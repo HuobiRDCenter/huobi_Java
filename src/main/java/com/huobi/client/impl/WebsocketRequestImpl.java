@@ -4,11 +4,14 @@ import static com.huobi.client.impl.utils.InternalUtils.await;
 
 import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
+import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.Channels;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.impl.utils.TimeService;
+import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountChange;
+import com.huobi.client.model.Balance;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.Order;
@@ -17,23 +20,37 @@ import com.huobi.client.model.PriceDepth;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.enums.AccountChangeType;
+import com.huobi.client.model.enums.AccountState;
+import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.BalanceType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DealRole;
+import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.event.AccountEvent;
+import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
+import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.MarketBBOEvent;
+import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.request.OrdersRequest;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 class WebsocketRequestImpl {
 
@@ -75,7 +92,9 @@ class WebsocketRequestImpl {
       candlestickEvent.setTimestamp(
           TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
       JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      Long id = tick.getLong("id");
       Candlestick data = new Candlestick();
+      data.setId(id);
       data.setTimestamp(TimeService.convertCSTInSecondToUTC(tick.getLong("id")));
       data.setOpen(tick.getBigDecimal("open"));
       data.setClose(tick.getBigDecimal("close"));
@@ -88,6 +107,63 @@ class WebsocketRequestImpl {
       return candlestickEvent;
     };
     return request;
+  }
+
+
+  WebsocketRequest<CandlestickReqEvent> requestCandlestickEvent(
+      List<String> symbols, Long from, Long to,
+      CandlestickInterval interval,
+      SubscriptionListener<CandlestickReqEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+
+    InputChecker.checker()
+        .checkSymbolList(symbols)
+        .shouldNotNull(subscriptionListener, "listener")
+        .shouldNotNull(interval, "CandlestickInterval");
+    WebsocketRequest<CandlestickReqEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "Candlestick for " + symbols;
+    } else {
+      request.name = "Candlestick for " + symbols + " ...";
+    }
+    request.connectionHandler = (connection) ->
+        symbols.stream()
+            .map((symbol) -> Channels.klineReqChannel(symbol, interval, from, to))
+            .forEach(req -> {
+              connection.send(req);
+              await(1);
+            });
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      CandlestickReqEvent candlestickEvent = new CandlestickReqEvent();
+      candlestickEvent.setSymbol(parser.getSymbol());
+      candlestickEvent.setInterval(interval);
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+
+      List<Candlestick> list = new ArrayList<>();
+      dataArray.forEach(dataJson -> {
+        Long id = dataJson.getLong("id");
+        Candlestick data = new Candlestick();
+        data.setId(id);
+        data.setTimestamp(TimeService.convertCSTInSecondToUTC(id));
+        data.setOpen(dataJson.getBigDecimal("open"));
+        data.setClose(dataJson.getBigDecimal("close"));
+        data.setLow(dataJson.getBigDecimal("low"));
+        data.setHigh(dataJson.getBigDecimal("high"));
+        data.setAmount(dataJson.getBigDecimal("amount"));
+        data.setCount(dataJson.getLong("count"));
+        data.setVolume(dataJson.getBigDecimal("vol"));
+        list.add(data);
+      });
+
+      candlestickEvent.setData(list);
+      return candlestickEvent;
+    };
+    return request;
+
+
   }
 
   WebsocketRequest<TradeEvent> subscribeTradeEvent(
@@ -133,11 +209,114 @@ class WebsocketRequestImpl {
     return request;
   }
 
+  WebsocketRequest<TradeEvent> requestTradeEvent(
+      List<String> symbols,
+      SubscriptionListener<TradeEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+    WebsocketRequest<TradeEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "Trade Req for " + symbols;
+    } else {
+      request.name = "Trade Req for " + symbols + " ...";
+    }
+    request.connectionHandler = (connection) ->
+        symbols.forEach(symbol -> {
+          String req = Channels.tradeChannel(Channels.OP_REQ, symbol);
+          connection.send(req);
+          await(1);
+        });
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeEvent tradeEvent = new TradeEvent();
+      tradeEvent.setSymbol(parser.getSymbol());
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<Trade> trades = new LinkedList<>();
+      dataArray.forEach((item) -> {
+        Trade trade = new Trade();
+        trade.setAmount(item.getBigDecimal("amount"));
+        trade.setPrice(item.getBigDecimal("price"));
+        trade.setTradeId(item.getString("id"));
+        trade.setDirection(TradeDirection.lookup(item.getString("direction")));
+        trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("ts")));
+        trades.add(trade);
+      });
+      tradeEvent.setTradeList(trades);
+      return tradeEvent;
+    };
+    return request;
+  }
+
+
+  WebsocketRequest<PriceDepthEvent> requestPriceDepthEvent(
+      List<String> symbols, DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+
+    WebsocketRequest<PriceDepthEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "PriceDepth Req for " + symbols;
+    } else {
+      request.name = "PriceDepth Req  for " + symbols + " ...";
+    }
+    request.connectionHandler = (connection) ->
+        symbols.forEach(symbol -> {
+          String req = Channels.priceDepthChannel(Channels.OP_REQ, symbol, step);
+          connection.send(req);
+          await(1);
+        });
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      PriceDepthEvent priceDepthEvent = new PriceDepthEvent();
+      priceDepthEvent.setTimestamp(
+          TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      priceDepthEvent.setSymbol(parser.getSymbol());
+      PriceDepth priceDepth = new PriceDepth();
+      JsonWrapper tick = jsonWrapper.getJsonObject("data");
+      priceDepth.setTimestamp(TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts")));
+      List<DepthEntry> bidList = new LinkedList<>();
+      JsonWrapperArray bids = tick.getJsonArray("bids");
+      bids.forEachAsArray((item) -> {
+        DepthEntry depthEntry = new DepthEntry();
+        depthEntry.setPrice(item.getBigDecimalAt(0));
+        depthEntry.setAmount(item.getBigDecimalAt(1));
+        bidList.add(depthEntry);
+      });
+      List<DepthEntry> askList = new LinkedList<>();
+      JsonWrapperArray asks = tick.getJsonArray("asks");
+      asks.forEachAsArray((item) -> {
+        DepthEntry depthEntry = new DepthEntry();
+        depthEntry.setPrice(item.getBigDecimalAt(0));
+        depthEntry.setAmount(item.getBigDecimalAt(1));
+        askList.add(depthEntry);
+      });
+      priceDepth.setAsks(askList);
+      priceDepth.setBids(bidList);
+      priceDepthEvent.setData(priceDepth);
+      return priceDepthEvent;
+    };
+    return request;
+  }
+
   WebsocketRequest<PriceDepthEvent> subscribePriceDepthEvent(
       List<String> symbols,
       SubscriptionListener<PriceDepthEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
+    return subscribePriceDepthEvent(symbols, DepthStep.STEP0, subscriptionListener, errorHandler);
+  }
+
+  WebsocketRequest<PriceDepthEvent> subscribePriceDepthEvent(
+      List<String> symbols, DepthStep step,
+      SubscriptionListener<PriceDepthEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+
     InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+
     WebsocketRequest<PriceDepthEvent> request =
         new WebsocketRequest<>(subscriptionListener, errorHandler);
     if (symbols.size() == 1) {
@@ -146,12 +325,11 @@ class WebsocketRequestImpl {
       request.name = "PriceDepth for " + symbols + " ...";
     }
     request.connectionHandler = (connection) ->
-        symbols.stream()
-            .map(Channels::priceDepthChannel)
-            .forEach(req -> {
-              connection.send(req);
-              await(1);
-            });
+        symbols.forEach(symbol -> {
+          String req = Channels.priceDepthChannel(symbol, step);
+          connection.send(req);
+          await(1);
+        });
     request.jsonParser = (jsonWrapper) -> {
       String ch = jsonWrapper.getString("ch");
       ChannelParser parser = new ChannelParser(ch);
@@ -185,6 +363,34 @@ class WebsocketRequestImpl {
     };
     return request;
   }
+
+
+  WebsocketRequest<MarketBBOEvent> subscribeMarketBBOEvent(
+      List<String> symbols,
+      SubscriptionListener<MarketBBOEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+
+    WebsocketRequest<MarketBBOEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "MarketBBO for " + symbols;
+    } else {
+      request.name = "MarketBBO for " + symbols + " ...";
+    }
+
+    request.connectionHandler = (connection) ->
+        symbols.forEach(symbol -> {
+          String req = Channels.marketBBOChannel(symbol);
+          connection.send(req);
+          await(1);
+        });
+    request.jsonParser = MarketBBOEvent.getParser();
+    return request;
+  }
+
+
 
   WebsocketRequest<OrderUpdateEvent> subscribeOrderUpdateEvent(
       List<String> symbols,
@@ -349,6 +555,213 @@ class WebsocketRequestImpl {
       statistics.setVolume(tick.getBigDecimal("vol"));
       tradeStatisticsEvent.setData(statistics);
       return tradeStatisticsEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<TradeStatisticsEvent> request24HTradeStatisticsEvent(
+      List<String> symbols,
+      SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker().checkSymbolList(symbols).shouldNotNull(subscriptionListener, "listener");
+    WebsocketRequest<TradeStatisticsEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    if (symbols.size() == 1) {
+      request.name = "24HTradeStatistics Req for " + symbols;
+    } else {
+      request.name = "24HTradeStatistics Req for " + symbols + " ...";
+    }
+    request.connectionHandler = (connection) -> {
+      for (String symbol : symbols) {
+        String req = Channels.tradeStatisticsChannel(Channels.OP_REQ, symbol);
+        connection.send(req);
+      }
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeStatisticsEvent tradeStatisticsEvent = new TradeStatisticsEvent();
+      tradeStatisticsEvent.setSymbol(parser.getSymbol());
+      JsonWrapper tick = jsonWrapper.getJsonObject("data");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      tradeStatisticsEvent.setTimeStamp(ts);
+      TradeStatistics statistics = new TradeStatistics();
+      statistics.setAmount(tick.getBigDecimal("amount"));
+      statistics.setOpen(tick.getBigDecimal("open"));
+      statistics.setClose(tick.getBigDecimal("close"));
+      statistics.setHigh(tick.getBigDecimal("high"));
+      statistics.setTimestamp(ts);
+      //statistics.setId(tick.getLong("id"));
+      statistics.setCount(tick.getLong("count"));
+      statistics.setLow(tick.getBigDecimal("low"));
+      statistics.setVolume(tick.getBigDecimal("vol"));
+      tradeStatisticsEvent.setData(statistics);
+      return tradeStatisticsEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<AccountListEvent> requestAccountListEvent(
+      SubscriptionListener<AccountListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+
+    WebsocketRequest<AccountListEvent> request = new WebsocketRequest<AccountListEvent>(subscriptionListener, errorHandler);
+    request.authHandler = (connection) -> {
+      connection.send(Channels.requestAccountListChannel());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      JsonWrapperArray array = jsonWrapper.getJsonArray("data");
+      List<Account> accountList = new ArrayList<>();
+      array.forEach(accountItem -> {
+        Account account = new Account();
+        account.setId(accountItem.getLong("id"));
+        account.setType(AccountType.lookup(accountItem.getString("type")));
+        account.setState(AccountState.lookup(accountItem.getString("state")));
+        List<Balance> balanceList = new ArrayList<>();
+        JsonWrapperArray balanceArray = accountItem.getJsonArray("list");
+        balanceArray.forEach(balanceItem -> {
+          Balance balance = new Balance();
+          balance.setBalance(balanceItem.getBigDecimal("balance"));
+          balance.setCurrency(balanceItem.getString("currency"));
+          balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+          balanceList.add(balance);
+        });
+
+        account.setBalances(balanceList);
+        accountList.add(account);
+      });
+
+      return AccountListEvent.builder()
+          .timestamp(ts)
+          .accountList(accountList)
+          .build();
+    };
+
+    return request;
+  }
+
+
+  WebsocketRequest<OrderListEvent> requestOrderListEvent(
+      OrdersRequest ordersRequest,
+      SubscriptionListener<OrderListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    WebsocketRequest<OrderListEvent> request = new WebsocketRequest<>(subscriptionListener, errorHandler);
+    request.name = "Order List Req for " + ordersRequest.getSymbol();
+
+    request.authHandler = (connection) -> {
+
+      Account account = AccountsInfoMap.getUser(apiKey).getAccount(AccountType.SPOT);
+      if (account == null) {
+        throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
+      }
+
+      String startDateString = ordersRequest.getStartDate() == null
+          ? null : DateFormatUtils.format(ordersRequest.getStartDate(), "yyyy-MM-dd");
+      String endDateString = ordersRequest.getEndDate() == null
+          ? null : DateFormatUtils.format(ordersRequest.getEndDate(), "yyyy-MM-dd");
+      JSONObject requestTopic = new JSONObject();
+      requestTopic.put("op", Channels.OP_REQ);
+      requestTopic.put("topic", "orders.list");
+      requestTopic.put("account-id", account.getId());
+      requestTopic.put("symbol", ordersRequest.getSymbol());
+      requestTopic.put("types", ordersRequest.getTypesString());
+      requestTopic.put("states", ordersRequest.getStatesString());
+      requestTopic.put("start-date", startDateString);
+      requestTopic.put("end-date", endDateString);
+      requestTopic.put("from", ordersRequest.getStartId() != null ? ordersRequest.getStartId()+"" : null);
+      requestTopic.put("direct", ordersRequest.getDirect() != null ? ordersRequest.getDirect().toString() : null);
+      requestTopic.put("size", ordersRequest.getSize() != null ? ordersRequest.getSize()+"" : null);
+
+      connection.send(requestTopic.toJSONString());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<Order> orderList = new ArrayList<>();
+      dataArray.forEach(item -> {
+        Order order = new Order();
+        order.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+        order.setAmount(item.getBigDecimal("amount"));
+        order.setCanceledTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
+        order.setFinishedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+        order.setOrderId(item.getLong("id"));
+        order.setSymbol(item.getString("symbol"));
+        order.setPrice(item.getBigDecimal("price"));
+        order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setType(OrderType.lookup(item.getString("type")));
+        order.setFilledAmount(item.getBigDecimal("filled-amount"));
+        order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
+        order.setFilledFees(item.getBigDecimal("filled-fees"));
+        order.setSource(OrderSource.lookup(item.getString("source")));
+        order.setState(OrderState.lookup(item.getString("state")));
+        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
+
+        orderList.add(order);
+      });
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<OrderListEvent> requestOrderDetailEvent(
+      Long orderId,
+      SubscriptionListener<OrderListEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    WebsocketRequest<OrderListEvent> request = new WebsocketRequest<>(subscriptionListener, errorHandler);
+
+    InputChecker.checker().shouldNotNull(orderId,"orderId");
+    request.name = "Order Detail Req for " + orderId;
+
+    request.authHandler = (connection) -> {
+
+      JSONObject requestTopic = new JSONObject();
+      requestTopic.put("op", Channels.OP_REQ);
+      requestTopic.put("topic", "orders.detail");
+      requestTopic.put("order-id", orderId.toString());
+
+      System.out.println("[send]"+ requestTopic.toJSONString());
+      connection.send(requestTopic.toJSONString());
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapper item = jsonWrapper.getJsonObject("data");
+      List<Order> orderList = new ArrayList<>();
+
+      Order order = new Order();
+      order.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+      order.setAmount(item.getBigDecimal("amount"));
+      order.setCanceledTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
+      order.setFinishedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+      order.setOrderId(item.getLong("id"));
+      order.setSymbol(item.getString("symbol"));
+      order.setPrice(item.getBigDecimal("price"));
+      order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+      order.setType(OrderType.lookup(item.getString("type")));
+      order.setFilledAmount(item.getBigDecimal("filled-amount"));
+      order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
+      order.setFilledFees(item.getBigDecimal("filled-fees"));
+      order.setSource(OrderSource.lookup(item.getString("source")));
+      order.setState(OrderState.lookup(item.getString("state")));
+      order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
+      order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
+
+      orderList.add(order);
+
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
     };
     return request;
   }

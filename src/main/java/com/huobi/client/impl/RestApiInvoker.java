@@ -68,6 +68,10 @@ abstract class RestApiInvoker {
       String str;
       log.debug("Request URL " + request.request.url());
       Response response = client.newCall(request.request).execute();
+      if (response.code() != 200) {
+        throw new HuobiApiException(
+            HuobiApiException.EXEC_ERROR, "[Invoking] Response Status Error : "+response.code()+" message:"+response.message());
+      }
       if (response != null && response.body() != null) {
         str = response.body().string();
         response.close();
