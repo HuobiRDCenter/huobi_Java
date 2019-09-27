@@ -6,6 +6,11 @@ The SDK supports both synchronous and asynchronous RESTful API invoking, and sub
 
 
 
+## Huobi Java SDK (change log)
+[Java SDK Change Log](https://github.com/HuobiRDCenter/huobi_Java/blob/master/CHANGE_LOG.md)
+
+
+
 ## Table of Contents
 
 - [Beginning](#Beginning)
