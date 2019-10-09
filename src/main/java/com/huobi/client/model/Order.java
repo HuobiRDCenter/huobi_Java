@@ -1,5 +1,10 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.AccountsInfoMap;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
@@ -7,6 +12,8 @@ import com.huobi.client.model.enums.OrderType;
 import com.huobi.client.model.enums.StopOrderOperator;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 import lombok.ToString;
 
@@ -241,5 +248,82 @@ public class Order {
 
   public void setOperator(StopOrderOperator operator) {
     this.operator = operator;
+  }
+
+  public static RestApiJsonParser<List<Order>> getListParser(String apiKey){
+    return (jsonWrapper -> {
+      List<Order> orderList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Order order = parse(item,apiKey);
+        orderList.add(order);
+      });
+      return orderList;
+    });
+  }
+
+  public static RestApiJsonParser<Order> getParser(String apiKey) {
+    return (jsonWrapper -> {
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      return parse(data,apiKey);
+    });
+  }
+
+  public static Order parse(JsonWrapper data,String apiKey) {
+
+    BigDecimal filledAmount = data.getBigDecimalOrDefault("field-amount",null);
+    if (filledAmount == null) {
+      filledAmount = data.getBigDecimalOrDefault("filled-amount",null);
+    }
+
+    BigDecimal filledCashAmount = data.getBigDecimalOrDefault("field-cash-amount",null);
+    if (filledCashAmount == null) {
+      filledCashAmount = data.getBigDecimalOrDefault("filled-cash-amount",null);
+    }
+
+    BigDecimal filledFees = data.getBigDecimalOrDefault("field-fees",null);
+    if (filledFees == null) {
+      filledFees = data.getBigDecimalOrDefault("filled-fees",null);
+    }
+
+    Order order = new Order();
+    order.setOrderId(data.getLong("id"));
+    order.setSymbol(data.getString("symbol"));
+    order.setPrice(data.getBigDecimal("price"));
+    order.setAmount(data.getBigDecimal("amount"));
+    order.setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
+    order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
+    order.setType(OrderType.lookup(data.getString("type")));
+
+    order.setFilledAmount(filledAmount);
+    order.setFilledCashAmount(filledCashAmount);
+    order.setFilledFees(filledFees);
+
+    order.setSource(OrderSource.lookup(data.getString("source")));
+    order.setState(OrderState.lookup(data.getString("state")));
+    order.setStopPrice(data.getBigDecimalOrDefault("stop-price", null));
+    order.setOperator(StopOrderOperator.find(data.getStringOrDefault("operator", null)));
+
+
+    order.setCanceledTimestamp(TimeService.convertCSTInMillisecondToUTC(data.getLongOrDefault("canceled-at",0)));
+    order.setFinishedTimestamp(TimeService.convertCSTInMillisecondToUTC(data.getLongOrDefault("finished-at",0)));
+    return order;
+  }
+
+  public static Order parserForWebSocket(JsonWrapper data, String symbol, String apiKey){
+    Order order = new Order();
+    order.setOrderId(data.getLong("order-id"));
+    order.setSymbol(symbol);
+    order.setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
+    order.setAmount(data.getBigDecimal("order-amount"));
+    order.setPrice(data.getBigDecimal("order-price"));
+    order.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
+    order.setType(OrderType.lookup(data.getString("order-type")));
+    order.setFilledAmount(data.getBigDecimal("filled-amount"));
+    order.setFilledCashAmount(data.getBigDecimal("filled-cash-amount"));
+    order.setFilledFees(data.getBigDecimal("filled-fees"));
+    order.setState(OrderState.lookup(data.getString("order-state")));
+    order.setSource(OrderSource.lookup(data.getString("order-source")));
+    return order;
   }
 }

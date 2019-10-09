@@ -2,9 +2,17 @@ package com.huobi.client.model;
 
 import java.math.BigDecimal;
 
+import lombok.ToString;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
+
 /**
  * The best bid/ask consisting of price and amount.
  */
+@ToString
 public class BestQuote {
 
   private long timestamp;
@@ -76,5 +84,20 @@ public class BestQuote {
 
   public void setBidAmount(BigDecimal bidAmount) {
     this.bidAmount = bidAmount;
+  }
+
+  public static RestApiJsonParser<BestQuote> getParser(){
+    return (jsonWrapper -> {
+      BestQuote bestQuote = new BestQuote();
+      bestQuote.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      JsonWrapper jsonObject = jsonWrapper.getJsonObject("tick");
+      JsonWrapperArray askArray = jsonObject.getJsonArray("ask");
+      bestQuote.setAskPrice(askArray.getBigDecimalAt(0));
+      bestQuote.setAskAmount(askArray.getBigDecimalAt(1));
+      JsonWrapperArray bidArray = jsonObject.getJsonArray("bid");
+      bestQuote.setBidPrice(bidArray.getBigDecimalAt(0));
+      bestQuote.setBidAmount(bidArray.getBigDecimalAt(1));
+      return bestQuote;
+    });
   }
 }

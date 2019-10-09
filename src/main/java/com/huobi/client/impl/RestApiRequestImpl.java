@@ -169,25 +169,7 @@ class RestApiRequestImpl {
         .putToUrl("start", startTime)
         .putToUrl("end", endTime);
     request.request = createRequestByGet("/market/history/kline", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Candlestick> res = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Candlestick candlestick = new Candlestick();
-        candlestick.setId(item.getLong("id"));
-        candlestick.setTimestamp(
-            TimeService.convertCSTInSecondToUTC(item.getLong("id")));
-        candlestick.setOpen(item.getBigDecimal("open"));
-        candlestick.setClose(item.getBigDecimal("close"));
-        candlestick.setLow(item.getBigDecimal("low"));
-        candlestick.setHigh(item.getBigDecimal("high"));
-        candlestick.setAmount(item.getBigDecimal("amount"));
-        candlestick.setCount(item.getLong("count"));
-        candlestick.setVolume(item.getBigDecimal("vol"));
-        res.add(candlestick);
-      });
-      return res;
-    });
+    request.jsonParser = Candlestick.getListParser();
     return request;
   }
 
@@ -195,18 +177,7 @@ class RestApiRequestImpl {
     RestApiRequest<List<Account>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature("/v1/account/accounts", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Account> res = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Account account = new Account();
-        account.setId(item.getLong("id"));
-        account.setType(AccountType.lookup(item.getString("type")));
-        account.setState(AccountState.lookup(item.getString("state")));
-        res.add(account);
-      });
-      return res;
-    });
+    request.jsonParser = Account.getListParser();
     return request;
   }
 
@@ -218,33 +189,7 @@ class RestApiRequestImpl {
         .putToUrl("symbol", symbol)
         .putToUrl("type", "step0");
     request.request = createRequestByGet("/market/depth", builder);
-    request.jsonParser = (jsonWrapper -> {
-      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
-      PriceDepth dp = new PriceDepth();
-      long ts = TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts"));
-      JsonWrapperArray bids = tick.getJsonArray("bids");
-      JsonWrapperArray asks = tick.getJsonArray("asks");
-      List<DepthEntry> bidList = new LinkedList<>();
-      List<DepthEntry> askList = new LinkedList<>();
-      for (int i = 0; i < size; i++) {
-        JsonWrapperArray bidEntry = bids.getArrayAt(i);
-        DepthEntry entry = new DepthEntry();
-        entry.setPrice(bidEntry.getBigDecimalAt(0));
-        entry.setAmount(bidEntry.getBigDecimalAt(1));
-        bidList.add(entry);
-      }
-      for (int i = 0; i < size; i++) {
-        JsonWrapperArray askEntry = asks.getArrayAt(i);
-        DepthEntry entry = new DepthEntry();
-        entry.setPrice(askEntry.getBigDecimalAt(0));
-        entry.setAmount(askEntry.getBigDecimalAt(1));
-        askList.add(entry);
-      }
-      dp.setBids(bidList);
-      dp.setAsks(askList);
-      dp.setTimestamp(ts);
-      return dp;
-    });
+    request.jsonParser = PriceDepth.getParser(size);
     return request;
   }
 
@@ -255,23 +200,7 @@ class RestApiRequestImpl {
         .putToUrl("symbol", symbol)
         .putToUrl("size", size);  //.put("fromid", fromId)
     request.request = createRequestByGet("/market/history/trade", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Trade> res = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        JsonWrapperArray dataArrayIn = item.getJsonArray("data");
-        dataArrayIn.forEach((itemIn) -> {
-          Trade trade = new Trade();
-          trade.setPrice(itemIn.getBigDecimal("price"));
-          trade.setAmount(itemIn.getBigDecimal("amount"));
-          trade.setTradeId(itemIn.getString("id"));
-          trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(itemIn.getLong("ts")));
-          trade.setDirection(TradeDirection.lookup(itemIn.getString("direction")));
-          res.add(trade);
-        });
-      });
-      return res;
-    });
+    request.jsonParser = Trade.getDataListParser();
     return request;
   }
 
@@ -281,22 +210,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", symbol);
     request.request = createRequestByGet("/market/trade", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Trade> res = new LinkedList<>();
-
-      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
-      JsonWrapperArray dataArray = tick.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Trade trade = new Trade();
-        trade.setPrice(item.getBigDecimal("price"));
-        trade.setAmount(item.getBigDecimal("amount"));
-        trade.setTradeId(item.getString("id"));
-        trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("ts")));
-        trade.setDirection(TradeDirection.lookup(item.getString("direction")));
-        res.add(trade);
-      });
-      return res;
-    });
+    request.jsonParser = Trade.getTickListParser();
     return request;
   }
 
@@ -306,21 +220,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", symbol);
     request.request = createRequestByGet("/market/detail", builder);
-    request.jsonParser = (jsonWrapper -> {
-      TradeStatistics tradeStatistics = new TradeStatistics();
-      tradeStatistics.setTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
-      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
-      tradeStatistics.setAmount(tick.getBigDecimal("amount"));
-      tradeStatistics.setOpen(tick.getBigDecimal("open"));
-      tradeStatistics.setClose(tick.getBigDecimal("close"));
-      tradeStatistics.setHigh(tick.getBigDecimal("high"));
-      tradeStatistics.setLow(tick.getBigDecimal("low"));
-      //tradeStatistics.setId(tick.getLong("id"));
-      tradeStatistics.setCount(tick.getLong("count"));
-      tradeStatistics.setVolume(tick.getBigDecimal("vol"));
-      return tradeStatistics;
-    });
+    request.jsonParser = TradeStatistics.getParser();
     return request;
   }
 
@@ -329,27 +229,7 @@ class RestApiRequestImpl {
     RestApiRequest<List<Symbol>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGet("/v1/common/symbols", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Symbol> symbolList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Symbol symbol = new Symbol();
-        symbol.setBaseCurrency(item.getString("base-currency"));
-        symbol.setQuoteCurrency(item.getString("quote-currency"));
-        symbol.setPricePrecision(item.getInteger("price-precision"));
-        symbol.setAmountPrecision(item.getInteger("amount-precision"));
-        symbol.setSymbolPartition(item.getString("symbol-partition"));
-        symbol.setSymbol(item.getString("symbol"));
-        symbol.setValuePrecision(item.getIntegerOrDefault("value-precision", null));
-        symbol.setMinOrderAmt(item.getBigDecimalOrDefault("min-order-amt", null));
-        symbol.setMaxOrderAmt(item.getBigDecimalOrDefault("max-order-amt", null));
-        symbol.setMinOrderValue(item.getBigDecimalOrDefault("min-order-value", null));
-        symbol.setLeverageRatio(item.getIntegerOrDefault("leverage-ratio", null));
-        symbolList.add(symbol);
-
-      });
-      return symbolList;
-    });
+    request.jsonParser = Symbol.getListParser();
     return request;
 
   }
@@ -374,18 +254,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", symbol);
     request.request = createRequestByGet("/market/detail/merged", builder);
-    request.jsonParser = (jsonWrapper -> {
-      BestQuote bestQuote = new BestQuote();
-      bestQuote.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
-      JsonWrapper jsonObject = jsonWrapper.getJsonObject("tick");
-      JsonWrapperArray askArray = jsonObject.getJsonArray("ask");
-      bestQuote.setAskPrice(askArray.getBigDecimalAt(0));
-      bestQuote.setAskAmount(askArray.getBigDecimalAt(1));
-      JsonWrapperArray bidArray = jsonObject.getJsonArray("bid");
-      bestQuote.setBidPrice(bidArray.getBigDecimalAt(0));
-      bestQuote.setBidAmount(bidArray.getBigDecimalAt(1));
-      return bestQuote;
-    });
+    request.jsonParser = BestQuote.getParser();
     return request;
   }
 
@@ -405,27 +274,7 @@ class RestApiRequestImpl {
         .putToUrl("size", size)
         .putToUrl("direct", queryDirection);
     request.request = createRequestByGetWithSignature("/v1/query/deposit-withdraw", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Withdraw> withdraws = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Withdraw withdraw = new Withdraw();
-        withdraw.setId(item.getLong("id"));
-        withdraw.setCurrency(item.getString("currency"));
-        withdraw.setTxHash(item.getString("tx-hash"));
-        withdraw.setAmount(item.getBigDecimal("amount"));
-        withdraw.setAddress(item.getString("address"));
-        withdraw.setAddressTag(item.getString("address-tag"));
-        withdraw.setFee(item.getBigDecimal("fee"));
-        withdraw.setWithdrawState(WithdrawState.lookup(item.getString("state")));
-        withdraw.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        withdraw.setUpdatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
-        withdraws.add(withdraw);
-      });
-      return withdraws;
-    });
+    request.jsonParser = Withdraw.getListParser();
     return request;
   }
 
@@ -445,27 +294,7 @@ class RestApiRequestImpl {
         .putToUrl("size", size)
         .putToUrl("direct", queryDirection);
     request.request = createRequestByGetWithSignature("/v1/query/deposit-withdraw", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Deposit> deposits = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Deposit deposit = new Deposit();
-        deposit.setId(item.getLong("id"));
-        deposit.setCurrency(item.getString("currency"));
-        deposit.setTxHash(item.getString("tx-hash"));
-        deposit.setAmount(item.getBigDecimal("amount"));
-        deposit.setAddress(item.getString("address"));
-        deposit.setAddressTag(item.getString("address-tag"));
-        deposit.setFee(item.getBigDecimal("fee"));
-        deposit.setDepositState(DepositState.lookup(item.getString("state")));
-        deposit.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        deposit.setUpdatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
-        deposits.add(deposit);
-      });
-      return deposits;
-    });
+    request.jsonParser = Deposit.getListParser();
     return request;
   }
 
@@ -474,19 +303,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     String url = String.format("/v1/account/accounts/%d/balance", account.getId());
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Balance> balances = new LinkedList<>();
-      JsonWrapper data = jsonWrapper.getJsonObject("data");
-      JsonWrapperArray listArray = data.getJsonArray("list");
-      listArray.forEach((item) -> {
-        Balance balance = new Balance();
-        balance.setBalance(item.getBigDecimal("balance"));
-        balance.setCurrency(item.getString("currency"));
-        balance.setType(BalanceType.lookup(item.getString("type")));
-        balances.add(balance);
-      });
-      return balances;
-    });
+    request.jsonParser = Balance.getListParser();
     return request;
   }
 
@@ -552,9 +369,7 @@ class RestApiRequestImpl {
         .putToPost("amount", amount);
     request.request = createRequestByPostWithSignature("/v1/margin/orders", builder);
     request.jsonParser = (jsonWrapper -> {
-      long id;
-      id = jsonWrapper.getLong("data");
-      return id;
+      return jsonWrapper.getLong("data");
     });
     return request;
   }
@@ -586,31 +401,7 @@ class RestApiRequestImpl {
         .putToUrl("direct", loanOrderRequest.getDirection());
 
     request.request = createRequestByGetWithSignature("/v1/margin/loan-orders", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Loan> loans = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Loan loan = new Loan();
-        loan.setLoanBalance(item.getBigDecimal("loan-balance"));
-        loan.setInterestBalance(item.getBigDecimal("interest-balance"));
-        loan.setInterestRate(item.getBigDecimal("interest-rate"));
-        loan.setLoanAmount(item.getBigDecimal("loan-amount"));
-        loan.setInterestAmount(item.getBigDecimal("interest-amount"));
-        loan.setSymbol(item.getString("symbol"));
-        loan.setCurrency(item.getString("currency"));
-        loan.setId(item.getLong("id"));
-        loan.setState(LoanOrderStates.lookup(item.getString("state")));
-        loan.setAccountType(
-            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
-        loan.setUserId(item.getLong("user-id"));
-        loan.setAccruedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("accrued-at")));
-        loan.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        loans.add(loan);
-      });
-      return loans;
-    });
+    request.jsonParser = Loan.getListParser(apiKey);
     return request;
 
   }
@@ -680,31 +471,7 @@ class RestApiRequestImpl {
         .putToUrl("from", openOrderRequest.getFrom());
 
     request.request = createRequestByGetWithSignature("/v1/order/openOrders", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Order> orderList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Order order = new Order();
-        order.setOrderId(item.getLong("id"));
-        order.setSymbol(item.getString("symbol"));
-        order.setPrice(item.getBigDecimal("price"));
-        order.setAmount(item.getBigDecimal("amount"));
-        order.setAccountType(
-            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        order.setType(OrderType.lookup(item.getString("type")));
-        order.setFilledAmount(item.getBigDecimal("filled-amount"));
-        order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
-        order.setFilledFees(item.getBigDecimal("filled-fees"));
-        order.setSource(OrderSource.lookup(item.getString("source")));
-        order.setState(OrderState.lookup(item.getString("state")));
-        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
-        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
-        orderList.add(order);
-      });
-      return orderList;
-    });
+    request.jsonParser = Order.getListParser(apiKey);
     return request;
   }
 
@@ -779,7 +546,7 @@ class RestApiRequestImpl {
     String url = String.format("/v1/order/orders/%d", orderId);
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = getOrderParser();
+    request.jsonParser = Order.getParser(apiKey);
     return request;
   }
 
@@ -790,7 +557,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     builder.putToUrl("clientOrderId", clientOrderId);
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = getOrderParser();
+    request.jsonParser = Order.getParser(apiKey);
     return request;
   }
 
@@ -800,7 +567,7 @@ class RestApiRequestImpl {
     String url = String.format("/v1/order/orders/%d/matchresults", orderId);
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = getMatchResultListParser();
+    request.jsonParser = MatchResult.getMatchResultListParser();
     return request;
   }
 
@@ -817,7 +584,7 @@ class RestApiRequestImpl {
         //.putToUrl("direct", "prev")
         .putToUrl("size", matchResultRequest.getSize());
     request.request = createRequestByGetWithSignature("/v1/order/matchresults", builder);
-    request.jsonParser = getMatchResultListParser();
+    request.jsonParser = MatchResult.getMatchResultListParser();
     return request;
   }
 
@@ -867,35 +634,7 @@ class RestApiRequestImpl {
         .putToUrl("size", req.getSize())
         .putToUrl("direct", req.getDirect());
     request.request = createRequestByGetWithSignature("/v1/order/orders", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Order> orderList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Order order = new Order();
-        order.setAccountType(
-            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
-        order.setAmount(item.getBigDecimal("amount"));
-        order.setCanceledTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
-        order.setFinishedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
-        order.setOrderId(item.getLong("id"));
-        order.setSymbol(item.getString("symbol"));
-        order.setPrice(item.getBigDecimal("price"));
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        order.setType(OrderType.lookup(item.getString("type")));
-        order.setFilledAmount(item.getBigDecimal("field-amount"));
-        order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
-        order.setFilledFees(item.getBigDecimal("field-fees"));
-        order.setSource(OrderSource.lookup(item.getString("source")));
-        order.setState(OrderState.lookup(item.getString("state")));
-        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
-        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
-        orderList.add(order);
-      });
-      return orderList;
-    });
+    request.jsonParser = Order.getListParser(apiKey);
     return request;
   }
 
@@ -909,35 +648,7 @@ class RestApiRequestImpl {
         .putToUrl("size", req.getSize())
         .putToUrl("direct", req.getDirect());
     request.request = createRequestByGetWithSignature("/v1/order/history", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Order> orderList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Order order = new Order();
-        order.setAccountType(
-            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
-        order.setAmount(item.getBigDecimal("amount"));
-        order.setCanceledTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
-        order.setFinishedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
-        order.setOrderId(item.getLong("id"));
-        order.setSymbol(item.getString("symbol"));
-        order.setPrice(item.getBigDecimal("price"));
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        order.setType(OrderType.lookup(item.getString("type")));
-        order.setFilledAmount(item.getBigDecimal("field-amount"));
-        order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
-        order.setFilledFees(item.getBigDecimal("field-fees"));
-        order.setSource(OrderSource.lookup(item.getString("source")));
-        order.setState(OrderState.lookup(item.getString("state")));
-        order.setStopPrice(item.getBigDecimalOrDefault("stop-price", null));
-        order.setOperator(StopOrderOperator.find(item.getStringOrDefault("operator", null)));
-        orderList.add(order);
-      });
-      return orderList;
-    });
+    request.jsonParser = Order.getListParser(apiKey);
     return request;
   }
 
@@ -947,19 +658,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbols", symbol);
     request.request = createRequestByGetWithSignature("/v1/fee/fee-rate/get", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<FeeRate> rateList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-
-        rateList.add(FeeRate.builder()
-            .symbol(item.getString("symbol"))
-            .makerFee(item.getBigDecimalOrDefault("maker-fee", null))
-            .takerFee(item.getBigDecimalOrDefault("taker-fee", null))
-            .build());
-      });
-      return rateList;
-    });
+    request.jsonParser = FeeRate.getListParser();
     return request;
   }
 
@@ -984,17 +683,7 @@ class RestApiRequestImpl {
     RestApiRequest<List<Balance>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     request.request = createRequestByGetWithSignature("/v1/subuser/aggregate-balance", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Balance> balances = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Balance balance = new Balance();
-        balance.setCurrency(item.getString("currency"));
-        balance.setBalance(item.getBigDecimal("balance"));
-        balances.add(balance);
-      });
-      return balances;
-    });
+    request.jsonParser = Balance.getAggregatedBalanceParser();
     return request;
   }
 
@@ -1003,27 +692,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     String url = String.format("/v1/account/accounts/%d", subId);
     request.request = createRequestByGetWithSignature(url, builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<CompleteSubAccountInfo> completeSubAccountInfos = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        CompleteSubAccountInfo completeSubAccountInfo = new CompleteSubAccountInfo();
-        completeSubAccountInfo.setId(item.getLong("id"));
-        completeSubAccountInfo.setType(AccountType.lookup(item.getString("type")));
-        JsonWrapperArray list = item.getJsonArray("list");
-        List<Balance> balances = new LinkedList<>();
-        list.forEach((val) -> {
-          Balance balance = new Balance();
-          balance.setCurrency(val.getString("currency"));
-          balance.setType(BalanceType.lookup(val.getString("type")));
-          balance.setBalance(val.getBigDecimal("balance"));
-          balances.add(balance);
-        });
-        completeSubAccountInfo.setBalances(balances);
-        completeSubAccountInfos.add(completeSubAccountInfo);
-      });
-      return completeSubAccountInfos;
-    });
+    request.jsonParser = CompleteSubAccountInfo.getListParser();
     return request;
   }
 
@@ -1040,25 +709,7 @@ class RestApiRequestImpl {
         .putToUrl("period", interval)
         .putToUrl("limit", size);
     request.request = createRequestByGet("/quotation/market/history/kline", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<Candlestick> res = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        Candlestick candlestick = new Candlestick();
-        candlestick.setId(item.getLong("id"));
-        candlestick.setTimestamp(
-            TimeService.convertCSTInSecondToUTC(item.getLong("id")));
-        candlestick.setOpen(item.getBigDecimal("open"));
-        candlestick.setClose(item.getBigDecimal("close"));
-        candlestick.setLow(item.getBigDecimal("low"));
-        candlestick.setHigh(item.getBigDecimal("high"));
-        candlestick.setAmount(item.getBigDecimal("amount"));
-        candlestick.setCount(0);
-        candlestick.setVolume(item.getBigDecimal("vol"));
-        res.add(candlestick);
-      });
-      return res;
-    });
+    request.jsonParser = Candlestick.getListParser();
     return request;
   }
 
@@ -1068,28 +719,7 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("etf_name", etfSymbol);
     request.request = createRequestByGet("/etf/swap/config", builder);
-    request.jsonParser = (jsonWrapper -> {
-      JsonWrapper data = jsonWrapper.getJsonObject("data");
-      EtfSwapConfig etfSwapConfig = new EtfSwapConfig();
-      etfSwapConfig.setPurchaseMaxAmount(data.getInteger("purchase_max_amount"));
-      etfSwapConfig.setPurchaseMinAmount(data.getInteger("purchase_min_amount"));
-      etfSwapConfig.setRedemptionMaxAmount(data.getInteger("redemption_max_amount"));
-      etfSwapConfig.setRedemptionMinAmount(data.getInteger("redemption_min_amount"));
-      etfSwapConfig.setPurchaseFeeRate(data.getBigDecimal("purchase_fee_rate"));
-      etfSwapConfig.setRedemptionFeeRate(data.getBigDecimal("redemption_fee_rate"));
-      etfSwapConfig.setStatus(
-          EtfStatus.lookup(Integer.toString(data.getInteger("etf_status"))));
-      JsonWrapperArray unitPrices = data.getJsonArray("unit_price");
-      List<UnitPrice> unitPriceList = new LinkedList<>();
-      unitPrices.forEach((item) -> {
-        UnitPrice unitPrice = new UnitPrice();
-        unitPrice.setCurrency(item.getString("currency"));
-        unitPrice.setAmount(item.getBigDecimal("amount"));
-        unitPriceList.add(unitPrice);
-      });
-      etfSwapConfig.setUnitPriceList(unitPriceList);
-      return etfSwapConfig;
-    });
+    request.jsonParser = EtfSwapConfig.getParser();
     return request;
   }
 
@@ -1119,42 +749,7 @@ class RestApiRequestImpl {
         .putToUrl("offset", offset)
         .putToUrl("limit", size);
     request.request = createRequestByGetWithSignature("/etf/swap/list", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<EtfSwapHistory> etfSwapHistoryList = new LinkedList<>();
-      JsonWrapperArray data = jsonWrapper.getJsonArray("data");
-      data.forEach((dataItem) -> {
-        EtfSwapHistory etfSwapHistory = new EtfSwapHistory();
-        etfSwapHistory.setCreatedTimestamp(dataItem.getLong("gmt_created"));
-        etfSwapHistory.setCurrency(dataItem.getString("currency"));
-        etfSwapHistory.setAmount(dataItem.getBigDecimal("amount"));
-        etfSwapHistory.setType(EtfSwapType.lookup(dataItem.getString("type")));
-        etfSwapHistory.setStatus(dataItem.getInteger("status"));
-        JsonWrapper detail = dataItem.getJsonObject("detail");
-        etfSwapHistory.setRate(detail.getBigDecimal("rate"));
-        etfSwapHistory.setFee(detail.getBigDecimal("fee"));
-        etfSwapHistory.setPointCardAmount(detail.getBigDecimal("point_card_amount"));
-        JsonWrapperArray usedCurrencyArray = detail.getJsonArray("used_currency_list");
-        List<UnitPrice> usedCurrencyList = new LinkedList<>();
-        usedCurrencyArray.forEach((currency) -> {
-          UnitPrice unitPrice = new UnitPrice();
-          unitPrice.setAmount(currency.getBigDecimal("amount"));
-          unitPrice.setCurrency(currency.getString("currency"));
-          usedCurrencyList.add(unitPrice);
-        });
-        etfSwapHistory.setUsedCurrencyList(usedCurrencyList);
-        JsonWrapperArray obtainCurrencyArray = detail.getJsonArray("obtain_currency_list");
-        List<UnitPrice> obtainCurrencyList = new LinkedList<>();
-        obtainCurrencyArray.forEach((currency) -> {
-          UnitPrice unitPrice = new UnitPrice();
-          unitPrice.setAmount(currency.getBigDecimal("amount"));
-          unitPrice.setCurrency(currency.getString("currency"));
-          obtainCurrencyList.add(unitPrice);
-        });
-        etfSwapHistory.setObtainCurrencyList(obtainCurrencyList);
-        etfSwapHistoryList.add(etfSwapHistory);
-      });
-      return etfSwapHistoryList;
-    });
+    request.jsonParser = EtfSwapHistory.getListParser();
     return request;
   }
 
@@ -1164,113 +759,18 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", symbol);
     request.request = createRequestByGetWithSignature("/v1/margin/accounts/balance", builder);
-    request.jsonParser = (jsonWrapper -> {
-      List<MarginBalanceDetail> marginBalanceDetailList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((itemInData) -> {
-        MarginBalanceDetail marginBalanceDetail = new MarginBalanceDetail();
-        marginBalanceDetail.setId(itemInData.getLong("id"));
-        marginBalanceDetail.setType(AccountType.lookup(itemInData.getString("type")));
-        marginBalanceDetail.setSymbol(itemInData.getString("symbol"));
-        marginBalanceDetail.setFlPrice(itemInData.getBigDecimal("fl-price"));
-        marginBalanceDetail.setFlType(itemInData.getString("fl-type"));
-        marginBalanceDetail.setState(AccountState.lookup(itemInData.getString("state")));
-        marginBalanceDetail.setRiskRate(itemInData.getBigDecimal("risk-rate"));
-        List<Balance> balanceList = new LinkedList<>();
-        JsonWrapperArray listArray = itemInData.getJsonArray("list");
-        listArray.forEach((itemInList) -> {
-          Balance balance = new Balance();
-          balance.setCurrency(itemInList.getString("currency"));
-          balance.setType(BalanceType.lookup(itemInList.getString("type")));
-          balance.setBalance(itemInList.getBigDecimal("balance"));
-          balanceList.add(balance);
-        });
-        marginBalanceDetail.setSubAccountBalance(balanceList);
-        marginBalanceDetailList.add(marginBalanceDetail);
-      });
-      return marginBalanceDetailList;
-    });
+    request.jsonParser = MarginBalanceDetail.getListParser();
     return request;
   }
 
   RestApiRequest<Map<String, TradeStatistics>> getTickers() {
     RestApiRequest<Map<String, TradeStatistics>> request = new RestApiRequest<>();
     request.request = createRequestByGet("/market/tickers", UrlParamsBuilder.build());
-    request.jsonParser = (jsonWrapper -> {
-      Map<String, TradeStatistics> map = new HashMap<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
-      dataArray.forEach(item -> {
-        TradeStatistics statistics = new TradeStatistics();
-        statistics.setTimestamp(ts);
-        statistics.setAmount(item.getBigDecimal("amount"));
-        statistics.setOpen(item.getBigDecimal("open"));
-        statistics.setClose(item.getBigDecimal("close"));
-        statistics.setHigh(item.getBigDecimal("high"));
-        statistics.setLow(item.getBigDecimal("low"));
-        statistics.setCount(item.getLong("count"));
-        statistics.setVolume(item.getBigDecimal("vol"));
-        map.put(item.getString("symbol"), statistics);
-      });
-      return map;
-    });
+    request.jsonParser = TradeStatistics.getMapParser();
     return request;
   }
 
 
-  public RestApiJsonParser<Order> getOrderParser() {
-    return (jsonWrapper -> {
-      JsonWrapper data = jsonWrapper.getJsonObject("data");
-      Order order = new Order();
-      order.setSymbol(data.getString("symbol"));
-      order.setOrderId(data.getLong("id"));
-      order
-          .setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
-      order.setAmount(data.getBigDecimal("amount"));
-      order.setCanceledTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("canceled-at")));
-      order.setCreatedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
-      order.setFinishedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("finished-at")));
-      order.setFilledAmount(data.getBigDecimal("field-amount"));
-      order.setFilledCashAmount(data.getBigDecimal("field-cash-amount"));
-      order.setFilledFees(data.getBigDecimal("field-fees"));
-      order.setPrice(data.getBigDecimal("price"));
-      order.setSource(OrderSource.lookup(data.getString("source")));
-      order.setState(OrderState.lookup(data.getString("state")));
-      order.setType(OrderType.lookup(data.getString("type")));
-      order.setStopPrice(data.getBigDecimalOrDefault("stop-price", null));
-      order.setOperator(StopOrderOperator.find(data.getStringOrDefault("operator", null)));
-      return order;
-    });
-  }
-
-  public RestApiJsonParser<List<MatchResult>> getMatchResultListParser() {
-    return (jsonWrapper -> {
-      List<MatchResult> matchResultList = new LinkedList<>();
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      dataArray.forEach((item) -> {
-        MatchResult matchResult = new MatchResult();
-        matchResult.setId(item.getLong("id"));
-        matchResult.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
-        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
-        matchResult.setMatchId(item.getLong("match-id"));
-        matchResult.setOrderId(item.getLong("order-id"));
-        matchResult.setPrice(item.getBigDecimal("price"));
-        matchResult.setSource(OrderSource.lookup(item.getString("source")));
-        matchResult.setSymbol(item.getString("symbol"));
-        matchResult.setType(OrderType.lookup(item.getString("type")));
-        matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
-        matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
-        matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
-        matchResultList.add(matchResult);
-      });
-      return matchResultList;
-    });
-  }
 
 
 }

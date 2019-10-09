@@ -1,8 +1,11 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.model.enums.AccountType;
 
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -52,5 +55,25 @@ public class CompleteSubAccountInfo {
     this.balances = balances;
   }
 
+
+  public static RestApiJsonParser<List<CompleteSubAccountInfo>> getListParser(){
+    return (jsonWrapper -> {
+      List<CompleteSubAccountInfo> completeSubAccountInfos = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        CompleteSubAccountInfo completeSubAccountInfo = new CompleteSubAccountInfo();
+        completeSubAccountInfo.setId(item.getLong("id"));
+        completeSubAccountInfo.setType(AccountType.lookup(item.getString("type")));
+        JsonWrapperArray list = item.getJsonArray("list");
+        List<Balance> balances = new LinkedList<>();
+        list.forEach((val) -> {
+          balances.add(Balance.parse(val));
+        });
+        completeSubAccountInfo.setBalances(balances);
+        completeSubAccountInfos.add(completeSubAccountInfo);
+      });
+      return completeSubAccountInfos;
+    });
+  }
 
 }

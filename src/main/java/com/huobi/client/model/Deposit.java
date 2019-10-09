@@ -1,11 +1,19 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.enums.DepositState;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
+
+import lombok.ToString;
 
 /**
  * The latest status for deposits
  */
+@ToString
 public class Deposit {
 
   private long id;
@@ -147,5 +155,29 @@ public class Deposit {
 
   public void setDepositState(DepositState depositState) {
     this.depositState = depositState;
+  }
+
+  public static RestApiJsonParser<List<Deposit>> getListParser(){
+    return (jsonWrapper -> {
+      List<Deposit> deposits = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Deposit deposit = new Deposit();
+        deposit.setId(item.getLong("id"));
+        deposit.setCurrency(item.getString("currency"));
+        deposit.setTxHash(item.getString("tx-hash"));
+        deposit.setAmount(item.getBigDecimal("amount"));
+        deposit.setAddress(item.getString("address"));
+        deposit.setAddressTag(item.getString("address-tag"));
+        deposit.setFee(item.getBigDecimal("fee"));
+        deposit.setDepositState(DepositState.lookup(item.getString("state")));
+        deposit.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        deposit.setUpdatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
+        deposits.add(deposit);
+      });
+      return deposits;
+    });
   }
 }

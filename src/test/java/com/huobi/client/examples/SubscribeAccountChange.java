@@ -27,7 +27,7 @@ public class SubscribeAccountChange {
       System.out.println("-------------Request Account List---------------");
       accountListEvent.getAccountList().forEach(account -> {
 
-        System.out.println(" type:" + account.getType() + " state" + account.getState());
+        System.out.println(" type:" + account.getType() + " state:" + account.getState());
         account.getBalances().forEach(balance -> {
           System.out.println("    currency:" + balance.getCurrency() + " type:" + balance.getType() + " balance:" + balance.getBalance().toPlainString());
         });

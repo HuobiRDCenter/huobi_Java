@@ -1,10 +1,10 @@
 package com.huobi.client.impl;
 
-class ChannelParser {
+public class ChannelParser {
 
   private String symbol = "";
 
-  ChannelParser(String input) {
+  public ChannelParser(String input) {
     String[] fields = input.split("\\.");
     if (fields.length >= 2) {
       symbol = fields[1];

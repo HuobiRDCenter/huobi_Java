@@ -1,8 +1,14 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.AccountsInfoMap;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.LoanOrderStates;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The margin order information.
@@ -190,5 +196,34 @@ public class Loan {
 
   public void setAccruedTimestamp(long accruedTimestamp) {
     this.accruedTimestamp = accruedTimestamp;
+  }
+
+
+  public static RestApiJsonParser<List<Loan>> getListParser(String apiKey){
+    return (jsonWrapper -> {
+      List<Loan> loans = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Loan loan = new Loan();
+        loan.setLoanBalance(item.getBigDecimal("loan-balance"));
+        loan.setInterestBalance(item.getBigDecimal("interest-balance"));
+        loan.setInterestRate(item.getBigDecimal("interest-rate"));
+        loan.setLoanAmount(item.getBigDecimal("loan-amount"));
+        loan.setInterestAmount(item.getBigDecimal("interest-amount"));
+        loan.setSymbol(item.getString("symbol"));
+        loan.setCurrency(item.getString("currency"));
+        loan.setId(item.getLong("id"));
+        loan.setState(LoanOrderStates.lookup(item.getString("state")));
+        loan.setAccountType(
+            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+        loan.setUserId(item.getLong("user-id"));
+        loan.setAccruedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("accrued-at")));
+        loan.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        loans.add(loan);
+      });
+      return loans;
+    });
   }
 }

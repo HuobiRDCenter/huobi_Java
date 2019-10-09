@@ -1,6 +1,14 @@
 package com.huobi.client.model.event;
 
+import com.huobi.client.impl.ChannelParser;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.Trade;
+import com.huobi.client.model.enums.TradeDirection;
+
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -49,5 +57,39 @@ public class TradeEvent {
 
   public void setTradeList(List<Trade> tradeList) {
     this.tradeList = tradeList;
+  }
+
+  public static RestApiJsonParser<TradeEvent> getParser(){
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("ch");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeEvent tradeEvent = new TradeEvent();
+      tradeEvent.setSymbol(parser.getSymbol());
+      tradeEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      JsonWrapperArray dataArray = tick.getJsonArray("data");
+      List<Trade> trades = new LinkedList<>();
+      dataArray.forEach((item) -> {
+        trades.add(Trade.parse(item));
+      });
+      tradeEvent.setTradeList(trades);
+      return tradeEvent;
+    };
+  }
+
+  public static RestApiJsonParser<TradeEvent> getReqParser(){
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeEvent tradeEvent = new TradeEvent();
+      tradeEvent.setSymbol(parser.getSymbol());
+      List<Trade> trades = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        trades.add(Trade.parse(item));
+      });
+      tradeEvent.setTradeList(trades);
+      return tradeEvent;
+    };
   }
 }

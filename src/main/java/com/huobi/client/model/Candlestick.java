@@ -1,6 +1,13 @@
 package com.huobi.client.model;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 
 /**
  * The candlestick/kline data.
@@ -128,5 +135,31 @@ public class Candlestick {
 
   public void setVolume(BigDecimal volume) {
     this.volume = volume;
+  }
+
+  public static RestApiJsonParser<List<Candlestick>> getListParser() {
+    return (jsonWrapper -> {
+      List<Candlestick> res = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        res.add(parse(item));
+      });
+
+      return res;
+    });
+  }
+
+  public static Candlestick parse(JsonWrapper item){
+    Candlestick candlestick = new Candlestick();
+    candlestick.setId(item.getLong("id"));
+    candlestick.setTimestamp(TimeService.convertCSTInSecondToUTC(item.getLong("id")));
+    candlestick.setOpen(item.getBigDecimal("open"));
+    candlestick.setClose(item.getBigDecimal("close"));
+    candlestick.setLow(item.getBigDecimal("low"));
+    candlestick.setHigh(item.getBigDecimal("high"));
+    candlestick.setAmount(item.getBigDecimal("amount"));
+    candlestick.setCount(item.getLongOrDefault("count",0));
+    candlestick.setVolume(item.getBigDecimal("vol"));
+    return candlestick;
   }
 }

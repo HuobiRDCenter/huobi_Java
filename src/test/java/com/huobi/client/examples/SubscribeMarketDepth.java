@@ -11,6 +11,8 @@ public class SubscribeMarketDepth {
     SubscriptionClient subscriptionClient = SubscriptionClient.create();
     subscriptionClient.subscribePriceDepthEvent(symbol, (priceDepthEvent) -> {
       System.out.println("------------Subscribe Price Depth-----------------");
+      System.out.println("asks 0 volume: " + priceDepthEvent.getData().getAsks().get(0).getAmount());
+      System.out.println("asks 0 price: " + priceDepthEvent.getData().getAsks().get(0).getPrice());
       System.out.println("bids 0 price: " + priceDepthEvent.getData().getBids().get(0).getPrice());
       System.out.println("bids 0 volume: " + priceDepthEvent.getData().getBids().get(0).getAmount());
 

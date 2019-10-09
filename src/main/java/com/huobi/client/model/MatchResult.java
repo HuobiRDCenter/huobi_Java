@@ -1,9 +1,14 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderType;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 import lombok.ToString;
 
@@ -192,5 +197,31 @@ public class MatchResult {
 
   public void setRole(DealRole role) {
     this.role = role;
+  }
+
+  public static RestApiJsonParser<List<MatchResult>> getMatchResultListParser() {
+    return (jsonWrapper -> {
+      List<MatchResult> matchResultList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        MatchResult matchResult = new MatchResult();
+        matchResult.setId(item.getLong("id"));
+        matchResult.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
+        matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
+        matchResult.setMatchId(item.getLong("match-id"));
+        matchResult.setOrderId(item.getLong("order-id"));
+        matchResult.setPrice(item.getBigDecimal("price"));
+        matchResult.setSource(OrderSource.lookup(item.getString("source")));
+        matchResult.setSymbol(item.getString("symbol"));
+        matchResult.setType(OrderType.lookup(item.getString("type")));
+        matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
+        matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
+        matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
+        matchResultList.add(matchResult);
+      });
+      return matchResultList;
+    });
   }
 }

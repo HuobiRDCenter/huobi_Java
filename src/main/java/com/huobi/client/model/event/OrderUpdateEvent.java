@@ -1,5 +1,9 @@
 package com.huobi.client.model.event;
 
+import com.huobi.client.impl.ChannelParser;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.Order;
 
 /**
@@ -48,5 +52,19 @@ public class OrderUpdateEvent {
 
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public static RestApiJsonParser<OrderUpdateEvent> getParser(String apiKey) {
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      ChannelParser parser = new ChannelParser(ch);
+      OrderUpdateEvent orderUpdateEvent = new OrderUpdateEvent();
+      orderUpdateEvent.setSymbol(parser.getSymbol());
+      orderUpdateEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+
+      orderUpdateEvent.setData(Order.parserForWebSocket(data, parser.getSymbol(), apiKey));
+      return orderUpdateEvent;
+    };
   }
 }

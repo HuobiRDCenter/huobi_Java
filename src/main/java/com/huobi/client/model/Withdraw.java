@@ -1,7 +1,12 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.enums.WithdrawState;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 import lombok.ToString;
 
@@ -150,5 +155,29 @@ public class Withdraw {
 
   public void setWithdrawState(WithdrawState withdrawState) {
     this.withdrawState = withdrawState;
+  }
+
+  public static RestApiJsonParser<List<Withdraw>> getListParser(){
+    return (jsonWrapper -> {
+      List<Withdraw> withdraws = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Withdraw withdraw = new Withdraw();
+        withdraw.setId(item.getLong("id"));
+        withdraw.setCurrency(item.getString("currency"));
+        withdraw.setTxHash(item.getString("tx-hash"));
+        withdraw.setAmount(item.getBigDecimal("amount"));
+        withdraw.setAddress(item.getString("address"));
+        withdraw.setAddressTag(item.getString("address-tag"));
+        withdraw.setFee(item.getBigDecimal("fee"));
+        withdraw.setWithdrawState(WithdrawState.lookup(item.getString("state")));
+        withdraw.setCreatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        withdraw.setUpdatedTimestamp(
+            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
+        withdraws.add(withdraw);
+      });
+      return withdraws;
+    });
   }
 }

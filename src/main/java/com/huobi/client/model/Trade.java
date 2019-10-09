@@ -1,7 +1,14 @@
 package com.huobi.client.model;
 
-import com.huobi.client.model.enums.TradeDirection;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
+import com.huobi.client.model.enums.TradeDirection;
 
 /**
  * The trade information with price and amount etc.
@@ -77,5 +84,41 @@ public class Trade {
 
   public void setDirection(TradeDirection direction) {
     this.direction = direction;
+  }
+
+  public static Trade parse(JsonWrapper jsonWrapper) {
+    Trade trade = new Trade();
+    trade.setPrice(jsonWrapper.getBigDecimal("price"));
+    trade.setAmount(jsonWrapper.getBigDecimal("amount"));
+    trade.setTradeId(jsonWrapper.getString("id"));
+    trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+    trade.setDirection(TradeDirection.lookup(jsonWrapper.getString("direction")));
+    return trade;
+  }
+
+  public static RestApiJsonParser<List<Trade>> getDataListParser() {
+    return  (jsonWrapper -> {
+      List<Trade> res = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        JsonWrapperArray dataArrayIn = item.getJsonArray("data");
+        dataArrayIn.forEach((itemIn) -> {
+          res.add(parse(itemIn));
+        });
+      });
+      return res;
+    });
+  }
+
+  public static RestApiJsonParser<List<Trade>> getTickListParser() {
+    return  (jsonWrapper -> {
+      List<Trade> res = new LinkedList<>();
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      JsonWrapperArray dataArray = tick.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        res.add(parse(item));
+      });
+      return res;
+    });
   }
 }

@@ -1,6 +1,8 @@
 package com.huobi.client.model;
 
 import com.huobi.client.SubscriptionListener;
+import com.huobi.client.impl.AccountsInfoMap;
+import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.BalanceType;
@@ -72,5 +74,14 @@ public class AccountChange {
 
   public void setBalanceType(BalanceType balanceType) {
     this.balanceType = balanceType;
+  }
+
+  public static AccountChange parse(JsonWrapper item,String apiKey) {
+    AccountChange change = new AccountChange();
+    change.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+    change.setCurrency(item.getString("currency"));
+    change.setBalance(item.getBigDecimal("balance"));
+    change.setBalanceType(BalanceType.lookup(item.getString("type")));
+    return change;
   }
 }

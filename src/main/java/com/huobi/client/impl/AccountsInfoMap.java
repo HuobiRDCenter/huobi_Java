@@ -11,14 +11,14 @@ public class AccountsInfoMap {
 
   private static final Map<String, User> userMap = new HashMap<>();
 
-  static void updateUserInfo(String key, RestApiRequestImpl requestImpl) {
+  public static void updateUserInfo(String key, RestApiRequestImpl requestImpl) {
     List<Account> accounts = RestApiInvoker.callSync(requestImpl.getAccounts());
     User user = new User();
     user.setAccounts(accounts);
     AccountsInfoMap.userMap.put(key, user);
   }
 
-  static User getUser(String key) {
+  public static User getUser(String key) {
     if ("".equals(key) || key == null) {
       throw new HuobiApiException(
           HuobiApiException.KEY_MISSING, "[User] Key is empty or null");
@@ -30,7 +30,7 @@ public class AccountsInfoMap {
     return AccountsInfoMap.userMap.get(key);
   }
 
-  static Account getAccount(String apiKey, long accountId) {
+  public static Account getAccount(String apiKey, long accountId) {
     User user = getUser(apiKey);
     Account account = user.getAccount(accountId);
     if (account == null) {

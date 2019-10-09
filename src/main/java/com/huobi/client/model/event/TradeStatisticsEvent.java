@@ -1,5 +1,9 @@
 package com.huobi.client.model.event;
 
+import com.huobi.client.impl.ChannelParser;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.TradeStatistics;
 
 /**
@@ -49,4 +53,32 @@ public class TradeStatisticsEvent {
   public void setData(TradeStatistics tradeStatistics) {
     this.tradeStatistics = tradeStatistics;
   }
+
+  public static RestApiJsonParser<TradeStatisticsEvent> getParser(){
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("ch");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeStatisticsEvent tradeStatisticsEvent = new TradeStatisticsEvent();
+      tradeStatisticsEvent.setSymbol(parser.getSymbol());
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      tradeStatisticsEvent.setTimeStamp(ts);
+      tradeStatisticsEvent.setData(TradeStatistics.parse(tick,ts));
+      return tradeStatisticsEvent;
+    };
+  }
+  public static RestApiJsonParser<TradeStatisticsEvent> getReqParser(){
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      TradeStatisticsEvent tradeStatisticsEvent = new TradeStatisticsEvent();
+      tradeStatisticsEvent.setSymbol(parser.getSymbol());
+      JsonWrapper tick = jsonWrapper.getJsonObject("data");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      tradeStatisticsEvent.setTimeStamp(ts);
+      tradeStatisticsEvent.setData(TradeStatistics.parse(tick,ts));
+      return tradeStatisticsEvent;
+    };
+  }
+
 }

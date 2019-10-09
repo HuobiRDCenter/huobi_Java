@@ -1,8 +1,18 @@
 package com.huobi.client.model.event;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.huobi.client.impl.AccountsInfoMap;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.Order;
+import com.huobi.client.model.enums.OrderSource;
+import com.huobi.client.model.enums.OrderState;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.enums.StopOrderOperator;
 
 /**
  * The order received by subscription of order list request.
@@ -47,5 +57,41 @@ public class OrderListEvent {
 
   public void setOrderList(List<Order> orderList) {
     this.orderList = orderList;
+  }
+
+  public static RestApiJsonParser<OrderListEvent> getParser(String apiKey) {
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<Order> orderList = new ArrayList<>();
+      dataArray.forEach(item -> {
+
+        orderList.add(Order.parse(item, apiKey));
+      });
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
+    };
+  }
+
+  public static RestApiJsonParser<OrderListEvent> getSingleParser(String apiKey) {
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("topic");
+      OrderListEvent listEvent = new OrderListEvent();
+      listEvent.setTopic(ch);
+      listEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+
+      JsonWrapper item = jsonWrapper.getJsonObject("data");
+      List<Order> orderList = new ArrayList<>();
+
+      orderList.add(Order.parse(item, apiKey));
+
+      listEvent.setOrderList(orderList);
+      return listEvent;
+    };
   }
 }

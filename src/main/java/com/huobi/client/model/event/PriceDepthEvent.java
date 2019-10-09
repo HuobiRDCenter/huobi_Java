@@ -1,5 +1,14 @@
 package com.huobi.client.model.event;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.huobi.client.impl.ChannelParser;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
+import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.PriceDepth;
 
 /**
@@ -49,4 +58,45 @@ public class PriceDepthEvent {
   public void setData(PriceDepth data) {
     this.data = data;
   }
+
+  public static RestApiJsonParser<PriceDepthEvent> getReqParser() {
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      return convert(jsonWrapper, parser);
+    };
+  }
+
+  public static RestApiJsonParser<PriceDepthEvent> getParser() {
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("ch");
+      ChannelParser parser = new ChannelParser(ch);
+      return convert(jsonWrapper, parser);
+    };
+  }
+
+  public static PriceDepthEvent convert(JsonWrapper jsonWrapper, ChannelParser parser) {
+    PriceDepthEvent priceDepthEvent = new PriceDepthEvent();
+    priceDepthEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+    priceDepthEvent.setSymbol(parser.getSymbol());
+    PriceDepth priceDepth = new PriceDepth();
+    JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+    priceDepth.setTimestamp(TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts")));
+    List<DepthEntry> bidList = new LinkedList<>();
+    JsonWrapperArray bids = tick.getJsonArray("bids");
+    bids.forEachAsArray((item) -> {
+      bidList.add(DepthEntry.parse(item));
+    });
+    List<DepthEntry> askList = new LinkedList<>();
+    JsonWrapperArray asks = tick.getJsonArray("asks");
+    asks.forEachAsArray((item) -> {
+      askList.add(DepthEntry.parse(item));
+    });
+    priceDepth.setAsks(askList);
+    priceDepth.setBids(bidList);
+    priceDepthEvent.setData(priceDepth);
+    return priceDepthEvent;
+  }
+
+
 }

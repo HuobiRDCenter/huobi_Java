@@ -1,7 +1,14 @@
 package com.huobi.client.model.event;
 
+import com.huobi.client.impl.AccountsInfoMap;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.AccountChange;
 import com.huobi.client.model.enums.AccountChangeType;
+import com.huobi.client.model.enums.BalanceType;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,4 +59,23 @@ public class AccountEvent {
   public void setData(List<AccountChange> accountChangeList) {
     this.accountChangeList = accountChangeList;
   }
+
+  public static RestApiJsonParser<AccountEvent> getParser(String apiKey){
+    return (jsonWrapper) -> {
+      AccountEvent accountEvent = new AccountEvent();
+      accountEvent.setTimestamp(
+          TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      accountEvent.setChangeType(AccountChangeType.lookup(data.getString("event")));
+      JsonWrapperArray listArray = data.getJsonArray("list");
+      List<AccountChange> accountChangeList = new LinkedList<>();
+      listArray.forEach((itemInList) -> {
+        accountChangeList.add(AccountChange.parse(itemInList,apiKey));
+      });
+      accountEvent.setData(accountChangeList);
+      return accountEvent;
+    };
+  }
+
+
 }

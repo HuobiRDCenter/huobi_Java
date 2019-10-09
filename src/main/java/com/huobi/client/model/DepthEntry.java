@@ -2,6 +2,8 @@ package com.huobi.client.model;
 
 import java.math.BigDecimal;
 
+import com.huobi.client.impl.utils.JsonWrapperArray;
+
 /**
  * An depth entry consisting of price and amount.
  */
@@ -34,5 +36,12 @@ public class DepthEntry {
 
   public void setAmount(BigDecimal amount) {
     this.amount = amount;
+  }
+
+  public static DepthEntry parse(JsonWrapperArray jsonEntry) {
+    DepthEntry entry = new DepthEntry();
+    entry.setPrice(jsonEntry.getBigDecimalAt(0));
+    entry.setAmount(jsonEntry.getBigDecimalAt(1));
+    return entry;
   }
 }

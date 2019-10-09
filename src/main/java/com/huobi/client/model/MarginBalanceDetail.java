@@ -1,8 +1,12 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.model.enums.AccountState;
 import com.huobi.client.model.enums.AccountType;
+
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -114,5 +118,30 @@ public class MarginBalanceDetail {
 
   public void setSubAccountBalance(List<Balance> subAccountBalance) {
     this.subAccountBalance = subAccountBalance;
+  }
+
+  public static RestApiJsonParser<List<MarginBalanceDetail>> getListParser(){
+    return (jsonWrapper -> {
+      List<MarginBalanceDetail> marginBalanceDetailList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((itemInData) -> {
+        MarginBalanceDetail marginBalanceDetail = new MarginBalanceDetail();
+        marginBalanceDetail.setId(itemInData.getLong("id"));
+        marginBalanceDetail.setType(AccountType.lookup(itemInData.getString("type")));
+        marginBalanceDetail.setSymbol(itemInData.getString("symbol"));
+        marginBalanceDetail.setFlPrice(itemInData.getBigDecimal("fl-price"));
+        marginBalanceDetail.setFlType(itemInData.getString("fl-type"));
+        marginBalanceDetail.setState(AccountState.lookup(itemInData.getString("state")));
+        marginBalanceDetail.setRiskRate(itemInData.getBigDecimal("risk-rate"));
+        List<Balance> balanceList = new LinkedList<>();
+        JsonWrapperArray listArray = itemInData.getJsonArray("list");
+        listArray.forEach((itemInList) -> {
+          balanceList.add(Balance.parse(itemInList));
+        });
+        marginBalanceDetail.setSubAccountBalance(balanceList);
+        marginBalanceDetailList.add(marginBalanceDetail);
+      });
+      return marginBalanceDetailList;
+    });
   }
 }

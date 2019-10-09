@@ -71,24 +71,30 @@ public class PlaceOrder {
     System.out.println("--- The new order created ---");
     System.out.println("--- " + marketSellId + " ---");
 
-    NewOrderRequest buyStopLimit = NewOrderRequest.spotBuyStopOrder(symbol,
-        new BigDecimal("4.6"),
-        new BigDecimal("4.6"),
-        new BigDecimal("1"),
-        StopOrderOperator.GTE);
+    try {
+      NewOrderRequest buyStopLimit = NewOrderRequest.spotBuyStopOrder(symbol,
+          new BigDecimal("4.6"),
+          new BigDecimal("4.6"),
+          new BigDecimal("1"),
+          StopOrderOperator.GTE);
 
-    long buyStopLimitId = syncRequestClient.createOrder(buyStopLimit);
-    System.out.println("--- The new stop limit order created ---");
-    System.out.println("--- " + buyStopLimitId + " ---");
+      long buyStopLimitId = syncRequestClient.createOrder(buyStopLimit);
+      System.out.println("--- The new stop limit order created ---");
+      System.out.println("--- " + buyStopLimitId + " ---");
 
-    NewOrderRequest sellStopLimit = NewOrderRequest.spotSellStopOrder(symbol,
-        new BigDecimal("3.5"),
-        new BigDecimal("3.4"),
-        new BigDecimal("1"),
-        StopOrderOperator.LTE);
-    long sellStopLimitId = syncRequestClient.createOrder(sellStopLimit);
-    System.out.println("--- The new stop limit order created ---");
-    System.out.println("--- " + sellStopLimitId + " ---");
+      NewOrderRequest sellStopLimit = NewOrderRequest.spotSellStopOrder(symbol,
+          new BigDecimal("3.5"),
+          new BigDecimal("3.4"),
+          new BigDecimal("1"),
+          StopOrderOperator.LTE);
+      long sellStopLimitId = syncRequestClient.createOrder(sellStopLimit);
+      System.out.println("--- The new stop limit order created ---");
+      System.out.println("--- " + sellStopLimitId + " ---");
+    } catch (Exception e) {
+
+    }
+
+
 
     // Get the order detail use order id
     Order orderInfo = syncRequestClient.getOrder(symbol, o1);
@@ -140,7 +146,7 @@ public class PlaceOrder {
 
 
     // Get all the orders
-    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.FILLED));
+    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.CANCELED));
     orderList.forEach(order -> {
       System.out.println("Orders :: "+ order.toString());
     });

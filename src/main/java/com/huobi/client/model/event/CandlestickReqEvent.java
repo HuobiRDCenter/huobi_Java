@@ -1,7 +1,12 @@
 package com.huobi.client.model.event;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.huobi.client.impl.ChannelParser;
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.enums.CandlestickInterval;
 
@@ -65,5 +70,24 @@ public class CandlestickReqEvent {
 
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public static RestApiJsonParser<CandlestickReqEvent> getParser(CandlestickInterval interval){
+    return (jsonWrapper) -> {
+      String ch = jsonWrapper.getString("rep");
+      ChannelParser parser = new ChannelParser(ch);
+      CandlestickReqEvent candlestickEvent = new CandlestickReqEvent();
+      candlestickEvent.setSymbol(parser.getSymbol());
+      candlestickEvent.setInterval(interval);
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+
+      List<Candlestick> list = new ArrayList<>();
+      dataArray.forEach(dataJson -> {
+        list.add(Candlestick.parse(dataJson));
+      });
+
+      candlestickEvent.setData(list);
+      return candlestickEvent;
+    };
   }
 }

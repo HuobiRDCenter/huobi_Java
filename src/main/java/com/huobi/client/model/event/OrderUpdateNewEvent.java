@@ -1,7 +1,13 @@
 package com.huobi.client.model.event;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.OrderUpdate;
+import com.huobi.client.model.enums.DealRole;
+import com.huobi.client.model.enums.OrderState;
+import com.huobi.client.model.enums.OrderType;
 
 /**
  * The order update received by subscription of order update.
@@ -49,5 +55,17 @@ public class OrderUpdateNewEvent {
 
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public static RestApiJsonParser<OrderUpdateNewEvent> getParser(){
+    return (jsonWrapper) -> {
+      OrderUpdateNewEvent orderUpdateEvent = new OrderUpdateNewEvent();
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      String symbol = data.getString("symbol");
+      orderUpdateEvent.setSymbol(symbol);
+      orderUpdateEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      orderUpdateEvent.setData(OrderUpdate.parse(data,symbol));
+      return orderUpdateEvent;
+    };
   }
 }

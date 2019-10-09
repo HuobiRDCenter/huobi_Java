@@ -1,7 +1,11 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.model.enums.EtfStatus;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -124,5 +128,27 @@ public class EtfSwapConfig {
 
   public void setUnitPriceList(List<UnitPrice> unitPriceList) {
     this.unitPriceList = unitPriceList;
+  }
+
+
+  public static RestApiJsonParser<EtfSwapConfig> getParser(){
+    return (jsonWrapper -> {
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      EtfSwapConfig etfSwapConfig = new EtfSwapConfig();
+      etfSwapConfig.setPurchaseMaxAmount(data.getInteger("purchase_max_amount"));
+      etfSwapConfig.setPurchaseMinAmount(data.getInteger("purchase_min_amount"));
+      etfSwapConfig.setRedemptionMaxAmount(data.getInteger("redemption_max_amount"));
+      etfSwapConfig.setRedemptionMinAmount(data.getInteger("redemption_min_amount"));
+      etfSwapConfig.setPurchaseFeeRate(data.getBigDecimal("purchase_fee_rate"));
+      etfSwapConfig.setRedemptionFeeRate(data.getBigDecimal("redemption_fee_rate"));
+      etfSwapConfig.setStatus(EtfStatus.lookup(Integer.toString(data.getInteger("etf_status"))));
+      JsonWrapperArray unitPrices = data.getJsonArray("unit_price");
+      List<UnitPrice> unitPriceList = new LinkedList<>();
+      unitPrices.forEach((item) -> {
+        unitPriceList.add(UnitPrice.parse(item));
+      });
+      etfSwapConfig.setUnitPriceList(unitPriceList);
+      return etfSwapConfig;
+    });
   }
 }

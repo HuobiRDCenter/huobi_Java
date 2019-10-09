@@ -1,8 +1,13 @@
 package com.huobi.client.model;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 import lombok.ToString;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapperArray;
 
 /**
  * The Huobi supported symbols.
@@ -160,5 +165,29 @@ public class Symbol {
 
   public void setLeverageRatio(Integer leverageRatio) {
     this.leverageRatio = leverageRatio;
+  }
+
+  public static RestApiJsonParser<List<Symbol>> getListParser(){
+    return (jsonWrapper -> {
+      List<Symbol> symbolList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Symbol symbol = new Symbol();
+        symbol.setBaseCurrency(item.getString("base-currency"));
+        symbol.setQuoteCurrency(item.getString("quote-currency"));
+        symbol.setPricePrecision(item.getInteger("price-precision"));
+        symbol.setAmountPrecision(item.getInteger("amount-precision"));
+        symbol.setSymbolPartition(item.getString("symbol-partition"));
+        symbol.setSymbol(item.getString("symbol"));
+        symbol.setValuePrecision(item.getIntegerOrDefault("value-precision", null));
+        symbol.setMinOrderAmt(item.getBigDecimalOrDefault("min-order-amt", null));
+        symbol.setMaxOrderAmt(item.getBigDecimalOrDefault("max-order-amt", null));
+        symbol.setMinOrderValue(item.getBigDecimalOrDefault("min-order-value", null));
+        symbol.setLeverageRatio(item.getIntegerOrDefault("leverage-ratio", null));
+        symbolList.add(symbol);
+
+      });
+      return symbolList;
+    });
   }
 }

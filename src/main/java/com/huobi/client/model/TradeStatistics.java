@@ -1,6 +1,13 @@
 package com.huobi.client.model;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.impl.utils.TimeService;
 
 /**
  * The summary of trading in the market for the last 24 hours
@@ -119,4 +126,42 @@ public class TradeStatistics {
   public void setVolume(BigDecimal volume) {
     this.volume = volume;
   }
+
+
+  public static RestApiJsonParser<TradeStatistics> getParser() {
+    return (jsonWrapper -> {
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      JsonWrapper tick = jsonWrapper.getJsonObject("tick");
+      return parse(tick,ts);
+    });
+  }
+
+  public static RestApiJsonParser<Map<String,TradeStatistics>> getMapParser(){
+    return (jsonWrapper -> {
+      Map<String, TradeStatistics> map = new HashMap<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      dataArray.forEach(item -> {
+        map.put(item.getString("symbol"), TradeStatistics.parse(item,ts));
+      });
+      return map;
+    });
+  }
+
+  public static TradeStatistics parse(JsonWrapper item,long ts){
+    TradeStatistics statistics = new TradeStatistics();
+    statistics.setTimestamp(ts);
+    statistics.setAmount(item.getBigDecimal("amount"));
+    statistics.setOpen(item.getBigDecimal("open"));
+    statistics.setClose(item.getBigDecimal("close"));
+    statistics.setHigh(item.getBigDecimal("high"));
+    statistics.setLow(item.getBigDecimal("low"));
+    statistics.setCount(item.getLong("count"));
+    statistics.setVolume(item.getBigDecimal("vol"));
+    return statistics;
+  }
+
+
+
+
 }

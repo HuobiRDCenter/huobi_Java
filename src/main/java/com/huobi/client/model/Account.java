@@ -1,10 +1,14 @@
 package com.huobi.client.model;
 
 
-import com.huobi.client.model.enums.AccountState;
-import com.huobi.client.model.enums.AccountType;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
+import com.huobi.client.model.enums.AccountState;
+import com.huobi.client.model.enums.AccountType;
 
 /**
  * The account information for spot account, margin account etc.
@@ -89,5 +93,24 @@ public class Account {
 
   public void setState(AccountState state) {
     this.state = state;
+  }
+
+  public static RestApiJsonParser<List<Account>> getListParser() {
+    return  (jsonWrapper -> {
+      List<Account> res = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        res.add(parse(item));
+      });
+      return res;
+    });
+  }
+
+  public static Account parse(JsonWrapper item){
+    Account account = new Account();
+    account.setId(item.getLong("id"));
+    account.setType(AccountType.lookup(item.getString("type")));
+    account.setState(AccountState.lookup(item.getString("state")));
+    return account;
   }
 }

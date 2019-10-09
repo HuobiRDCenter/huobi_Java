@@ -1,7 +1,11 @@
 package com.huobi.client.model;
 
+import com.huobi.client.impl.RestApiJsonParser;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.model.enums.EtfSwapType;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -150,5 +154,38 @@ public class EtfSwapHistory {
 
   public void setObtainCurrencyList(List<UnitPrice> obtainCurrencyList) {
     this.obtainCurrencyList = obtainCurrencyList;
+  }
+
+  public static RestApiJsonParser<List<EtfSwapHistory>> getListParser(){
+    return (jsonWrapper -> {
+      List<EtfSwapHistory> etfSwapHistoryList = new LinkedList<>();
+      JsonWrapperArray data = jsonWrapper.getJsonArray("data");
+      data.forEach((dataItem) -> {
+        EtfSwapHistory etfSwapHistory = new EtfSwapHistory();
+        etfSwapHistory.setCreatedTimestamp(dataItem.getLong("gmt_created"));
+        etfSwapHistory.setCurrency(dataItem.getString("currency"));
+        etfSwapHistory.setAmount(dataItem.getBigDecimal("amount"));
+        etfSwapHistory.setType(EtfSwapType.lookup(dataItem.getString("type")));
+        etfSwapHistory.setStatus(dataItem.getInteger("status"));
+        JsonWrapper detail = dataItem.getJsonObject("detail");
+        etfSwapHistory.setRate(detail.getBigDecimal("rate"));
+        etfSwapHistory.setFee(detail.getBigDecimal("fee"));
+        etfSwapHistory.setPointCardAmount(detail.getBigDecimal("point_card_amount"));
+        JsonWrapperArray usedCurrencyArray = detail.getJsonArray("used_currency_list");
+        List<UnitPrice> usedCurrencyList = new LinkedList<>();
+        usedCurrencyArray.forEach((currency) -> {
+          usedCurrencyList.add(UnitPrice.parse(currency));
+        });
+        etfSwapHistory.setUsedCurrencyList(usedCurrencyList);
+        JsonWrapperArray obtainCurrencyArray = detail.getJsonArray("obtain_currency_list");
+        List<UnitPrice> obtainCurrencyList = new LinkedList<>();
+        obtainCurrencyArray.forEach((currency) -> {
+          obtainCurrencyList.add(UnitPrice.parse(currency));
+        });
+        etfSwapHistory.setObtainCurrencyList(obtainCurrencyList);
+        etfSwapHistoryList.add(etfSwapHistory);
+      });
+      return etfSwapHistoryList;
+    });
   }
 }
