@@ -63,7 +63,9 @@ public class PriceDepthEvent {
     return (jsonWrapper) -> {
       String ch = jsonWrapper.getString("rep");
       ChannelParser parser = new ChannelParser(ch);
-      return convert(jsonWrapper, parser);
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      return convert(ts,data, parser);
     };
   }
 
@@ -71,24 +73,26 @@ public class PriceDepthEvent {
     return (jsonWrapper) -> {
       String ch = jsonWrapper.getString("ch");
       ChannelParser parser = new ChannelParser(ch);
-      return convert(jsonWrapper, parser);
+      JsonWrapper data = jsonWrapper.getJsonObject("tick");
+      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      return convert(ts, data, parser);
     };
   }
 
-  public static PriceDepthEvent convert(JsonWrapper jsonWrapper, ChannelParser parser) {
+  public static PriceDepthEvent convert(long ts, JsonWrapper data, ChannelParser parser) {
     PriceDepthEvent priceDepthEvent = new PriceDepthEvent();
-    priceDepthEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+    priceDepthEvent.setTimestamp(ts);
     priceDepthEvent.setSymbol(parser.getSymbol());
     PriceDepth priceDepth = new PriceDepth();
-    JsonWrapper tick = jsonWrapper.getJsonObject("tick");
-    priceDepth.setTimestamp(TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts")));
+
+    priceDepth.setTimestamp(TimeService.convertCSTInMillisecondToUTC(data.getLong("ts")));
     List<DepthEntry> bidList = new LinkedList<>();
-    JsonWrapperArray bids = tick.getJsonArray("bids");
+    JsonWrapperArray bids = data.getJsonArray("bids");
     bids.forEachAsArray((item) -> {
       bidList.add(DepthEntry.parse(item));
     });
     List<DepthEntry> askList = new LinkedList<>();
-    JsonWrapperArray asks = tick.getJsonArray("asks");
+    JsonWrapperArray asks = data.getJsonArray("asks");
     asks.forEachAsArray((item) -> {
       askList.add(DepthEntry.parse(item));
     });
