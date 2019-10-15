@@ -491,7 +491,13 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build();
     builder.putToPost("client-order-id", clientOrderId);
     request.request = createRequestByPostWithSignature(url, builder);
-    request.jsonParser = (json -> (null));
+    request.jsonParser = (json -> {
+
+      System.out.println(clientOrderId + "===>" + json.getJson().toJSONString());
+
+
+      return null;
+    });
     return request;
   }
 

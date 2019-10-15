@@ -145,7 +145,7 @@ public class WebSocketConnection extends WebSocketListener {
 
   void send(String str) {
     boolean result = false;
-    log.debug("[Send]{}", str);
+    log.info("[Send]{}", str);
     if (webSocket != null) {
       result = webSocket.send(str);
     }
@@ -185,7 +185,7 @@ public class WebSocketConnection extends WebSocketListener {
         closeOnError();
         return;
       }
-      log.debug("[On Message][{}] {}", connectionId, data);
+      log.info("[On Message][{}] {}", connectionId, data);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
       if (jsonWrapper.containKey("status") && !"ok".equals(jsonWrapper.getString("status"))) {
         String errorCode = jsonWrapper.getStringOrDefault("err-code", "");

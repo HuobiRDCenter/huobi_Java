@@ -2,6 +2,7 @@ package com.huobi.client.impl;
 
 import java.io.IOException;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -79,7 +80,8 @@ abstract class RestApiInvoker {
         throw new HuobiApiException(
             HuobiApiException.ENV_ERROR, "[Invoking] Cannot get the response from server");
       }
-      log.debug("Response =====> " + str);
+      String bodyString = request.request.body() != null ? JSON.toJSONString(request.request.body()) : "null";
+      log.info("Response =====> " + str + "===>" +request.request.url() + " ===>"+ bodyString);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(str);
       checkResponse(jsonWrapper);
       return request.jsonParser.parseJson(jsonWrapper);

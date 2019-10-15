@@ -7,19 +7,20 @@ import com.huobi.client.model.enums.CandlestickInterval;
 public class SubscribeCandlestickEvent {
   public static void main(String[] args) {
     SubscriptionClient subscriptionClient = SubscriptionClient.create();
-    String symbol = "btcusdt";
-    subscriptionClient.subscribeCandlestickEvent(symbol, CandlestickInterval.MIN15, (candlestickEvent) -> {
-      System.out.println("--------------- Subscribe Candlestick ------------------");
-      System.out.println("id: " + candlestickEvent.getData().getId());
-      System.out.println("Timestamp: " + candlestickEvent.getData().getTimestamp());
-      System.out.println("High: " + candlestickEvent.getData().getHigh());
-      System.out.println("Low: " + candlestickEvent.getData().getLow());
-      System.out.println("Open: " + candlestickEvent.getData().getOpen());
-      System.out.println("Close: " + candlestickEvent.getData().getClose());
-      System.out.println("Volume: " + candlestickEvent.getData().getVolume());
-    });
+    String symbol = "linkusdt";
+//    subscriptionClient.subscribeCandlestickEvent(symbol, CandlestickInterval.MIN15, (candlestickEvent) -> {
+//      System.out.println("--------------- Subscribe Candlestick ------------------");
+//      System.out.println("id: " + candlestickEvent.getData().getId());
+//      System.out.println("Timestamp: " + candlestickEvent.getData().getTimestamp());
+//      System.out.println("High: " + candlestickEvent.getData().getHigh());
+//      System.out.println("Low: " + candlestickEvent.getData().getLow());
+//      System.out.println("Open: " + candlestickEvent.getData().getOpen());
+//      System.out.println("Close: " + candlestickEvent.getData().getClose());
+//      System.out.println("Volume: " + candlestickEvent.getData().getVolume());
+//    });
 
-    subscriptionClient.requestCandlestickEvent(symbol,null,null,CandlestickInterval.MIN15, (candlestickEvent) -> {
+//    {"req": "market.linkusdt.kline.1min","id": "id963852741","from": 1570377600"","to": "1570395600"}
+    subscriptionClient.requestCandlestickEvent(symbol,1570377600L,1570395600L,CandlestickInterval.MIN1, (candlestickEvent) -> {
       System.out.println("--------------- Request Candlestick ------------------");
       candlestickEvent.getData().forEach(candlestick -> {
         System.out.println("id: " + candlestick.getId());

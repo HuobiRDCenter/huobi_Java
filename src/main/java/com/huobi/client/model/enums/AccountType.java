@@ -8,6 +8,7 @@ import com.huobi.client.impl.utils.EnumLookup;
 public enum AccountType {
   SPOT("spot"),
   MARGIN("margin"),
+  SUPER_MARGIN("super-margin"),
   OTC("otc"),
   POINT("point"),
   UNKNOWN("unknown");

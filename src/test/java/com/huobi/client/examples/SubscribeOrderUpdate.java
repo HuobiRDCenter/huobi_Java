@@ -28,51 +28,51 @@ public class SubscribeOrderUpdate {
       log.info(event.getData().toString());
     }));
 
-    /**
-     * subscribe order updateEvent ,new interface (recommend)
-     */
-    client.subscribeOrderUpdateNewEvent(symbol,(event ->{
-      log.info(event.getData().toString());
-    }));
+//    /**
+//     * subscribe order updateEvent ,new interface (recommend)
+//     */
+//    client.subscribeOrderUpdateNewEvent(symbol,(event ->{
+//      log.info(event.getData().toString());
+//    }));
 
-    /**
-     * request order list event
-     */
-    List<OrderState> stateList = new ArrayList<>();
-    stateList.add(OrderState.CANCELED);
-    stateList.add(OrderState.FILLED);
-
-    List<OrderType> typeList = new ArrayList<>();
-    typeList.add(OrderType.BUY_LIMIT);
-    typeList.add(OrderType.SELL_LIMIT);
-    typeList.add(OrderType.BUY_MARKET);
-    typeList.add(OrderType.SELL_MARKET);
-
-    Date today = new Date();
-    Date startDate = DateUtils.addDays(today, -2);
-
-    long startOrderId = 48909764277L;
-
-    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, startOrderId, 20, QueryDirection.PREV);
-
-    client.requestOrderListEvent(ordersRequest, orderListEvent -> {
-      System.out.println("=================Request Order List======================");
-      orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Orders:" + order.toString());
-      });
-    });
-
-    System.out.println("------------------------------------------");
-
-    /**
-     * request order detail event
-     */
-    client.requestOrderDetailEvent(startOrderId,orderListEvent -> {
-      System.out.println("=================Request Order Detail======================");
-      orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Order:" + order.toString());
-      });
-    });
+//    /**
+//     * request order list event
+//     */
+//    List<OrderState> stateList = new ArrayList<>();
+//    stateList.add(OrderState.CANCELED);
+//    stateList.add(OrderState.FILLED);
+//
+//    List<OrderType> typeList = new ArrayList<>();
+//    typeList.add(OrderType.BUY_LIMIT);
+//    typeList.add(OrderType.SELL_LIMIT);
+//    typeList.add(OrderType.BUY_MARKET);
+//    typeList.add(OrderType.SELL_MARKET);
+//
+//    Date today = new Date();
+//    Date startDate = DateUtils.addDays(today, -2);
+//
+//    long startOrderId = 48909764277L;
+//
+//    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, startOrderId, 20, QueryDirection.PREV);
+//
+//    client.requestOrderListEvent(ordersRequest, orderListEvent -> {
+//      System.out.println("=================Request Order List======================");
+//      orderListEvent.getOrderList().forEach(order -> {
+//        System.out.println("Request Orders:" + order.toString());
+//      });
+//    });
+//
+//    System.out.println("------------------------------------------");
+//
+//    /**
+//     * request order detail event
+//     */
+//    client.requestOrderDetailEvent(startOrderId,orderListEvent -> {
+//      System.out.println("=================Request Order Detail======================");
+//      orderListEvent.getOrderList().forEach(order -> {
+//        System.out.println("Request Order:" + order.toString());
+//      });
+//    });
 
   }
 

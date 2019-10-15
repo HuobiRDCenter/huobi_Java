@@ -23,8 +23,13 @@ public class GetAccounts {
     accountList.forEach(account -> {
       System.out.println("----- account type:" + account.getType() + " -----");
       account.getBalances().forEach(balance -> {
-        System.out.println(" account balance: " + JSON.toJSONString(balance));
+        if (balance.getCurrency().equals("usdt")) {
+          System.out.println(" account balance: " + JSON.toJSONString(balance));
+        }
+
       });
+
+
     });
 
 
