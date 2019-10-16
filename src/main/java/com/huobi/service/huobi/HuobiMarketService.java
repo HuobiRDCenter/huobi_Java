@@ -7,14 +7,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.MarketClient;
-import com.huobi.client.model.Symbol;
 import com.huobi.client.req.CandlestickRequest;
 import com.huobi.client.req.SubCandlestickRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.CandlestickIntervalEnum;
-import com.huobi.model.Candlestick;
-import com.huobi.model.CandlestickEvent;
+import com.huobi.model.market.Candlestick;
+import com.huobi.model.market.CandlestickEvent;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.CandlestickEventParser;
@@ -146,7 +145,6 @@ public class HuobiMarketService implements MarketClient {
 
       System.out.println(candlestick.toString());
     });
-
 
 
 

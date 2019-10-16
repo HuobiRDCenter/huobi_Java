@@ -1,4 +1,4 @@
-package com.huobi.model;
+package com.huobi.model.market;
 
 import java.math.BigDecimal;
 

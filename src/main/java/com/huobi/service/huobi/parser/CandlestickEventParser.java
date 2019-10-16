@@ -5,7 +5,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.model.CandlestickEvent;
+import com.huobi.model.market.CandlestickEvent;
 import com.huobi.service.huobi.utils.DataUtils;
 
 public class CandlestickEventParser implements HuobiModelParser<CandlestickEvent> {

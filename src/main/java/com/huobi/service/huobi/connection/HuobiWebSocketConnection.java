@@ -1,6 +1,9 @@
 package com.huobi.service.huobi.connection;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,7 +19,7 @@ import okio.ByteString;
 
 import com.huobi.client.impl.utils.InternalUtils;
 import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
+import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ConnectionStateEnum;
 import com.huobi.service.huobi.parser.HuobiModelParser;
@@ -61,28 +64,56 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   private long delayInSecond;
 
+  private String host;
+
   private HuobiWebSocketConnection(){}
 
+  public static HuobiWebSocketConnection createAssetConnection(Options options,
+      List<String> commandList,
+      HuobiModelParser parser,
+      ResponseCallback callback,
+      Boolean autoClose){
+
+    return createConnection(options,commandList,parser,callback,autoClose,true);
+  }
 
   public static HuobiWebSocketConnection createMarketConnection(Options options,
       List<String> commandList,
       HuobiModelParser parser,
       ResponseCallback callback,
-      Boolean autoClose){
+      boolean autoClose) {
+    return createConnection(options,commandList,parser,callback,autoClose,false);
+  }
+  public static HuobiWebSocketConnection createConnection(Options options,
+      List<String> commandList,
+      HuobiModelParser parser,
+      ResponseCallback callback,
+      Boolean autoClose,
+      boolean authNeed){
 
     HuobiWebSocketConnection connection = new HuobiWebSocketConnection();
     connection.setOptions(options);
     connection.setCommandList(commandList);
     connection.setParser(parser);
     connection.setCallback(callback);
-    connection.setAuthNeed(false);
+    connection.setAuthNeed(authNeed);
     connection.setAutoClose(autoClose);
     connection.setId(CONNECTION_COUNTER.addAndGet(1));
 
     // 创建websocket请求
-    String url = options.getOptionWebSocketHost()+"/"+HUOBI_MARKET_WEBSOCKET_PATH;
+    String url = options.getOptionWebSocketHost()+HUOBI_MARKET_WEBSOCKET_PATH;
+    if (authNeed) {
+      url = options.getOptionWebSocketHost()+HUOBI_TRADING_WEBSOCKET_PATH;
+    }
     Request request = new Request.Builder().url(url).build();
     connection.setOkhttpRequest(request);
+
+
+    try {
+      connection.setHost(new URL(options.getOptionRestHost()).getHost());
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    }
 
     // 开启链接
     connection.connect();
@@ -121,6 +152,15 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   public long getLastReceivedTime() {
     return this.lastReceivedTime;
+  }
+
+  void send(List<String> commandList) {
+    if (commandList == null || commandList.size() <= 0) {
+      return;
+    }
+    commandList.forEach(command->{
+      send(command);
+    });
   }
 
   void send(String str) {
@@ -173,10 +213,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
         } else if (op.equals("ping")) {
           processPingOnTradingLine(jsonObject, webSocket);
         } else if (op.equals("auth")) {
-          // TODO 认证成功后发送消息
-
-
-
+          send(commandList);
         } else if (op.equals("req")) {
           onReceiveAndClose(jsonObject);
         }
@@ -266,7 +303,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       ApiSignature as = new ApiSignature();
       UrlParamsBuilder builder = UrlParamsBuilder.build();
       try {
-        as.createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "GET", options.getOptionWebSocketHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
+        as.createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
       } catch (Exception e) {
         onError("Unexpected error when create the signature: " + e.getMessage(), e);
         close();

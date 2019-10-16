@@ -24,7 +24,7 @@ public class ConnectionFactory {
     try {
       response = client.newCall(request).execute();
       if (response.code() != 200) {
-        throw new SDKException(SDKException.EXEC_ERROR, "[Execute] Response Status Error : "+response.code()+" message:"+response.message());
+        throw new SDKException(SDKException.EXEC_ERROR, "[Execute] Response Status Error : " + response.code() + " message:" + response.message());
       }
       if (response != null && response.body() != null) {
         str = response.body().string();
@@ -32,6 +32,7 @@ public class ConnectionFactory {
       } else {
         throw new SDKException(SDKException.ENV_ERROR, "[Execute] Cannot get the response from server");
       }
+      log.info("[Response]{}", str);
       return str;
     } catch (IOException e) {
       e.printStackTrace();
@@ -41,7 +42,7 @@ public class ConnectionFactory {
   }
 
   public static WebSocket createWebSocket(Request request, WebSocketListener listener) {
-    return client.newWebSocket(request,listener);
+    return client.newWebSocket(request, listener);
   }
 
 }

@@ -4,8 +4,12 @@ import java.util.List;
 
 import com.huobi.client.req.CandlestickRequest;
 import com.huobi.client.req.SubCandlestickRequest;
-import com.huobi.model.Candlestick;
-import com.huobi.model.CandlestickEvent;
+import com.huobi.constant.Options;
+import com.huobi.constant.enums.ExchangeEnum;
+import com.huobi.exception.SDKException;
+import com.huobi.model.market.Candlestick;
+import com.huobi.model.market.CandlestickEvent;
+import com.huobi.service.huobi.HuobiMarketService;
 import com.huobi.utils.ResponseCallback;
 
 public interface MarketClient {
@@ -33,5 +37,15 @@ public interface MarketClient {
   void getMarketHistoryTrade();
 
   void subscribeMarketBBO();
+
+
+  static MarketClient create(Options options){
+
+    if (options.getExchange().equals(ExchangeEnum.HUOBI)) {
+      return new HuobiMarketService(options);
+    }
+    throw new SDKException(SDKException.INPUT_ERROR, "Unsupport Exchange.");
+  }
+
 
 }

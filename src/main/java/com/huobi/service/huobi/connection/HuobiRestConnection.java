@@ -1,5 +1,8 @@
 package com.huobi.service.huobi.connection;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.Request;
@@ -8,6 +11,7 @@ import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.EtfResult;
 import com.huobi.constant.Options;
 import com.huobi.exception.SDKException;
+import com.huobi.service.huobi.signature.ApiSignature;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.ConnectionFactory;
 
@@ -15,12 +19,19 @@ public class HuobiRestConnection {
 
   private Options options;
 
+  private String host;
+
   public Options getOptions() {
     return options;
   }
 
   public HuobiRestConnection(Options options) {
     this.options = options;
+    try {
+      this.host = new URL(this.options.getOptionRestHost()).getHost();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    }
   }
 
   public JSONObject executeGet(String path, UrlParamsBuilder paramsBuilder){
@@ -29,10 +40,27 @@ public class HuobiRestConnection {
 
     String url = options.getOptionRestHost() + path + paramsBuilder.buildUrl();
 
-    Request executeRequest =  new Request.Builder()
+    Request executeRequest = new Request.Builder()
         .url(url)
         .addHeader("Content-Type", "application/x-www-form-urlencoded")
         .build();
+
+    String resp = ConnectionFactory.execute(executeRequest);
+    return checkAndGetResponse(resp);
+  }
+
+
+  public JSONObject executeGetWithSignature(String path, UrlParamsBuilder paramsBuilder) {
+
+
+    Options options = this.getOptions();
+
+    String requestUrl =  options.getOptionRestHost() + path;
+    new ApiSignature().createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "GET", host, path, paramsBuilder);
+    requestUrl += paramsBuilder.buildUrl();
+
+    Request executeRequest = new Request.Builder().url(requestUrl)
+        .addHeader("Content-Type", "application/x-www-form-urlencoded").build();
 
     String resp = ConnectionFactory.execute(executeRequest);
     return checkAndGetResponse(resp);

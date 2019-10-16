@@ -1,4 +1,4 @@
-package com.huobi.model;
+package com.huobi.client.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CandlestickEvent {
+public class AccountBalanceRequest {
 
-  private String ch;
-
-  private Long ts;
-
-  private Candlestick candlestick;
+  private Long accountId;
 
 }
