@@ -22,6 +22,7 @@ public class ConnectionFactory {
     Response response = null;
     String str = null;
     try {
+      log.info("[Request URL]{}",request.url());
       response = client.newCall(request).execute();
       if (response.code() != 200) {
         throw new SDKException(SDKException.EXEC_ERROR, "[Execute] Response Status Error : " + response.code() + " message:" + response.message());

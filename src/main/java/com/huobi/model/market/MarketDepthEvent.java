@@ -1,4 +1,4 @@
-package com.huobi.client.req;
+package com.huobi.model.market;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,17 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.CandlestickIntervalEnum;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class SubCandlestickRequest {
+public class MarketDepthEvent {
 
-  private String symbol;
+  private String ch;
 
-  private CandlestickIntervalEnum interval;
+  private Long ts;
 
+  private MarketDepth depth;
 }

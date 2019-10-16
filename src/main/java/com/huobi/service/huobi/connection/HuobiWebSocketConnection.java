@@ -2,7 +2,6 @@ package com.huobi.service.huobi.connection;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,11 +18,11 @@ import okio.ByteString;
 
 import com.huobi.client.impl.utils.InternalUtils;
 import com.huobi.client.impl.utils.TimeService;
-import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ConnectionStateEnum;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 import com.huobi.service.huobi.signature.ApiSignature;
+import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.ConnectionFactory;
 import com.huobi.utils.ResponseCallback;
 import com.huobi.utils.WebSocketConnection;

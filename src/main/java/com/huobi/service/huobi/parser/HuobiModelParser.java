@@ -10,6 +10,8 @@ public interface HuobiModelParser<T> {
 
   T parse(JSONObject json);
 
+  T parse(JSONArray json);
+
   List<T> parseArray(JSONArray jsonArray);
 
 }

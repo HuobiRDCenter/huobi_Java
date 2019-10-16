@@ -1,4 +1,4 @@
-package com.huobi.service.huobi.parser;
+package com.huobi.service.huobi.parser.market;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.model.market.CandlestickEvent;
+import com.huobi.service.huobi.parser.HuobiModelParser;
 import com.huobi.service.huobi.utils.DataUtils;
 
 public class CandlestickEventParser implements HuobiModelParser<CandlestickEvent> {
@@ -20,6 +21,11 @@ public class CandlestickEventParser implements HuobiModelParser<CandlestickEvent
         .ts(json.getLong("ts"))
         .candlestick(new CandlestickParser().parse(json.getJSONObject(dataKey)))
         .build();
+  }
+
+  @Override
+  public CandlestickEvent parse(JSONArray json) {
+    return null;
   }
 
   @Override

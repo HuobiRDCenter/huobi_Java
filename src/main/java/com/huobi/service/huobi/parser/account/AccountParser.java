@@ -1,4 +1,4 @@
-package com.huobi.service.huobi.parser;
+package com.huobi.service.huobi.parser.account;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.huobi.constant.enums.AccountStateEnum;
 import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.model.account.Account;
+import com.huobi.service.huobi.parser.HuobiModelParser;
 
 public class AccountParser implements HuobiModelParser<Account> {
 
@@ -19,6 +20,11 @@ public class AccountParser implements HuobiModelParser<Account> {
     account.setState(AccountStateEnum.find(json.getString("state")));
 
     return account;
+  }
+
+  @Override
+  public Account parse(JSONArray json) {
+    return null;
   }
 
   @Override

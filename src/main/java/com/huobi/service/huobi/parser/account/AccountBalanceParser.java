@@ -1,4 +1,4 @@
-package com.huobi.service.huobi.parser;
+package com.huobi.service.huobi.parser.account;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.huobi.constant.enums.AccountStateEnum;
 import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.model.account.AccountBalance;
+import com.huobi.service.huobi.parser.HuobiModelParser;
 
 public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
 
@@ -21,6 +22,11 @@ public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
     accountBalance.setList(new BalanceParser().parseArray(json.getJSONArray("list")));
 
     return accountBalance;
+  }
+
+  @Override
+  public AccountBalance parse(JSONArray json) {
+    return null;
   }
 
   @Override

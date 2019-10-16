@@ -12,7 +12,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
 
 public class ApiSignature {
 
