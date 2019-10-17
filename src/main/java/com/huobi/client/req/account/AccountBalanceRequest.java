@@ -1,4 +1,4 @@
-package com.huobi.client.req;
+package com.huobi.client.req.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

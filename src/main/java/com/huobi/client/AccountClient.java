@@ -2,11 +2,14 @@ package com.huobi.client;
 
 import java.util.List;
 
-import com.huobi.client.req.AccountBalanceRequest;
-import com.huobi.client.req.SubAccountChangeRequest;
+import com.huobi.client.req.account.AccountBalanceRequest;
+import com.huobi.client.req.account.SubAccountChangeRequest;
+import com.huobi.client.req.account.TransferSubuserRequest;
 import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.AccountChangeEvent;
+import com.huobi.model.account.AccountReq;
+import com.huobi.model.account.SubuserAggregateBalance;
 import com.huobi.utils.ResponseCallback;
 
 public interface AccountClient {
@@ -15,13 +18,15 @@ public interface AccountClient {
 
   AccountBalance getAccountBalance(AccountBalanceRequest request);
 
-  void transferSubuser();
+  long transferSubuser(TransferSubuserRequest request);
 
-  void getSubuserAccountBalance();
+  List<AccountBalance> getSubuserAccountBalance(Long subuserId);
 
-  void getSubuserAggregateBalance();
+  List<SubuserAggregateBalance> getSubuserAggregateBalance();
 
   void subAccounts(SubAccountChangeRequest request, ResponseCallback<AccountChangeEvent> callback);
+
+  void reqAccounts(ResponseCallback<AccountReq> callback);
 
 
 }

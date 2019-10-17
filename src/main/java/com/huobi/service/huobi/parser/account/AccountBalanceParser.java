@@ -1,5 +1,6 @@
 package com.huobi.service.huobi.parser.account;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -31,6 +32,17 @@ public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
 
   @Override
   public List<AccountBalance> parseArray(JSONArray jsonArray) {
-    return null;
+
+    if (jsonArray == null || jsonArray.size() <= 0) {
+      return new ArrayList<>();
+    }
+
+    List<AccountBalance> list = new ArrayList<>();
+    for (int i = 0; i < jsonArray.size(); i++) {
+      JSONObject jsonObject = jsonArray.getJSONObject(i);
+      list.add(parse(jsonObject));
+    }
+
+    return list;
   }
 }

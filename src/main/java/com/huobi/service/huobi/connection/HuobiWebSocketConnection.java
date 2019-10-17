@@ -65,15 +65,15 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   private String host;
 
-  private HuobiWebSocketConnection(){}
+  private HuobiWebSocketConnection() {}
 
   public static HuobiWebSocketConnection createAssetConnection(Options options,
       List<String> commandList,
       HuobiModelParser parser,
       ResponseCallback callback,
-      Boolean autoClose){
+      Boolean autoClose) {
 
-    return createConnection(options,commandList,parser,callback,autoClose,true);
+    return createConnection(options, commandList, parser, callback, autoClose, true);
   }
 
   public static HuobiWebSocketConnection createMarketConnection(Options options,
@@ -81,14 +81,15 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       HuobiModelParser parser,
       ResponseCallback callback,
       boolean autoClose) {
-    return createConnection(options,commandList,parser,callback,autoClose,false);
+    return createConnection(options, commandList, parser, callback, autoClose, false);
   }
+
   public static HuobiWebSocketConnection createConnection(Options options,
       List<String> commandList,
       HuobiModelParser parser,
       ResponseCallback callback,
       Boolean autoClose,
-      boolean authNeed){
+      boolean authNeed) {
 
     HuobiWebSocketConnection connection = new HuobiWebSocketConnection();
     connection.setOptions(options);
@@ -100,13 +101,12 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     connection.setId(CONNECTION_COUNTER.addAndGet(1));
 
     // 创建websocket请求
-    String url = options.getOptionWebSocketHost()+HUOBI_MARKET_WEBSOCKET_PATH;
+    String url = options.getOptionWebSocketHost() + HUOBI_MARKET_WEBSOCKET_PATH;
     if (authNeed) {
-      url = options.getOptionWebSocketHost()+HUOBI_TRADING_WEBSOCKET_PATH;
+      url = options.getOptionWebSocketHost() + HUOBI_TRADING_WEBSOCKET_PATH;
     }
     Request request = new Request.Builder().url(url).build();
     connection.setOkhttpRequest(request);
-
 
     try {
       connection.setHost(new URL(options.getOptionRestHost()).getHost());
@@ -157,7 +157,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     if (commandList == null || commandList.size() <= 0) {
       return;
     }
-    commandList.forEach(command->{
+    commandList.forEach(command -> {
       send(command);
     });
   }
@@ -239,6 +239,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       close();
     }
   }
+
   @SuppressWarnings("unchecked")
   private void onReceive(JSONObject jsonObject) {
     Object obj = null;
@@ -315,7 +316,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     } else {
 
       // 不需要验签的话，直接把命令发出去就好
-      commandList.forEach(command ->{
+      commandList.forEach(command -> {
         send(command);
       });
     }

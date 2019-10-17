@@ -67,11 +67,17 @@ public class HuobiRestConnection {
   }
 
 
-  public JSONObject executePostAndSignature(){
+  public JSONObject executePostWithSignature(String path, UrlParamsBuilder paramsBuilder){
 
-    // TODO 验签
+    Options options = this.getOptions();
 
-    String resp = ConnectionFactory.execute(null);
+    String requestUrl =  options.getOptionRestHost() + path;
+    new ApiSignature().createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "POST", host, path, paramsBuilder);
+    requestUrl += paramsBuilder.buildUrl();
+    Request executeRequest = new Request.Builder().url(requestUrl).post(paramsBuilder.buildPostBody())
+        .addHeader("Content-Type", "application/json").build();
+
+    String resp = ConnectionFactory.execute(executeRequest);
     return checkAndGetResponse(resp);
   }
 

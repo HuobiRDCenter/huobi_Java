@@ -1,4 +1,6 @@
-package com.huobi.client.req;
+package com.huobi.model.account;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,15 +8,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.BalanceModeEnum;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class SubAccountChangeRequest {
+public class AccountReq {
 
-  private BalanceModeEnum balanceMode;
+  private String topic;
+
+  private Long ts;
+
+  private String cid;
+
+  private List<AccountBalance> balanceList;
 
 }
