@@ -28,7 +28,7 @@ public class HuobiRestConnection {
   public HuobiRestConnection(Options options) {
     this.options = options;
     try {
-      this.host = new URL(this.options.getOptionRestHost()).getHost();
+      this.host = new URL(this.options.getRestHost()).getHost();
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
@@ -38,7 +38,7 @@ public class HuobiRestConnection {
 
     Options options = this.getOptions();
 
-    String url = options.getOptionRestHost() + path + paramsBuilder.buildUrl();
+    String url = options.getRestHost() + path + paramsBuilder.buildUrl();
 
     Request executeRequest = new Request.Builder()
         .url(url)
@@ -55,8 +55,8 @@ public class HuobiRestConnection {
 
     Options options = this.getOptions();
 
-    String requestUrl =  options.getOptionRestHost() + path;
-    new ApiSignature().createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "GET", host, path, paramsBuilder);
+    String requestUrl =  options.getRestHost() + path;
+    new ApiSignature().createSignature(options.getApiKey(), options.getSecretKey(), "GET", host, path, paramsBuilder);
     requestUrl += paramsBuilder.buildUrl();
 
     Request executeRequest = new Request.Builder().url(requestUrl)
@@ -71,8 +71,8 @@ public class HuobiRestConnection {
 
     Options options = this.getOptions();
 
-    String requestUrl =  options.getOptionRestHost() + path;
-    new ApiSignature().createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "POST", host, path, paramsBuilder);
+    String requestUrl =  options.getRestHost() + path;
+    new ApiSignature().createSignature(options.getApiKey(), options.getSecretKey(), "POST", host, path, paramsBuilder);
     requestUrl += paramsBuilder.buildUrl();
     Request executeRequest = new Request.Builder().url(requestUrl).post(paramsBuilder.buildPostBody())
         .addHeader("Content-Type", "application/json").build();
@@ -104,6 +104,12 @@ public class HuobiRestConnection {
           } else {
             throw new SDKException(SDKException.EXEC_ERROR, "[Executing] " + err_code + ": " + err_msg);
           }
+        }
+      } else if (json.containsKey("code")) {
+        int code = json.getInteger("code");
+        if (code != 200) {
+          String message = json.getString("message");
+          throw new SDKException(SDKException.EXEC_ERROR,"[Executing]" + message);
         }
       } else {
         throw new SDKException(SDKException.RUNTIME_ERROR, "[Invoking] Status cannot be found in response.");

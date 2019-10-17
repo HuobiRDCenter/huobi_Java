@@ -8,12 +8,11 @@ import lombok.ToString;
 
 import com.huobi.constant.enums.ExchangeEnum;
 
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class HuobiOptions extends Options {
+public class HuobiOptions implements Options {
 
   @Builder.Default
   private String restHost = "https://api.huobi.vn";
@@ -26,12 +25,12 @@ public class HuobiOptions extends Options {
   private String secretKey;
 
   @Override
-  public String getOptionsApiKey() {
+  public String getApiKey() {
     return this.apiKey;
   }
 
   @Override
-  public String getOptionsSecretKey() {
+  public String getSecretKey() {
     return this.secretKey;
   }
 
@@ -41,12 +40,13 @@ public class HuobiOptions extends Options {
   }
 
   @Override
-  public String getOptionRestHost() {
+  public String getRestHost() {
     return this.restHost;
   }
 
   @Override
-  public String getOptionWebSocketHost() {
+  public String getWebSocketHost() {
     return this.websocketHost;
   }
+
 }

@@ -101,15 +101,15 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     connection.setId(CONNECTION_COUNTER.addAndGet(1));
 
     // 创建websocket请求
-    String url = options.getOptionWebSocketHost() + HUOBI_MARKET_WEBSOCKET_PATH;
+    String url = options.getWebSocketHost() + HUOBI_MARKET_WEBSOCKET_PATH;
     if (authNeed) {
-      url = options.getOptionWebSocketHost() + HUOBI_TRADING_WEBSOCKET_PATH;
+      url = options.getWebSocketHost() + HUOBI_TRADING_WEBSOCKET_PATH;
     }
     Request request = new Request.Builder().url(url).build();
     connection.setOkhttpRequest(request);
 
     try {
-      connection.setHost(new URL(options.getOptionRestHost()).getHost());
+      connection.setHost(new URL(options.getRestHost()).getHost());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
@@ -303,7 +303,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       ApiSignature as = new ApiSignature();
       UrlParamsBuilder builder = UrlParamsBuilder.build();
       try {
-        as.createSignature(options.getOptionsApiKey(), options.getOptionsSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
+        as.createSignature(options.getApiKey(), options.getSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
       } catch (Exception e) {
         onError("Unexpected error when create the signature: " + e.getMessage(), e);
         close();

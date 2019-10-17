@@ -2,16 +2,16 @@ package com.huobi.constant;
 
 import com.huobi.constant.enums.ExchangeEnum;
 
-public abstract class Options {
+public interface Options {
 
-  public abstract String getOptionsApiKey();
+  public String getApiKey();
 
-  public abstract String getOptionsSecretKey();
+  public String getSecretKey();
 
-  public abstract ExchangeEnum getExchange();
+  public ExchangeEnum getExchange();
 
-  public abstract String getOptionRestHost();
+  public String getRestHost();
 
-  public abstract String getOptionWebSocketHost();
+  public String getWebSocketHost();
 
 }

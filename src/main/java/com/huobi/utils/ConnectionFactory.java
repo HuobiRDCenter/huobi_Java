@@ -2,20 +2,22 @@ package com.huobi.utils;
 
 import java.io.IOException;
 
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.huobi.exception.SDKException;
 
-@Slf4j
+
 public class ConnectionFactory {
 
   private static final OkHttpClient client = new OkHttpClient();
 
+  private static final Logger log = LoggerFactory.getLogger(ConnectionFactory.class);
 
   public static String execute(Request request) {
 
