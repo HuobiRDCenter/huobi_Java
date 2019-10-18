@@ -30,47 +30,11 @@ public class PlaceOrder {
 
     String symbol = "htusdt";
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
     SyncRequestClient syncRequestClient = SyncRequestClient.create(
         Constants.API_KEY, Constants.SECRET_KEY);
 
-    for (int i = 0; i < 10; i++) {
-      String clientOrderId = "dqx_t_" + System.nanoTime()+ RandomUtils.nextInt(3);
-//      syncRequestClient.cancelOrderByClientOrderId(symbol,clientOrderId);
 
-
-      executorService.execute(new Runnable() {
-        @Override
-        public void run() {
-          // Create Buy Limit Order
-          NewOrderRequest requestLimitBuy = NewOrderRequest.spotBuyLimit(clientOrderId, symbol, new BigDecimal("3.3"), new BigDecimal("1"));
-          long orderBuyId = syncRequestClient.createOrder(requestLimitBuy);
-          System.out.println("--- The new order created ---");
-          System.out.println("--- " + orderBuyId + " ---");
-          System.out.println("--- " + clientOrderId + " ---");
-        }
-      });
-
-      executorService.execute(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            syncRequestClient.cancelOrderByClientOrderId(symbol,clientOrderId);
-          } catch (Exception e) {
-
-          }
-        }
-      });
-
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-
-      }
-    }
-
-//    // General Place Order
+    // General Place Order
 //    String clientOrderId = "T" + System.nanoTime();
 //    NewOrderRequest newOrderRequest = new NewOrderRequest(
 //        symbol,
@@ -168,7 +132,7 @@ public class PlaceOrder {
 //    syncRequestClient.cancelOrder(symbol, o1);
 //
 //    // Cancel order use client order id
-//    syncRequestClient.cancelOrderByClientOrderId(symbol, clientOrderId);
+    syncRequestClient.cancelOrderByClientOrderId(symbol, "T2170137561018829");
 //
 //    List<Long> cancelOrderList = new ArrayList<>();
 //    // Get current open orders

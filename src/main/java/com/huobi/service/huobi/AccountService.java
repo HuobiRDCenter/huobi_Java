@@ -1,8 +1,9 @@
 package com.huobi.service.huobi;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -13,14 +14,13 @@ import com.huobi.client.req.account.SubAccountChangeRequest;
 import com.huobi.client.req.account.TransferSubuserRequest;
 import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
-import com.huobi.constant.WebSocketConstants;
-import com.huobi.constant.enums.TransferMasterTypeEnum;
-import com.huobi.model.account.Account;
 import com.huobi.constant.Options;
+import com.huobi.constant.WebSocketConstants;
+import com.huobi.constant.enums.AccountTypeEnum;
+import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.AccountChangeEvent;
 import com.huobi.model.account.AccountReq;
-import com.huobi.model.account.Balance;
 import com.huobi.model.account.SubuserAggregateBalance;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
@@ -28,7 +28,6 @@ import com.huobi.service.huobi.parser.account.AccountBalanceParser;
 import com.huobi.service.huobi.parser.account.AccountChangeEventParser;
 import com.huobi.service.huobi.parser.account.AccountParser;
 import com.huobi.service.huobi.parser.account.AccountReqParser;
-import com.huobi.service.huobi.parser.account.BalanceParser;
 import com.huobi.service.huobi.parser.account.SubuserAggregateBalanceParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
@@ -46,6 +45,8 @@ public class AccountService implements AccountClient {
   public static final String SUB_ACCOUNT_TOPIC = "accounts";
   public static final String REQ_ACCOUNT_TOPIC = "accounts.list";
 
+
+  private Map<AccountTypeEnum,Account> accountMap = new ConcurrentHashMap<>();
 
   private Options options;
 
@@ -147,6 +148,26 @@ public class AccountService implements AccountClient {
     commandList.add(command.toJSONString());
     HuobiWebSocketConnection.createAssetConnection(options, commandList, new AccountReqParser(), callback, true);
   }
+
+
+  public Account getAccount(AccountTypeEnum accountType) {
+    // 若accountMap为空，同步初始化该map
+    if (accountMap.isEmpty()) {
+      synchronized (accountMap) {
+        List<Account> accountList = this.getAccounts();
+        if (accountList == null || accountList.size() <= 0) {
+          return null;
+        }
+
+        accountList.forEach(account -> {
+          accountMap.put(account.getType(),account);
+        });
+      }
+    }
+
+    return accountMap.get(accountType);
+  }
+
 
   public static void main(String[] args) {
 

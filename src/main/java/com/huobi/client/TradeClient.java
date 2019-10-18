@@ -1,5 +1,19 @@
 package com.huobi.client;
 
+import java.util.List;
+
+import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
+import com.huobi.client.req.trade.FeeRateRequest;
+import com.huobi.client.req.trade.MatchResultRequest;
+import com.huobi.client.req.trade.OpenOrdersRequest;
+import com.huobi.client.req.trade.OrderHistoryRequest;
+import com.huobi.client.req.trade.OrdersRequest;
+import com.huobi.model.trade.BatchCancelOpenOrdersResult;
+import com.huobi.model.trade.BatchCancelOrderResult;
+import com.huobi.model.trade.FeeRate;
+import com.huobi.model.trade.MatchResult;
+import com.huobi.model.trade.Order;
+
 public interface TradeClient {
 
   Long createOrder();
@@ -8,25 +22,25 @@ public interface TradeClient {
 
   Integer cancelOrder(String clientOrderId);
 
-  Integer batchCancelOpenOrder();
+  BatchCancelOpenOrdersResult batchCancelOpenOrders(BatchCancelOpenOrdersRequest request);
 
-  void batchCancelOrder();
+  BatchCancelOrderResult batchCancelOrder(List<Long> ids);
 
-  void getOpenOrders();
+  List<Order> getOpenOrders(OpenOrdersRequest request);
 
-  void getOrder(Long orderId);
+  Order getOrder(Long orderId);
 
-  void getOrder(String clientOrderId);
+  Order getOrder(String clientOrderId);
 
-  void getOrders();
+  List<Order> getOrders(OrdersRequest request);
 
-  void getOrdersHistory();
+  List<Order> getOrdersHistory(OrderHistoryRequest request);
 
-  void getMatchResult(Long orderId);
+  List<MatchResult> getMatchResult(Long orderId);
 
-  void getMatchResults();
+  List<MatchResult> getMatchResults(MatchResultRequest request);
 
-  void getFeeRate();
+  List<FeeRate> getFeeRate(FeeRateRequest request);
 
 
 }
