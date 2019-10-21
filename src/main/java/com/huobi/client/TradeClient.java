@@ -3,20 +3,27 @@ package com.huobi.client;
 import java.util.List;
 
 import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
+import com.huobi.client.req.trade.CreateOrderRequest;
 import com.huobi.client.req.trade.FeeRateRequest;
 import com.huobi.client.req.trade.MatchResultRequest;
 import com.huobi.client.req.trade.OpenOrdersRequest;
 import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
+import com.huobi.client.req.trade.ReqOrderListRequest;
+import com.huobi.client.req.trade.SubOrderUpdateRequest;
 import com.huobi.model.trade.BatchCancelOpenOrdersResult;
 import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
 import com.huobi.model.trade.MatchResult;
 import com.huobi.model.trade.Order;
+import com.huobi.model.trade.OrderDetailEvent;
+import com.huobi.model.trade.OrderListEvent;
+import com.huobi.model.trade.OrderUpdateEvent;
+import com.huobi.utils.ResponseCallback;
 
 public interface TradeClient {
 
-  Long createOrder();
+  Long createOrder(CreateOrderRequest request);
 
   Long cancelOrder(Long orderId);
 
@@ -42,5 +49,11 @@ public interface TradeClient {
 
   List<FeeRate> getFeeRate(FeeRateRequest request);
 
+
+  void subOrderUpdate(SubOrderUpdateRequest request, ResponseCallback<OrderUpdateEvent> callback);
+
+  void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListEvent> callback);
+
+  void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailEvent> callback);
 
 }

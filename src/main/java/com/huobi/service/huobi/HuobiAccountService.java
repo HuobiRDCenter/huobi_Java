@@ -33,7 +33,7 @@ import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
 
-public class AccountService implements AccountClient {
+public class HuobiAccountService implements AccountClient {
 
   public static final String GET_ACCOUNTS_PATH = "/v1/account/accounts";
   public static final String GET_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{account-id}/balance";
@@ -46,13 +46,14 @@ public class AccountService implements AccountClient {
   public static final String REQ_ACCOUNT_TOPIC = "accounts.list";
 
 
-  private Map<AccountTypeEnum,Account> accountMap = new ConcurrentHashMap<>();
+  private Map<AccountTypeEnum, Account> accountMap = new ConcurrentHashMap<>();
+  private Map<String, Account> marginAccountMap = new ConcurrentHashMap<>();
 
   private Options options;
 
   private HuobiRestConnection restConnection;
 
-  public AccountService(Options options) {
+  public HuobiAccountService(Options options) {
     this.options = options;
     this.restConnection = new HuobiRestConnection(options);
   }
@@ -62,7 +63,9 @@ public class AccountService implements AccountClient {
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNTS_PATH, UrlParamsBuilder.build());
     JSONArray data = jsonObject.getJSONArray("data");
-    return new AccountParser().parseArray(data);
+    List<Account> accountList = new AccountParser().parseArray(data);
+    initAccount(accountList);
+    return accountList;
   }
 
   @Override
@@ -117,6 +120,18 @@ public class AccountService implements AccountClient {
 
   }
 
+  public void getAccountHistory() {
+
+    Account account = getAccount(AccountTypeEnum.SPOT);
+
+    System.out.println("");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("account-id", account.getId());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature("/v1/account/history", builder);
+    System.out.println(jsonObject.toJSONString());
+  }
+
   @Override
   public void subAccounts(SubAccountChangeRequest request, ResponseCallback<AccountChangeEvent> callback) {
 
@@ -153,28 +168,43 @@ public class AccountService implements AccountClient {
   public Account getAccount(AccountTypeEnum accountType) {
     // 若accountMap为空，同步初始化该map
     if (accountMap.isEmpty()) {
-      synchronized (accountMap) {
-        List<Account> accountList = this.getAccounts();
-        if (accountList == null || accountList.size() <= 0) {
-          return null;
-        }
-
-        accountList.forEach(account -> {
-          accountMap.put(account.getType(),account);
-        });
-      }
+      this.getAccounts();
     }
 
     return accountMap.get(accountType);
   }
 
+  public  Account getMarginAccount(String symbol) {
+    if (marginAccountMap.isEmpty()) {
+      this.getAccounts();
+    }
+    return marginAccountMap.get(symbol);
+  }
+
+  public void initAccount(List<Account> accountList) {
+    synchronized (accountMap) {
+      if (accountList == null || accountList.size() <= 0) {
+        return;
+      }
+
+      accountList.forEach(account -> {
+        if (account.getType() == AccountTypeEnum.MARGIN) {
+          marginAccountMap.put(account.getSubtype(), account);
+        } else {
+          accountMap.put(account.getType(), account);
+        }
+      });
+    }
+  }
 
   public static void main(String[] args) {
 
-    AccountService accountService = new AccountService(HuobiOptions.builder()
+    HuobiAccountService huobiAccountService = new HuobiAccountService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());
+
+    huobiAccountService.getAccountHistory();
 
 //    List<Account> accountList = accountService.getAccounts();
 //    accountList.forEach(account -> {

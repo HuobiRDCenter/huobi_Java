@@ -1,6 +1,5 @@
 package com.huobi.service.huobi;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -21,7 +20,7 @@ import com.huobi.service.huobi.parser.WithdrawQuotaParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
-public class WalletService implements WalletClient {
+public class HuobiWalletService implements WalletClient {
 
 
   public static final String GET_DEPOSIT_ADDRESS_PATH = "/v2/account/deposit/address";
@@ -33,7 +32,7 @@ public class WalletService implements WalletClient {
 
   private HuobiRestConnection restConnection;
 
-  public WalletService(Options options) {
+  public HuobiWalletService(Options options) {
     this.options = options;
     this.restConnection = new HuobiRestConnection(options);
   }
@@ -107,7 +106,7 @@ public class WalletService implements WalletClient {
 
 
   public static void main(String[] args) {
-    WalletService walletService = new WalletService(HuobiOptions.builder()
+    HuobiWalletService huobiWalletService = new HuobiWalletService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());

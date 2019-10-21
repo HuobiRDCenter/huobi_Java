@@ -1,24 +1,26 @@
 package com.huobi.service.huobi;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.huobi.client.TradeClient;
 import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
+import com.huobi.client.req.trade.CreateOrderRequest;
 import com.huobi.client.req.trade.FeeRateRequest;
 import com.huobi.client.req.trade.MatchResultRequest;
 import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
+import com.huobi.client.req.trade.ReqOrderListRequest;
+import com.huobi.client.req.trade.SubOrderUpdateRequest;
+import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.constant.enums.OrderSideEnum;
 import com.huobi.constant.enums.OrderStateEnum;
 import com.huobi.constant.enums.OrderTypeEnum;
-import com.huobi.constant.enums.QueryDirectionEnum;
 import com.huobi.exception.SDKException;
 import com.huobi.model.account.Account;
 import com.huobi.client.req.trade.OpenOrdersRequest;
@@ -30,18 +32,28 @@ import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
 import com.huobi.model.trade.MatchResult;
 import com.huobi.model.trade.Order;
+import com.huobi.model.trade.OrderDetailEvent;
+import com.huobi.model.trade.OrderListEvent;
+import com.huobi.model.trade.OrderUpdateEvent;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.trade.BatchCancelOpenOrdersResultParser;
 import com.huobi.service.huobi.parser.trade.BatchCancelOrderResultParser;
 import com.huobi.service.huobi.parser.trade.FeeRateParser;
 import com.huobi.service.huobi.parser.trade.MatchResultParser;
+import com.huobi.service.huobi.parser.trade.OrderDetailEventParser;
+import com.huobi.service.huobi.parser.trade.OrderListEventParser;
 import com.huobi.service.huobi.parser.trade.OrderParser;
+import com.huobi.service.huobi.parser.trade.OrderUpdateEventParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
+import com.huobi.utils.ResponseCallback;
+import com.huobi.utils.SymbolUtils;
 
-public class TradeService implements TradeClient {
+public class HuobiTradeService implements TradeClient {
 
 
+  public static final String CREATE_ORDER_PATH = "/v1/order/orders/place";
   public static final String CANCEL_ORDER_PATH = "/v1/order/orders/{order-id}/submitcancel";
   public static final String CANCEL_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/submitCancelClientOrder";
   public static final String BATCH_CANCEL_OPEN_ORDERS_PATH = "/v1/order/orders/batchCancelOpenOrders";
@@ -55,21 +67,72 @@ public class TradeService implements TradeClient {
   public static final String GET_MATCH_RESULT_PATH = "/v1/order/matchresults";
   public static final String GET_FEE_RATE_PATH = "/v1/fee/fee-rate/get";
 
+
+  public static final String WEBSOCKET_ORDER_UPDATE_TOPIC = "orders.$symbol.update";
+  public static final String WEBSOCKET_ORDER_LIST_TOPIC = "orders.list";
+  public static final String WEBSOCKET_ORDER_DETAIL_TOPIC = "orders.detail";
+
+
   private Options options;
 
   private HuobiRestConnection restConnection;
 
-  private AccountService accountService;
+  private HuobiAccountService huobiAccountService;
 
-  public TradeService(Options options) {
+  public HuobiTradeService(Options options) {
     this.options = options;
     this.restConnection = new HuobiRestConnection(options);
-    this.accountService = new AccountService(options);
+    this.huobiAccountService = new HuobiAccountService(options);
   }
 
   @Override
-  public Long createOrder() {
-    return null;
+  public Long createOrder(CreateOrderRequest request) {
+
+    InputChecker.checker().checkSymbol(request.getSymbol())
+        .shouldNotNull(request.getAccountType(), "AccountType")
+        .shouldNotNull(request.getAmount(), "Amount")
+        .shouldNotNull(request.getType(), "Type");
+
+    if (request.getType() == OrderTypeEnum.SELL_LIMIT
+        || request.getType() == OrderTypeEnum.BUY_LIMIT
+        || request.getType() == OrderTypeEnum.BUY_LIMIT_MAKER
+        || request.getType() == OrderTypeEnum.SELL_LIMIT_MAKER) {
+      InputChecker.checker()
+          .shouldNotNull(request.getPrice(), "Price");
+    }
+    if (request.getType() == OrderTypeEnum.SELL_MARKET
+        || request.getType() == OrderTypeEnum.BUY_MARKET) {
+      InputChecker.checker()
+          .shouldNull(request.getPrice(), "Price");
+    }
+
+    String source = "api";
+    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
+      source = "margin-api";
+    } else if (request.getAccountType() == AccountTypeEnum.SUPER_MARGIN) {
+      source = "super-margin-api";
+    }
+
+    Account account = null;
+    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
+      account = huobiAccountService.getMarginAccount(request.getSymbol());
+    } else {
+      account = huobiAccountService.getAccount(request.getAccountType());
+    }
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("account-id", account.getId())
+        .putToPost("amount", request.getAmount())
+        .putToPost("price", request.getPrice())
+        .putToPost("symbol", request.getSymbol())
+        .putToPost("type", request.getType().getCode())
+        .putToPost("source", source)
+        .putToPost("client-order-id", request.getClientOrderId())
+        .putToPost("stop-price", request.getStopPrice())
+        .putToPost("operator", request.getOperator() == null ? null : request.getOperator().getOperator());
+
+    JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_ORDER_PATH, builder);
+    return jsonObject.getLong("data");
   }
 
   @Override
@@ -107,7 +170,7 @@ public class TradeService implements TradeClient {
       InputChecker.checker()
           .checkRange(request.getSize(), 1, 100, "size");
     }
-    Account account = accountService.getAccount(request.getAccountType());
+    Account account = huobiAccountService.getAccount(request.getAccountType());
     if (account == null) {
       throw new SDKException(SDKException.EXEC_ERROR, "[Executing] Could not find account:" + request.getAccountType());
     }
@@ -150,7 +213,7 @@ public class TradeService implements TradeClient {
         .shouldNotNull(request.getAccountType(), "accountType")
         .checkRange(request.getSize(), 1, 2000, "size");
 
-    Account account = accountService.getAccount(request.getAccountType());
+    Account account = huobiAccountService.getAccount(request.getAccountType());
     if (account == null) {
       throw new SDKException(SDKException.EXEC_ERROR, "[Executing] Could not find account:" + request.getAccountType());
     }
@@ -280,14 +343,171 @@ public class TradeService implements TradeClient {
   }
 
 
+  public void subOrderUpdate(SubOrderUpdateRequest request, ResponseCallback<OrderUpdateEvent> callback) {
+
+    // 检查参数
+    InputChecker.checker()
+        .shouldNotNull(request.getSymbols(), "symbols");
+
+    // 格式化symbol为数组
+    List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbols());
+
+    // 检查数组
+    InputChecker.checker().checkSymbolList(symbolList);
+
+    List<String> commandList = new ArrayList<>(symbolList.size());
+    symbolList.forEach(symbol -> {
+
+      String topic = WEBSOCKET_ORDER_UPDATE_TOPIC
+          .replace("$symbol", symbol);
+
+      JSONObject command = new JSONObject();
+      command.put("op", WebSocketConstants.OP_SUB);
+      command.put("topic", topic);
+      command.put("id", System.nanoTime());
+      commandList.add(command.toJSONString());
+    });
+
+    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderUpdateEventParser(), callback, false);
+  }
+
+  public void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListEvent> callback) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getAccountType(), "account-type")
+        .shouldNotNull(request.getSymbol(), "symbol")
+        .checkList(request.getStates(), 1, 100, "states");
+
+    Account account = null;
+    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
+      account = huobiAccountService.getMarginAccount(request.getSymbol());
+    } else {
+      account = huobiAccountService.getAccount(request.getAccountType());
+    }
+
+    String startDateString = request.getStartDate() == null
+        ? null : DateFormatUtils.format(request.getStartDate(), "yyyy-MM-dd");
+    String endDateString = request.getEndDate() == null
+        ? null : DateFormatUtils.format(request.getEndDate(), "yyyy-MM-dd");
+
+    JSONObject command = new JSONObject();
+    command.put("op", WebSocketConstants.OP_REQ);
+    command.put("topic", WEBSOCKET_ORDER_LIST_TOPIC);
+    command.put("account-id", account.getId());
+    command.put("symbol", request.getSymbol());
+    command.put("types", request.getTypesString());
+    command.put("states", request.getStatesString());
+    command.put("start-date", startDateString);
+    command.put("end-date", endDateString);
+    command.put("from", request.getFrom() != null ? request.getFrom() + "" : null);
+    command.put("direct", request.getDirection() != null ? request.getDirection().toString() : null);
+    command.put("size", request.getSize() != null ? request.getSize() + "" : null);
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+
+    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderListEventParser(), callback, true);
+
+  }
+
+  public void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailEvent> callback) {
+
+    InputChecker.checker()
+        .shouldNotNull(orderId, "order-id");
+
+    JSONObject command = new JSONObject();
+    command.put("op", WebSocketConstants.OP_REQ);
+    command.put("topic", WEBSOCKET_ORDER_DETAIL_TOPIC);
+    command.put("order-id", orderId.toString());
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+
+    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderDetailEventParser(), callback, true);
+
+  }
+
   public static void main(String[] args) {
 
     String symbol = "htusdt";
 
-    TradeService tradeService = new TradeService(HuobiOptions.builder()
+    HuobiTradeService huobiTradeService = new HuobiTradeService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());
+
+//    CreateOrderRequest buyLimitRequest = CreateOrderRequest.spotBuyLimit(symbol, new BigDecimal("3.37"), new BigDecimal("1"));
+//    Long buyLimitId = tradeService.createOrder(buyLimitRequest);
+//    System.out.println("create buy-limit order:" + buyLimitId);
+
+//    CreateOrderRequest sellLimitRequest = CreateOrderRequest.spotSellLimit(symbol, new BigDecimal("4"), new BigDecimal("1"));
+//    Long sellLimitId = tradeService.createOrder(sellLimitRequest);
+//    System.out.println("create sell-limit order:" + sellLimitId);
+
+//    CreateOrderRequest buyMarketRequest = CreateOrderRequest.spotBuyMarket(symbol, new BigDecimal("5"));
+//    Long buyMarketId = tradeService.createOrder(buyMarketRequest);
+//    System.out.println("create buy-market order:" + buyMarketId);
+//
+//
+//    CreateOrderRequest sellMarketRequest = CreateOrderRequest.spotSellMarket(symbol, new BigDecimal("1"));
+//    Long sellMarketId = tradeService.createOrder(sellMarketRequest);
+//    System.out.println("create sell-market order:" + sellMarketId);
+
+//    String superMarginSymbol = "xrpusdt";
+//    CreateOrderRequest superMarginBuyLimitRequest = CreateOrderRequest
+//        .superMarginBuyLimit(superMarginSymbol, new BigDecimal("0.27"), new BigDecimal("4"));
+//    Long superMarginBuyLimitId = tradeService.createOrder(superMarginBuyLimitRequest);
+//    System.out.println("create super-margin-buy-limit order:" + superMarginBuyLimitId);
+//
+//    CreateOrderRequest superMarginBuyMarketRequest = CreateOrderRequest.superMarginBuyMarket(superMarginSymbol, new BigDecimal("1"));
+//    Long superMarginBuyMarketId = tradeService.createOrder(superMarginBuyMarketRequest);
+//    System.out.println("create super-margin-buy-limit order:" + superMarginBuyMarketId);
+//
+//    CreateOrderRequest superMarginSellLimitRequest = CreateOrderRequest
+//        .superMarginSellLimit(superMarginSymbol, new BigDecimal("0.29"), new BigDecimal("3.45"));
+//    Long superMarginSellLimitId = tradeService.createOrder(superMarginSellLimitRequest);
+//    System.out.println("create super-margin-sell-limit order:" + superMarginSellLimitId);
+//
+//    CreateOrderRequest superMarginSellMarketRequest = CreateOrderRequest.superMarginSellMarket(superMarginSymbol, new BigDecimal("3.45"));
+//    Long superMarginSellMarketId = tradeService.createOrder(superMarginSellMarketRequest);
+//    System.out.println("create super-margin-sell-limit order:" + superMarginSellMarketId);
+
+//    String marginSymbol = "xrpusdt";
+//    CreateOrderRequest marginBuyLimitRequest = CreateOrderRequest.marginBuyLimit(marginSymbol,new BigDecimal("0.27"),new BigDecimal("4"));
+//    Long marginBuyLimitId = tradeService.createOrder(marginBuyLimitRequest);
+//    System.out.println("create margin-buy-limit order:" + marginBuyLimitId);
+
+//    CreateOrderRequest marginSellLimitRequest = CreateOrderRequest.marginSellLimit(marginSymbol,new BigDecimal("0.295"),new BigDecimal("4"));
+//    Long marginSellLimitId = tradeService.createOrder(marginSellLimitRequest);
+//    System.out.println("create margin-sell-limit order:" + marginSellLimitId);
+
+//    CreateOrderRequest marginBuyMarketRequest = CreateOrderRequest.marginBuyMarket(marginSymbol, new BigDecimal("1"));
+//    Long marginBuyMarketId = tradeService.createOrder(marginBuyMarketRequest);
+//    System.out.println("create margin-buy-limit order:" + marginBuyMarketId);
+
+//    CreateOrderRequest marginSellMarketRequest = CreateOrderRequest.marginSellMarket(marginSymbol, new BigDecimal("3.44"));
+//    Long marginSellMarketId = tradeService.createOrder(marginSellMarketRequest);
+//    System.out.println("create margin-sell-limit order:" + marginSellMarketId);
+
+//    CreateOrderRequest buyStopLossRequest = CreateOrderRequest.buyStopLoss(
+//        AccountTypeEnum.SPOT,
+//        symbol,
+//        new BigDecimal("3.4"),
+//        new BigDecimal("1"),
+//        new BigDecimal("3.41"),
+//        StopOrderOperatorEnum.GTE);
+//
+//    Long buyStopLossId = tradeService.createOrder(buyStopLossRequest);
+//    System.out.println("create buy-stop-limit order:" + buyStopLossId);
+
+//    CreateOrderRequest sellStopLossRequest = CreateOrderRequest.sellStopLoss(
+//        AccountTypeEnum.SPOT,
+//        symbol,
+//        new BigDecimal("3.32"),
+//        new BigDecimal("1"),
+//        new BigDecimal("3.33"),
+//        StopOrderOperatorEnum.LTE);
+//
+//    Long sellStopLossId = tradeService.createOrder(sellStopLossRequest);
+//    System.out.println("create sell-stop-limit order:" + sellStopLossId);
 
 //    Order clientOrder = tradeService.getOrder("T2170137561018829");
 //    System.out.println(clientOrder.toString());
@@ -371,5 +591,30 @@ public class TradeService implements TradeClient {
 //    feeRateList.forEach(feeRate -> {
 //      System.out.println(feeRate.toString());
 //    });
+
+//    tradeService.subOrderUpdate(SubOrderUpdateRequest.builder().symbols(symbol).build(), (orderUpdateEvent)->{
+//      System.out.println(orderUpdateEvent.toString());
+//    });
+//
+//    tradeService.reqOrderList(ReqOrderListRequest.builder()
+//        .accountType(AccountTypeEnum.SPOT)
+//        .symbol(symbol)
+//        .states(stateList)
+//        .types(typeList)
+//        .startDate(new Date(1571362445775L))
+//        .endDate(new Date(1571362445775L))
+//        .size(5)
+//        .build(), (orderListEvent) -> {
+//
+//      System.out.println(orderListEvent.toString());
+//      orderListEvent.getOrderList().forEach(order -> {
+//        System.out.println(new Date(order.getCreatedAt())+"==>"+order.toString());
+//      });
+//    });
+
+
+    huobiTradeService.reqOrderDetail(52286981706L,(orderDetailEvent)->{
+      System.out.println(orderDetailEvent.toString());
+    });
   }
 }
