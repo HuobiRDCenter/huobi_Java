@@ -162,7 +162,7 @@ public class HuobiCrossMarginService implements CrossMarginClient {
 //    });
 //
 //    // 等待100ms
-//    Constants.timeWait(1000);
+//    Constants.timeWait(5000);
 //
 //    // 还款
 //    marginService.repayLoan(CrossMarginRepayLoanRequest.builder()
@@ -180,7 +180,7 @@ public class HuobiCrossMarginService implements CrossMarginClient {
 //    });
 //
 //    // 等待100ms
-//    Constants.timeWait(1000);
+//    Constants.timeWait(5000);
 //
 //    // 转出至现货
 //    Long transferOutId = marginService.transfer(CrossMarginTransferRequest.builder()
