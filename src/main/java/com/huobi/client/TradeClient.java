@@ -16,8 +16,8 @@ import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
 import com.huobi.model.trade.MatchResult;
 import com.huobi.model.trade.Order;
-import com.huobi.model.trade.OrderDetailEvent;
-import com.huobi.model.trade.OrderListEvent;
+import com.huobi.model.trade.OrderDetailReq;
+import com.huobi.model.trade.OrderListReq;
 import com.huobi.model.trade.OrderUpdateEvent;
 import com.huobi.utils.ResponseCallback;
 
@@ -52,8 +52,8 @@ public interface TradeClient {
 
   void subOrderUpdate(SubOrderUpdateRequest request, ResponseCallback<OrderUpdateEvent> callback);
 
-  void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListEvent> callback);
+  void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListReq> callback);
 
-  void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailEvent> callback);
+  void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailReq> callback);
 
 }

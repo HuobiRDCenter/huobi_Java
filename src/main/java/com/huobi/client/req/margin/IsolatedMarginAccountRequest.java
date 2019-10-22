@@ -1,6 +1,4 @@
-package com.huobi.model.trade;
-
-import java.util.List;
+package com.huobi.client.req.margin;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,12 +11,10 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class OrderListEvent {
+public class IsolatedMarginAccountRequest {
 
-  private String topic;
+  private String symbol;
 
-  private Long ts;
-
-  private List<Order> orderList;
+  private Long subUid;
 
 }

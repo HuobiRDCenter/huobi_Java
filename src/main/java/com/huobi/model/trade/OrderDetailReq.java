@@ -11,7 +11,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class OrderDetailEvent {
+public class OrderDetailReq {
 
   private String topic;
 

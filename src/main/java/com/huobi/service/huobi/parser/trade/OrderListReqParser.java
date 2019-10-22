@@ -5,14 +5,14 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.model.trade.OrderListEvent;
+import com.huobi.model.trade.OrderListReq;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
-public class OrderListEventParser implements HuobiModelParser<OrderListEvent> {
+public class OrderListReqParser implements HuobiModelParser<OrderListReq> {
 
   @Override
-  public OrderListEvent parse(JSONObject json) {
-    return OrderListEvent.builder()
+  public OrderListReq parse(JSONObject json) {
+    return OrderListReq.builder()
         .topic(json.getString("topic"))
         .ts(json.getLong("ts"))
         .orderList(new OrderParser().parseArray(json.getJSONArray("data")))
@@ -20,12 +20,12 @@ public class OrderListEventParser implements HuobiModelParser<OrderListEvent> {
   }
 
   @Override
-  public OrderListEvent parse(JSONArray json) {
+  public OrderListReq parse(JSONArray json) {
     return null;
   }
 
   @Override
-  public List<OrderListEvent> parseArray(JSONArray jsonArray) {
+  public List<OrderListReq> parseArray(JSONArray jsonArray) {
     return null;
   }
 }
