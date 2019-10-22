@@ -1,5 +1,6 @@
 package com.huobi.service.huobi;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -428,8 +429,9 @@ public class HuobiTradeService implements TradeClient {
   public static void main(String[] args) {
 
     String symbol = "htusdt";
+    String marginSymbol = "xrpusdt";
 
-    HuobiTradeService huobiTradeService = new HuobiTradeService(HuobiOptions.builder()
+    HuobiTradeService tradeService = new HuobiTradeService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());
@@ -456,7 +458,7 @@ public class HuobiTradeService implements TradeClient {
 //        .superMarginBuyLimit(superMarginSymbol, new BigDecimal("0.27"), new BigDecimal("4"));
 //    Long superMarginBuyLimitId = tradeService.createOrder(superMarginBuyLimitRequest);
 //    System.out.println("create super-margin-buy-limit order:" + superMarginBuyLimitId);
-//
+
 //    CreateOrderRequest superMarginBuyMarketRequest = CreateOrderRequest.superMarginBuyMarket(superMarginSymbol, new BigDecimal("1"));
 //    Long superMarginBuyMarketId = tradeService.createOrder(superMarginBuyMarketRequest);
 //    System.out.println("create super-margin-buy-limit order:" + superMarginBuyMarketId);
@@ -470,7 +472,6 @@ public class HuobiTradeService implements TradeClient {
 //    Long superMarginSellMarketId = tradeService.createOrder(superMarginSellMarketRequest);
 //    System.out.println("create super-margin-sell-limit order:" + superMarginSellMarketId);
 
-//    String marginSymbol = "xrpusdt";
 //    CreateOrderRequest marginBuyLimitRequest = CreateOrderRequest.marginBuyLimit(marginSymbol,new BigDecimal("0.27"),new BigDecimal("4"));
 //    Long marginBuyLimitId = tradeService.createOrder(marginBuyLimitRequest);
 //    System.out.println("create margin-buy-limit order:" + marginBuyLimitId);
@@ -592,9 +593,9 @@ public class HuobiTradeService implements TradeClient {
 //      System.out.println(feeRate.toString());
 //    });
 
-//    tradeService.subOrderUpdate(SubOrderUpdateRequest.builder().symbols(symbol).build(), (orderUpdateEvent)->{
-//      System.out.println(orderUpdateEvent.toString());
-//    });
+    tradeService.subOrderUpdate(SubOrderUpdateRequest.builder().symbols(symbol + "," + marginSymbol).build(), (orderUpdateEvent) -> {
+      System.out.println(orderUpdateEvent.toString());
+    });
 //
 //    tradeService.reqOrderList(ReqOrderListRequest.builder()
 //        .accountType(AccountTypeEnum.SPOT)
@@ -612,9 +613,8 @@ public class HuobiTradeService implements TradeClient {
 //      });
 //    });
 
-
-    huobiTradeService.reqOrderDetail(52286981706L,(orderDetailEvent)->{
-      System.out.println(orderDetailEvent.toString());
-    });
+//    tradeService.reqOrderDetail(52286981706L,(orderDetailEvent)->{
+//      System.out.println(orderDetailEvent.toString());
+//    });
   }
 }

@@ -17,6 +17,7 @@ import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.AccountTypeEnum;
+import com.huobi.constant.enums.BalanceModeEnum;
 import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.AccountChangeEvent;
@@ -199,12 +200,12 @@ public class HuobiAccountService implements AccountClient {
 
   public static void main(String[] args) {
 
-    HuobiAccountService huobiAccountService = new HuobiAccountService(HuobiOptions.builder()
+    HuobiAccountService accountService = new HuobiAccountService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());
 
-    huobiAccountService.getAccountHistory();
+//    accountService.getAccountHistory();
 
 //    List<Account> accountList = accountService.getAccounts();
 //    accountList.forEach(account -> {
@@ -251,15 +252,15 @@ public class HuobiAccountService implements AccountClient {
 //    List<AccountBalance> subAccountBalanceList1 = accountService.getSubuserAccountBalance(120491258L);
 //    System.out.println(subAccountBalanceList1);
 //
-//    accountService.subAccounts(SubAccountChangeRequest.builder()
-//        .balanceMode(BalanceModeEnum.AVAILABLE)
-//        .build(),(accountChangeEvent)->{
-//
-//      System.out.println("event:"+accountChangeEvent.getEvent());
-//      accountChangeEvent.getList().forEach(accountChange -> {
-//        System.out.println(accountChange.toString());
-//      });
-//    });
+    accountService.subAccounts(SubAccountChangeRequest.builder()
+        .balanceMode(BalanceModeEnum.AVAILABLE)
+        .build(),(accountChangeEvent)->{
+
+      System.out.println("event:"+accountChangeEvent.getEvent());
+      accountChangeEvent.getList().forEach(accountChange -> {
+        System.out.println(accountChange.toString());
+      });
+    });
 
 //    accountService.reqAccounts((accountReq) -> {
 //
