@@ -29,7 +29,6 @@ public class CrossMarginLoadOrderParser implements HuobiModelParser<CrossMarginL
         .state(LoanOrderStateEnum.find(json.getString("state")))
         .accruedAt(json.getLong("accrued-at"))
         .createdAt(json.getLong("created-at"))
-        .updatedAt(json.getLong("updated-at"))
         .build();
   }
 

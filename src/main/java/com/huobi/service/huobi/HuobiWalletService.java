@@ -106,15 +106,15 @@ public class HuobiWalletService implements WalletClient {
 
 
   public static void main(String[] args) {
-    HuobiWalletService huobiWalletService = new HuobiWalletService(HuobiOptions.builder()
+    HuobiWalletService walletService = new HuobiWalletService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)
         .build());
 
-//    List<DepositAddress> addressList = walletService.getDepositAddress(DepositAddressRequest.builder().currency("usdt").build());
-//    addressList.forEach(depositAddress -> {
-//      System.out.println(depositAddress.toString());
-//    });
+    List<DepositAddress> addressList = walletService.getDepositAddress(DepositAddressRequest.builder().currency("usdt").build());
+    addressList.forEach(depositAddress -> {
+      System.out.println(depositAddress.toString());
+    });
 
 //    WithdrawQuota withdrawQuota = walletService.getWithdrawQuota(WithdrawQuotaRequest.builder().currency("usdt").build());
 //    System.out.println("currency:"+withdrawQuota.getCurrency());
