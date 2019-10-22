@@ -1,6 +1,5 @@
 package com.huobi.service.huobi;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -214,21 +213,14 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
 //    });
 
 
-    List<IsolatedMarginLoadOrder> loanOrderList = marginService.getLoanOrders(IsolatedMarginLoanOrdersRequest.builder()
-        .symbol(symbol)
-        .build());
-
-    loanOrderList.forEach(order->{
-      System.out.println(order.toString());
-    });
+//    List<IsolatedMarginLoadOrder> loanOrderList = marginService.getLoanOrders(IsolatedMarginLoanOrdersRequest.builder()
+//        .symbol(symbol)
+//        .build());
+//
+//    loanOrderList.forEach(order->{
+//      System.out.println(order.toString());
+//    });
   }
 
 
-  public static void timeWait(int millis) {
-    try {
-      System.out.println("time wait : " + millis + "ms");
-      Thread.sleep(millis);
-    } catch (InterruptedException e) {
-    }
-  }
 }
