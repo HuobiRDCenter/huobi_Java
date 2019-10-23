@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
+import com.huobi.client.req.wallet.DepositWithdrawRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
 import com.huobi.model.wallet.DepositAddress;
+import com.huobi.model.wallet.DepositWithdraw;
 import com.huobi.model.wallet.WithdrawQuota;
 
 public interface WalletClient {
@@ -18,6 +20,6 @@ public interface WalletClient {
 
   Long cancelWithdraw(Long withdrawId);
 
-  void getDepositWithdraw();
+  List<DepositWithdraw> getDepositWithdraw(DepositWithdrawRequest request);
 
 }

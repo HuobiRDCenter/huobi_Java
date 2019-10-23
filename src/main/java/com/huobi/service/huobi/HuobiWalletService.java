@@ -8,15 +8,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.huobi.client.WalletClient;
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
+import com.huobi.client.req.wallet.DepositWithdrawRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
 import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
+import com.huobi.constant.enums.DepositWithdrawTypeEnum;
 import com.huobi.model.wallet.DepositAddress;
+import com.huobi.model.wallet.DepositWithdraw;
 import com.huobi.model.wallet.WithdrawQuota;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
-import com.huobi.service.huobi.parser.DepositAddressParser;
-import com.huobi.service.huobi.parser.WithdrawQuotaParser;
+import com.huobi.service.huobi.parser.wallet.DepositAddressParser;
+import com.huobi.service.huobi.parser.wallet.DepositWithdrawParser;
+import com.huobi.service.huobi.parser.wallet.WithdrawQuotaParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
@@ -27,6 +31,7 @@ public class HuobiWalletService implements WalletClient {
   public static final String GET_WITHDRAW_QUOTA_PATH = "/v2/account/withdraw/quota";
   public static final String CREATE_WITHDRAW_PATH = "/v1/dw/withdraw/api/create";
   public static final String CANCEL_WITHDRAW_PATH = "/v1/dw/withdraw-virtual/{withdraw-id}/cancel";
+  public static final String DEPOSIT_WITHDRAW_PATH = "/v1/query/deposit-withdraw";
 
   private Options options;
 
@@ -100,8 +105,20 @@ public class HuobiWalletService implements WalletClient {
   }
 
   @Override
-  public void getDepositWithdraw() {
+  public List<DepositWithdraw> getDepositWithdraw(DepositWithdrawRequest request) {
 
+    InputChecker.checker()
+        .shouldNotNull(request.getType(),"type");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("type", request.getType().getType())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("from", request.getFrom())
+        .putToUrl("size", request.getSize())
+        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(DEPOSIT_WITHDRAW_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new DepositWithdrawParser().parseArray(data);
   }
 
 
@@ -111,10 +128,10 @@ public class HuobiWalletService implements WalletClient {
         .secretKey(Constants.SECRET_KEY)
         .build());
 
-    List<DepositAddress> addressList = walletService.getDepositAddress(DepositAddressRequest.builder().currency("usdt").build());
-    addressList.forEach(depositAddress -> {
-      System.out.println(depositAddress.toString());
-    });
+//    List<DepositAddress> addressList = walletService.getDepositAddress(DepositAddressRequest.builder().currency("usdt").build());
+//    addressList.forEach(depositAddress -> {
+//      System.out.println(depositAddress.toString());
+//    });
 
 //    WithdrawQuota withdrawQuota = walletService.getWithdrawQuota(WithdrawQuotaRequest.builder().currency("usdt").build());
 //    System.out.println("currency:"+withdrawQuota.getCurrency());
@@ -137,6 +154,13 @@ public class HuobiWalletService implements WalletClient {
 //    System.out.println("-----------cancel withdraw : "+res+"------------------");
 
 
+    List<DepositWithdraw> depositWithdrawList = walletService.getDepositWithdraw(DepositWithdrawRequest.builder()
+        .type(DepositWithdrawTypeEnum.WITHDRAW)
+        .build());
+
+    depositWithdrawList.forEach(depositWithdraw -> {
+      System.out.println(depositWithdraw.toString());
+    });
 
   }
 }
