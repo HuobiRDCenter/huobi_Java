@@ -16,9 +16,15 @@ public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
   @Override
   public AccountBalance parse(JSONObject json) {
 
+    String subType = json.getString("subtype");
+    if (subType == null) {
+      subType = json.getString("symbol");
+    }
+
     AccountBalance accountBalance = json.toJavaObject(AccountBalance.class);
     accountBalance.setType(AccountTypeEnum.find(json.getString("type")));
     accountBalance.setState(AccountStateEnum.find(json.getString("state")));
+    accountBalance.setSubType(subType);
     accountBalance.setUserId(json.getLong("user-id"));
     accountBalance.setList(new BalanceParser().parseArray(json.getJSONArray("list")));
 

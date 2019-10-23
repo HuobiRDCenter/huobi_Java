@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.regexp.internal.RE;
 
 import com.huobi.client.MarketClient;
 import com.huobi.client.req.market.CandlestickRequest;
@@ -13,6 +14,10 @@ import com.huobi.client.req.market.MarketDetailMergedRequest;
 import com.huobi.client.req.market.MarketDetailRequest;
 import com.huobi.client.req.market.MarketHistoryTradeRequest;
 import com.huobi.client.req.market.MarketTradeRequest;
+import com.huobi.client.req.market.ReqCandlestickRequest;
+import com.huobi.client.req.market.ReqMarketDepthRequest;
+import com.huobi.client.req.market.ReqMarketDetailRequest;
+import com.huobi.client.req.market.ReqMarketTradeRequest;
 import com.huobi.client.req.market.SubCandlestickRequest;
 import com.huobi.client.req.market.SubMarketBBORequest;
 import com.huobi.client.req.market.SubMarketDepthRequest;
@@ -20,33 +25,42 @@ import com.huobi.client.req.market.SubMarketDetailRequest;
 import com.huobi.client.req.market.SubMarketTradeRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
+import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.CandlestickIntervalEnum;
 import com.huobi.constant.enums.DepthSizeEnum;
 import com.huobi.constant.enums.DepthStepEnum;
 import com.huobi.model.market.Candlestick;
 import com.huobi.model.market.CandlestickEvent;
+import com.huobi.model.market.CandlestickReq;
 import com.huobi.model.market.MarketBBOEvent;
 import com.huobi.model.market.MarketDepth;
 import com.huobi.model.market.MarketDepthEvent;
+import com.huobi.model.market.MarketDepthReq;
 import com.huobi.model.market.MarketDetail;
 import com.huobi.model.market.MarketDetailEvent;
 import com.huobi.model.market.MarketDetailMerged;
+import com.huobi.model.market.MarketDetailReq;
 import com.huobi.model.market.MarketTicker;
 import com.huobi.model.market.MarketTrade;
 import com.huobi.model.market.MarketTradeEvent;
+import com.huobi.model.market.MarketTradeReq;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.market.CandlestickEventParser;
 import com.huobi.service.huobi.parser.market.CandlestickParser;
+import com.huobi.service.huobi.parser.market.CandlestickReqParser;
 import com.huobi.service.huobi.parser.market.MarketBBOEventParser;
 import com.huobi.service.huobi.parser.market.MarketDepthEventParser;
 import com.huobi.service.huobi.parser.market.MarketDepthParser;
+import com.huobi.service.huobi.parser.market.MarketDepthReqParser;
 import com.huobi.service.huobi.parser.market.MarketDetailEventParser;
 import com.huobi.service.huobi.parser.market.MarketDetailMergedParser;
 import com.huobi.service.huobi.parser.market.MarketDetailParser;
+import com.huobi.service.huobi.parser.market.MarketDetailReqParser;
 import com.huobi.service.huobi.parser.market.MarketTickerParser;
 import com.huobi.service.huobi.parser.market.MarketTradeEventParser;
 import com.huobi.service.huobi.parser.market.MarketTradeParser;
+import com.huobi.service.huobi.parser.market.MarketTradeReqParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -237,7 +251,7 @@ public class HuobiMarketService implements MarketClient {
 
       String topic = WEBSOCKET_MARKET_DEPTH_TOPIC
           .replace("$symbol", symbol)
-          .replace("$type",step);
+          .replace("$type", step);
 
       JSONObject command = new JSONObject();
       command.put("sub", topic);
@@ -326,7 +340,7 @@ public class HuobiMarketService implements MarketClient {
   }
 
   @Override
-  public void subMarketBBO(SubMarketBBORequest request,ResponseCallback<MarketBBOEvent> callback) {
+  public void subMarketBBO(SubMarketBBORequest request, ResponseCallback<MarketBBOEvent> callback) {
 
     // 检查参数
     InputChecker.checker()
@@ -353,6 +367,86 @@ public class HuobiMarketService implements MarketClient {
 
     HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketBBOEventParser(), callback, false);
 
+  }
+
+  public void reqCandlestick(ReqCandlestickRequest request, ResponseCallback<CandlestickReq> callback) {
+
+    // 检查参数
+    InputChecker.checker()
+        .shouldNotNull(request.getSymbol(), "symbol")
+        .shouldNotNull(request.getInterval(), "interval");
+
+    String topic = WEBSOCKET_CANDLESTICK_TOPIC
+        .replace("$symbol$", request.getSymbol())
+        .replace("$period$", request.getInterval().getCode());
+
+    JSONObject command = new JSONObject();
+    command.put(WebSocketConstants.OP_REQ, topic);
+    command.put("id", System.nanoTime());
+    if (request.getFrom() != null) {
+      command.put("from", request.getFrom());
+    }
+    if (request.getTo() != null) {
+      command.put("to", request.getTo());
+    }
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new CandlestickReqParser(), callback, true);
+  }
+
+  public void reqMarketDepth(ReqMarketDepthRequest request, ResponseCallback<MarketDepthReq> callback) {
+    // 检查参数
+    InputChecker.checker()
+        .shouldNotNull(request.getSymbol(), "symbol")
+        .shouldNotNull(request.getStep(), "step");
+
+    String topic = WEBSOCKET_MARKET_DEPTH_TOPIC
+        .replace("$symbol", request.getSymbol())
+        .replace("$type", request.getStep().getStep());
+
+    JSONObject command = new JSONObject();
+    command.put(WebSocketConstants.OP_REQ, topic);
+    command.put("id", System.nanoTime());
+
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketDepthReqParser(), callback, true);
+
+  }
+
+  public void reqMarketTrade(ReqMarketTradeRequest request, ResponseCallback<MarketTradeReq> callback) {
+    // 检查参数
+    InputChecker.checker()
+        .shouldNotNull(request.getSymbol(), "symbol");
+
+    String topic = WEBSOCKET_MARKET_TRADE_TOPIC
+        .replace("$symbol", request.getSymbol());
+
+    JSONObject command = new JSONObject();
+    command.put(WebSocketConstants.OP_REQ, topic);
+    command.put("id", System.nanoTime());
+
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketTradeReqParser(), callback, true);
+  }
+
+  public void reqMarketDetail(ReqMarketDetailRequest request, ResponseCallback<MarketDetailReq> callback) {
+    // 检查参数
+    InputChecker.checker()
+        .shouldNotNull(request.getSymbol(), "symbol");
+
+    String topic = WEBSOCKET_MARKET_DETAIL_TOPIC
+        .replace("$symbol", request.getSymbol());
+
+    JSONObject command = new JSONObject();
+    command.put(WebSocketConstants.OP_REQ, topic);
+    command.put("id", System.nanoTime());
+
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketDetailReqParser(), callback, true);
   }
 
 
@@ -442,6 +536,39 @@ public class HuobiMarketService implements MarketClient {
 //    marketService.subMarketBBO(SubMarketBBORequest.builder().symbol(symbol).build(),(marketBBOEvent)->{
 //      System.out.println(marketBBOEvent.toString());
 //    });
+
+//    marketService.reqCandlestick(ReqCandlestickRequest.builder()
+//        .symbol(symbol)
+//        .interval(CandlestickIntervalEnum.MIN15)
+//        .build(),candlestickReq ->{
+//
+//      System.out.println(candlestickReq.toString());
+//      candlestickReq.getCandlestickList().forEach(candlestick -> {
+//        System.out.println("candlestick:"+candlestick.toString());
+//      });
+//    });
+
+//    marketService.reqMarketDepth(ReqMarketDepthRequest.builder()
+//        .symbol(symbol)
+//        .step(DepthStepEnum.STEP0)
+//        .build(),marketDepthReq->{
+//
+//      System.out.println(marketDepthReq.toString());
+//    });
+
+//    marketService.reqMarketTrade(ReqMarketTradeRequest.builder()
+//        .symbol(symbol)
+//        .build(),marketTradeReq->{
+//
+//      System.out.println(marketTradeReq.toString());
+//    });
+
+    marketService.reqMarketDetail(ReqMarketDetailRequest.builder()
+        .symbol(symbol)
+        .build(),marketDetailReq->{
+
+      System.out.println(marketDetailReq.toString());
+    });
   }
 
 }

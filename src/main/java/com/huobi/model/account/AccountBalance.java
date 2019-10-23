@@ -28,4 +28,6 @@ public class AccountBalance {
 
   private List<Balance> list;
 
+  private String subType;
+
 }
