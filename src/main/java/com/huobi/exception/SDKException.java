@@ -1,5 +1,8 @@
 package com.huobi.exception;
 
+import lombok.Getter;
+
+@Getter
 public class SDKException extends RuntimeException {
 
   public static final String INPUT_ERROR = "InputError";

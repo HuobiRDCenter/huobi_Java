@@ -11,6 +11,9 @@ import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
 import com.huobi.client.req.trade.ReqOrderListRequest;
 import com.huobi.client.req.trade.SubOrderUpdateRequest;
+import com.huobi.constant.Options;
+import com.huobi.constant.enums.ExchangeEnum;
+import com.huobi.exception.SDKException;
 import com.huobi.model.trade.BatchCancelOpenOrdersResult;
 import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
@@ -19,6 +22,7 @@ import com.huobi.model.trade.Order;
 import com.huobi.model.trade.OrderDetailReq;
 import com.huobi.model.trade.OrderListReq;
 import com.huobi.model.trade.OrderUpdateEvent;
+import com.huobi.service.huobi.HuobiTradeService;
 import com.huobi.utils.ResponseCallback;
 
 public interface TradeClient {
@@ -55,5 +59,13 @@ public interface TradeClient {
   void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListReq> callback);
 
   void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailReq> callback);
+
+  static TradeClient create(Options options) {
+
+    if (options.getExchange().equals(ExchangeEnum.HUOBI)) {
+      return new HuobiTradeService(options);
+    }
+    throw new SDKException(SDKException.INPUT_ERROR, "Unsupport Exchange.");
+  }
 
 }

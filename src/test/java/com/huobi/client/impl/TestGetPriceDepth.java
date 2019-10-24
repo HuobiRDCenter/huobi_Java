@@ -82,7 +82,7 @@ public class TestGetPriceDepth {
   @Test
   public void testNormalCase() {
     RestApiRequest<PriceDepth> restApiRequest =
-        impl.getPriceDepth("btcusdt", null);
+        impl.getPriceDepth("btcusdt", 150);
     Request request = restApiRequest.request;
     assertEquals("GET", request.method());
     assertEquals("btcusdt", request.url().queryParameter("symbol"));
