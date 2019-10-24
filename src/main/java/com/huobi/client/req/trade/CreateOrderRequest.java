@@ -2,7 +2,6 @@ package com.huobi.client.req.trade;
 
 import java.math.BigDecimal;
 
-import com.sun.org.apache.regexp.internal.RE;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

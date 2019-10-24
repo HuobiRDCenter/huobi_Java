@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.client.model.enums.OrderType;
 import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.constant.enums.QueryDirectionEnum;
 

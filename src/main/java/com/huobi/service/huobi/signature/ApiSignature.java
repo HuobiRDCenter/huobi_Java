@@ -11,7 +11,8 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.huobi.client.exception.HuobiApiException;
+import com.huobi.exception.SDKException;
+
 
 public class ApiSignature {
 
@@ -35,7 +36,7 @@ public class ApiSignature {
     StringBuilder sb = new StringBuilder(1024);
 
     if (accessKey == null || "".equals(accessKey) || secretKey == null || "".equals(secretKey)) {
-      throw new HuobiApiException(HuobiApiException.KEY_MISSING,
+      throw new SDKException(SDKException.KEY_MISSING,
           "API key and secret key are required");
     }
 
@@ -56,10 +57,10 @@ public class ApiSignature {
           signatureMethodValue);
       hmacSha256.init(secKey);
     } catch (NoSuchAlgorithmException e) {
-      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+      throw new SDKException(SDKException.RUNTIME_ERROR,
           "[Signature] No such algorithm: " + e.getMessage());
     } catch (InvalidKeyException e) {
-      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+      throw new SDKException(SDKException.RUNTIME_ERROR,
           "[Signature] Invalid key: " + e.getMessage());
     }
     String payload = sb.toString();

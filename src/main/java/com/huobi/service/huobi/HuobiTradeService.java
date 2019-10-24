@@ -214,7 +214,7 @@ public class HuobiTradeService implements TradeClient {
     InputChecker.checker()
         .checkSymbol(request.getSymbol())
         .shouldNotNull(request.getAccountType(), "accountType")
-        .checkRange(request.getSize(), 1, 2000, "size");
+        .checkRange(request.getSize(), 1, 500, "size");
 
     Account account = huobiAccountService.getAccount(request.getAccountType());
     if (account == null) {

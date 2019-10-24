@@ -1,6 +1,5 @@
 package com.huobi.utils;
 
-import com.huobi.client.AsyncResult;
 
 /**
  * The interface for define asynchronous invoking callback.<br> If you want to ues the asynchronous
@@ -15,7 +14,6 @@ public interface ResponseCallback<T> {
   /**
    * Be called when the request successful.
    *
-   * @param response The {@link AsyncResult} of the asynchronous invoking.
    */
   void onResponse(T response);
 }

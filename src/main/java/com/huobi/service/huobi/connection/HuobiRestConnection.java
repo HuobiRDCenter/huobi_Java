@@ -7,8 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.Request;
 
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.EtfResult;
+import com.huobi.constant.EtfResult;
 import com.huobi.constant.Options;
 import com.huobi.exception.SDKException;
 import com.huobi.service.huobi.signature.ApiSignature;
@@ -117,7 +116,7 @@ public class HuobiRestConnection {
     } catch (SDKException e) {
       throw e;
     } catch (Exception e) {
-      throw new SDKException(HuobiApiException.RUNTIME_ERROR, "[Invoking] Unexpected error: " + e.getMessage());
+      throw new SDKException(SDKException.RUNTIME_ERROR, "[Invoking] Unexpected error: " + e.getMessage());
     }
 
     return json;

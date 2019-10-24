@@ -14,7 +14,8 @@ import com.alibaba.fastjson.JSON;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-import com.huobi.client.exception.HuobiApiException;
+import com.huobi.exception.SDKException;
+
 
 public class UrlParamsBuilder {
 
@@ -26,7 +27,7 @@ public class UrlParamsBuilder {
     void put(String name, String value) {
 
       if (name == null || "".equals(name)) {
-        throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+        throw new SDKException(SDKException.RUNTIME_ERROR,
             "[URL] Key can not be null");
       }
       if (value == null || "".equals(value)) {
@@ -200,7 +201,7 @@ public class UrlParamsBuilder {
     try {
       return URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20");
     } catch (UnsupportedEncodingException e) {
-      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+      throw new SDKException(SDKException.RUNTIME_ERROR,
           "[URL] UTF-8 encoding not supported!");
     }
   }

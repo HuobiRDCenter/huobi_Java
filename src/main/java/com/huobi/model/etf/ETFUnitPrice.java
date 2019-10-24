@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.client.impl.utils.JsonWrapper;
-
 @Data
 @Builder
 @AllArgsConstructor

@@ -3,7 +3,6 @@ package com.huobi.constant.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import com.huobi.client.impl.utils.EnumLookup;
 
 @AllArgsConstructor
 @Getter
@@ -17,8 +16,6 @@ public enum StopOrderOperatorEnum {
   private String operator;
 
   private String desc;
-
-  private static final EnumLookup<StopOrderOperatorEnum> lookup = new EnumLookup<>(StopOrderOperatorEnum.class);
 
   public static StopOrderOperatorEnum find(String operator) {
     for (StopOrderOperatorEnum op : StopOrderOperatorEnum.values()) {

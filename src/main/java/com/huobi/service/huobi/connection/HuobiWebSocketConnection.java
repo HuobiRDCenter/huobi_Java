@@ -16,19 +16,17 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
-import com.huobi.client.impl.utils.InternalUtils;
-import com.huobi.client.impl.utils.TimeService;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ConnectionStateEnum;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 import com.huobi.service.huobi.signature.ApiSignature;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.ConnectionFactory;
+import com.huobi.utils.InternalUtils;
 import com.huobi.utils.ResponseCallback;
 import com.huobi.utils.WebSocketConnection;
 import com.huobi.utils.WebSocketWatchDog;
 
-import static com.huobi.client.impl.utils.InternalUtils.decode;
 
 @Data
 @Slf4j
@@ -177,7 +175,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
   @Override
   public void onMessage(WebSocket webSocket, String text) {
     super.onMessage(webSocket, text);
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime =  System.currentTimeMillis();
   }
 
   @SuppressWarnings("unchecked")
@@ -186,11 +184,11 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     super.onMessage(webSocket, bytes);
     try {
 
-      lastReceivedTime = TimeService.getCurrentTimeStamp();
+      lastReceivedTime = System.currentTimeMillis();
 
       String data;
       try {
-        data = new String(decode(bytes.toByteArray()));
+        data = new String(InternalUtils.decode(bytes.toByteArray()));
       } catch (IOException e) {
         log.error("[Connection On Message][" + this.getId() + "] Receive message error: " + e.getMessage());
         closeOnError();
@@ -296,7 +294,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     WebSocketWatchDog.onConnectionCreated(this);
 
     state = ConnectionStateEnum.CONNECTED;
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime = System.currentTimeMillis();
 
     if (authNeed) {
       // 需要验签的部分
@@ -310,7 +308,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
         return;
       }
       builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
-          .putToUrl("cid", TimeService.getCurrentTimeStamp());
+          .putToUrl("cid", System.currentTimeMillis());
       send(builder.buildUrlToJsonString());
       InternalUtils.await(100);
     } else {

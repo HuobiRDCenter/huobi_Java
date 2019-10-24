@@ -15,10 +15,10 @@ import com.huobi.constant.enums.ExchangeEnum;
 public class HuobiOptions implements Options {
 
   @Builder.Default
-  private String restHost = "https://api.huobi.so";
+  private String restHost = "https://api.huobi.vn";
 
   @Builder.Default
-  private String websocketHost = "wss://api.huobi.so";
+  private String websocketHost = "wss://api.huobi.vn";
 
   private String apiKey;
 

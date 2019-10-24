@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.regexp.internal.RE;
 
 import com.huobi.client.MarketClient;
 import com.huobi.client.req.market.CandlestickRequest;
@@ -23,10 +22,8 @@ import com.huobi.client.req.market.SubMarketBBORequest;
 import com.huobi.client.req.market.SubMarketDepthRequest;
 import com.huobi.client.req.market.SubMarketDetailRequest;
 import com.huobi.client.req.market.SubMarketTradeRequest;
-import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
-import com.huobi.constant.enums.CandlestickIntervalEnum;
 import com.huobi.constant.enums.DepthSizeEnum;
 import com.huobi.constant.enums.DepthStepEnum;
 import com.huobi.model.market.Candlestick;
