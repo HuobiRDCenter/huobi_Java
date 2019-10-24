@@ -35,7 +35,6 @@ public class AccountClientExample {
         .build());
 
     System.out.println(accountBalance.getId());
-    System.out.println(accountBalance.getUserId());
     System.out.println(accountBalance.getType());
     System.out.println(accountBalance.getState());
     accountBalance.getList().forEach(balance -> {

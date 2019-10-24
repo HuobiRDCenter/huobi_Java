@@ -25,7 +25,6 @@ public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
     accountBalance.setType(AccountTypeEnum.find(json.getString("type")));
     accountBalance.setState(AccountStateEnum.find(json.getString("state")));
     accountBalance.setSubType(subType);
-    accountBalance.setUserId(json.getLong("user-id"));
     accountBalance.setList(new BalanceParser().parseArray(json.getJSONArray("list")));
 
     return accountBalance;

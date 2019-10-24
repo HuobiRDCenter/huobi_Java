@@ -20,8 +20,6 @@ public class AccountBalance {
 
   private Long id;
 
-  private Long userId;
-
   private AccountTypeEnum type;
 
   private AccountStateEnum state;
