@@ -642,6 +642,8 @@ class RestApiRequestImpl {
     String source = "api";
     if (newOrderRequest.getAccountType() == AccountType.MARGIN) {
       source = "margin-api";
+    } else if (newOrderRequest.getAccountType() == AccountType.SUPER_MARGIN) {
+      source = "super-margin-api";
     }
     String stopOp = newOrderRequest.getOperator() != null ? newOrderRequest.getOperator().getOperator() : "";
     UrlParamsBuilder builder = UrlParamsBuilder.build()
