@@ -1,6 +1,8 @@
 package com.huobi.client.model;
 
+import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.model.enums.AccountType;
+
 import java.util.List;
 
 /**
@@ -29,6 +31,23 @@ public class User {
   public Account getAccount(AccountType accountType) {
     for (Account account : accounts) {
       if (account.getType() == accountType) {
+        return account;
+      }
+    }
+    return null;
+  }
+
+  public Account getAccount(AccountType accountType, String symbol) {
+    if (AccountType.MARGIN != accountType) {
+      return getAccount(accountType);
+    }
+
+    if (symbol == null || symbol.trim().length() <= 0) {
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR, "Margin Account Type need subtype.");
+    }
+
+    for (Account account : accounts) {
+      if (account.getType() == accountType && symbol.equals(account.getSubtype())) {
         return account;
       }
     }

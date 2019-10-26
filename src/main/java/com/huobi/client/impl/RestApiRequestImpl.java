@@ -203,6 +203,7 @@ class RestApiRequestImpl {
         account.setId(item.getLong("id"));
         account.setType(AccountType.lookup(item.getString("type")));
         account.setState(AccountState.lookup(item.getString("state")));
+        account.setSubtype(item.getStringOrDefault("subtype",""));
         res.add(account);
       });
       return res;
@@ -633,7 +634,7 @@ class RestApiRequestImpl {
       InputChecker.checker()
           .shouldNull(newOrderRequest.getPrice(), "Price");
     }
-    Account account = AccountsInfoMap.getUser(apiKey).getAccount(newOrderRequest.getAccountType());
+    Account account = AccountsInfoMap.getUser(apiKey).getAccount(newOrderRequest.getAccountType(),newOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
@@ -666,7 +667,7 @@ class RestApiRequestImpl {
         .shouldNotNull(openOrderRequest.getAccountType(), "accountType")
         .checkRange(openOrderRequest.getSize(), 1, 2000, "size");
     AccountType accountType = openOrderRequest.getAccountType();
-    Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType);
+    Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType,openOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
@@ -751,7 +752,7 @@ class RestApiRequestImpl {
         .checkSymbol(cancelOpenOrderRequest.getSymbol())
         .shouldNotNull(cancelOpenOrderRequest.getAccountType(), "AccountType");
     Account account = AccountsInfoMap.getUser(apiKey)
-        .getAccount(cancelOpenOrderRequest.getAccountType());
+        .getAccount(cancelOpenOrderRequest.getAccountType(),cancelOpenOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
