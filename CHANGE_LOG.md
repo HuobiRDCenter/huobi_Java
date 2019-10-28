@@ -23,9 +23,9 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 - [Huobi Global API Java SDK version 1.0.1](#Huobi-Global-API-Java-SDK-version-1.0.1)
 
 
-# Huobi Global API JAVA SDK version 1.0.3
+## Huobi Global API Java SDK version 1.0.3
 
-## 1.RELEASE NOTE - Huobi Global API SDK  1.0.3
+[***version 1.0.3***](https://github.com/HuobiRDCenter/huobi_Java/releases)
 
 ***2019-10-28***
 
