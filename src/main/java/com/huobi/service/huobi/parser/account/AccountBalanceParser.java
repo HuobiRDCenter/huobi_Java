@@ -6,8 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.AccountStateEnum;
-import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -22,8 +20,8 @@ public class AccountBalanceParser implements HuobiModelParser<AccountBalance> {
     }
 
     AccountBalance accountBalance = json.toJavaObject(AccountBalance.class);
-    accountBalance.setType(AccountTypeEnum.find(json.getString("type")));
-    accountBalance.setState(AccountStateEnum.find(json.getString("state")));
+    accountBalance.setType(json.getString("type"));
+    accountBalance.setState(json.getString("state"));
     accountBalance.setSubType(subType);
     accountBalance.setList(new BalanceParser().parseArray(json.getJSONArray("list")));
 

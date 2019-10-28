@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.BalanceTypeEnum;
-
 /**
  * The balance of specified account.
  */
@@ -22,7 +20,7 @@ public class Balance {
 
   private String currency;
 
-  private BalanceTypeEnum type;
+  private String type;
 
   private BigDecimal balance;
 

@@ -18,18 +18,50 @@ import com.huobi.utils.ResponseCallback;
 
 public interface AccountClient {
 
+  /**
+   * Get User Account List
+   * @return
+   */
   List<Account> getAccounts();
 
+  /**
+   * Get User Account Balance
+   * @param request
+   * @return
+   */
   AccountBalance getAccountBalance(AccountBalanceRequest request);
 
+  /**
+   * Transfer to sub-user
+   * @param request
+   * @return
+   */
   long transferSubuser(TransferSubuserRequest request);
 
+  /**
+   * Get sub-user's account balance
+   * @param subuserId
+   * @return
+   */
   List<AccountBalance> getSubuserAccountBalance(Long subuserId);
 
+  /**
+   * Get the aggregated balance of all sub-accounts of the current user.
+   * @return
+   */
   List<SubuserAggregateBalance> getSubuserAggregateBalance();
 
+  /**
+   * Use WebSocket connection subscribe Account assets change event
+   * @param request
+   * @param callback
+   */
   void subAccounts(SubAccountChangeRequest request, ResponseCallback<AccountChangeEvent> callback);
 
+  /**
+   * Use WebSocket connection request Account Info
+   * @param callback
+   */
   void reqAccounts(ResponseCallback<AccountReq> callback);
 
 

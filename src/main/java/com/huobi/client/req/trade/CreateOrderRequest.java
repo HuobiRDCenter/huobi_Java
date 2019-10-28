@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.AccountTypeEnum;
+import com.huobi.constant.enums.OrderSourceEnum;
 import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.constant.enums.StopOrderOperatorEnum;
 
@@ -19,7 +19,8 @@ import com.huobi.constant.enums.StopOrderOperatorEnum;
 @ToString
 public class CreateOrderRequest {
 
-  private AccountTypeEnum accountType;
+
+  private Long accountId;
 
   private String symbol;
 
@@ -37,197 +38,211 @@ public class CreateOrderRequest {
 
   private StopOrderOperatorEnum operator;
 
+  private OrderSourceEnum orderSource;
+
   //------------------------------- Spot ---------------------------------------//
 
-  public static CreateOrderRequest spotBuyLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return spotBuyLimit(null, symbol, price, amount);
+  public static CreateOrderRequest spotBuyLimit(Long spotAccountId, String symbol, BigDecimal price, BigDecimal amount) {
+    return spotBuyLimit(spotAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest spotBuyLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest spotBuyLimit(Long spotAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SPOT)
+        .accountId(spotAccountId)
         .type(OrderTypeEnum.BUY_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.API)
         .build();
   }
 
-  public static CreateOrderRequest spotSellLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return spotSellLimit(null, symbol, price, amount);
+  public static CreateOrderRequest spotSellLimit(Long spotAccountId,String symbol, BigDecimal price, BigDecimal amount) {
+    return spotSellLimit(spotAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest spotSellLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest spotSellLimit(Long spotAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SPOT)
+        .accountId(spotAccountId)
         .type(OrderTypeEnum.SELL_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.API)
         .build();
   }
 
-  public static CreateOrderRequest spotBuyMarket(String symbol, BigDecimal amount) {
-    return spotBuyMarket(null, symbol, amount);
+  public static CreateOrderRequest spotBuyMarket(Long spotAccountId,String symbol, BigDecimal amount) {
+    return spotBuyMarket(spotAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest spotBuyMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest spotBuyMarket(Long spotAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SPOT)
+        .accountId(spotAccountId)
         .type(OrderTypeEnum.BUY_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.API)
         .build();
   }
 
-  public static CreateOrderRequest spotSellMarket(String symbol, BigDecimal amount) {
-    return spotSellMarket(null, symbol, amount);
+  public static CreateOrderRequest spotSellMarket(Long spotAccountId,String symbol, BigDecimal amount) {
+    return spotSellMarket(spotAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest spotSellMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest spotSellMarket(Long spotAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SPOT)
+        .accountId(spotAccountId)
         .type(OrderTypeEnum.SELL_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.API)
         .build();
   }
 
   //--------------------------------- Margin -----------------------------------------//
 
-  public static CreateOrderRequest marginBuyLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return marginBuyLimit(null, symbol, price, amount);
+  public static CreateOrderRequest marginBuyLimit(Long marginAccountId,String symbol, BigDecimal price, BigDecimal amount) {
+    return marginBuyLimit(marginAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest marginBuyLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest marginBuyLimit(Long marginAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.MARGIN)
+        .accountId(marginAccountId)
         .type(OrderTypeEnum.BUY_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest marginSellLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return marginSellLimit(null, symbol, price, amount);
+  public static CreateOrderRequest marginSellLimit(Long marginAccountId,String symbol, BigDecimal price, BigDecimal amount) {
+    return marginSellLimit(marginAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest marginSellLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest marginSellLimit(Long marginAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.MARGIN)
+        .accountId(marginAccountId)
         .type(OrderTypeEnum.SELL_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest marginBuyMarket(String symbol, BigDecimal amount) {
-    return marginBuyMarket(null, symbol, amount);
+  public static CreateOrderRequest marginBuyMarket(Long marginAccountId,String symbol, BigDecimal amount) {
+    return marginBuyMarket(marginAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest marginBuyMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest marginBuyMarket(Long marginAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.MARGIN)
+        .accountId(marginAccountId)
         .type(OrderTypeEnum.BUY_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest marginSellMarket(String symbol, BigDecimal amount) {
-    return marginSellMarket(null, symbol, amount);
+  public static CreateOrderRequest marginSellMarket(Long marginAccountId,String symbol, BigDecimal amount) {
+    return marginSellMarket(marginAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest marginSellMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest marginSellMarket(Long marginAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.MARGIN)
+        .accountId(marginAccountId)
         .type(OrderTypeEnum.SELL_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.MARGIN_API)
         .build();
   }
 
   //-------------------------------Super Margin---------------------------------------//
 
-  public static CreateOrderRequest superMarginBuyLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return superMarginBuyLimit(null, symbol, price, amount);
+  public static CreateOrderRequest superMarginBuyLimit(Long superMarginAccountId,String symbol, BigDecimal price, BigDecimal amount) {
+    return superMarginBuyLimit(superMarginAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest superMarginBuyLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest superMarginBuyLimit(Long superMarginAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SUPER_MARGIN)
+        .accountId(superMarginAccountId)
         .type(OrderTypeEnum.BUY_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.SUPER_MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest superMarginSellLimit(String symbol, BigDecimal price, BigDecimal amount) {
-    return superMarginSellLimit(null, symbol, price, amount);
+  public static CreateOrderRequest superMarginSellLimit(Long superMarginAccountId,String symbol, BigDecimal price, BigDecimal amount) {
+    return superMarginSellLimit(superMarginAccountId,null, symbol, price, amount);
   }
 
-  public static CreateOrderRequest superMarginSellLimit(String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
+  public static CreateOrderRequest superMarginSellLimit(Long superMarginAccountId,String clientOrderId, String symbol, BigDecimal price, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SUPER_MARGIN)
+        .accountId(superMarginAccountId)
         .type(OrderTypeEnum.SELL_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .price(price)
         .amount(amount)
+        .orderSource(OrderSourceEnum.SUPER_MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest superMarginBuyMarket(String symbol, BigDecimal amount) {
-    return superMarginBuyMarket(null, symbol, amount);
+  public static CreateOrderRequest superMarginBuyMarket(Long superMarginAccountId,String symbol, BigDecimal amount) {
+    return superMarginBuyMarket(superMarginAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest superMarginBuyMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest superMarginBuyMarket(Long superMarginAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SUPER_MARGIN)
+        .accountId(superMarginAccountId)
         .type(OrderTypeEnum.BUY_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.SUPER_MARGIN_API)
         .build();
   }
 
-  public static CreateOrderRequest superMarginSellMarket(String symbol, BigDecimal amount) {
-    return superMarginSellMarket(null, symbol, amount);
+  public static CreateOrderRequest superMarginSellMarket(Long superMarginAccountId,String symbol, BigDecimal amount) {
+    return superMarginSellMarket(superMarginAccountId,null, symbol, amount);
   }
 
-  public static CreateOrderRequest superMarginSellMarket(String clientOrderId, String symbol, BigDecimal amount) {
+  public static CreateOrderRequest superMarginSellMarket(Long superMarginAccountId,String clientOrderId, String symbol, BigDecimal amount) {
     return CreateOrderRequest.builder()
-        .accountType(AccountTypeEnum.SUPER_MARGIN)
+        .accountId(superMarginAccountId)
         .type(OrderTypeEnum.SELL_MARKET)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
         .amount(amount)
+        .orderSource(OrderSourceEnum.SUPER_MARGIN_API)
         .build();
   }
 
 
   //-------------------------------Stop Loss---------------------------------------//
-  public static CreateOrderRequest buyStopLoss(AccountTypeEnum accountType, String symbol,
-      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator) {
-    return buyStopLoss(null, accountType, symbol, price, amount, stopPrice, operator);
+  public static CreateOrderRequest buyStopLoss(Long accountId, String symbol, BigDecimal price, BigDecimal amount,
+      BigDecimal stopPrice, StopOrderOperatorEnum operator, OrderSourceEnum orderSource) {
+    return buyStopLoss(null, accountId, symbol, price, amount, stopPrice, operator,orderSource);
   }
 
-  public static CreateOrderRequest buyStopLoss(String clientOrderId, AccountTypeEnum accountType, String symbol,
-      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator) {
+  public static CreateOrderRequest buyStopLoss(String clientOrderId, Long accountId, String symbol,
+      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator, OrderSourceEnum orderSource) {
     return CreateOrderRequest.builder()
-        .accountType(accountType)
+        .accountId(accountId)
         .type(OrderTypeEnum.BUY_STOP_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
@@ -235,19 +250,20 @@ public class CreateOrderRequest {
         .amount(amount)
         .stopPrice(stopPrice)
         .operator(operator)
+        .orderSource(orderSource)
         .build();
   }
 
 
-  public static CreateOrderRequest sellStopLoss(AccountTypeEnum accountType, String symbol,
-      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator) {
-    return sellStopLoss(null, accountType, symbol, price, amount, stopPrice, operator);
+  public static CreateOrderRequest sellStopLoss(Long accountId, String symbol, BigDecimal price, BigDecimal amount,
+      BigDecimal stopPrice, StopOrderOperatorEnum operator, OrderSourceEnum orderSource) {
+    return sellStopLoss(null, accountId, symbol, price, amount, stopPrice, operator,orderSource);
   }
 
-  public static CreateOrderRequest sellStopLoss(String clientOrderId, AccountTypeEnum accountType, String symbol,
-      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator) {
+  public static CreateOrderRequest sellStopLoss(String clientOrderId, Long accountId, String symbol,
+      BigDecimal price, BigDecimal amount, BigDecimal stopPrice, StopOrderOperatorEnum operator, OrderSourceEnum orderSource) {
     return CreateOrderRequest.builder()
-        .accountType(accountType)
+        .accountId(accountId)
         .type(OrderTypeEnum.SELL_STOP_LIMIT)
         .clientOrderId(clientOrderId)
         .symbol(symbol)
@@ -255,6 +271,7 @@ public class CreateOrderRequest {
         .amount(amount)
         .stopPrice(stopPrice)
         .operator(operator)
+        .orderSource(orderSource)
         .build();
   }
 }

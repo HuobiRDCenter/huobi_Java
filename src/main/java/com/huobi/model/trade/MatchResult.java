@@ -2,16 +2,11 @@ package com.huobi.model.trade;
 
 import java.math.BigDecimal;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import com.huobi.constant.enums.DealRoleEnum;
-import com.huobi.constant.enums.OrderSourceEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 
 @Data
 @Builder
@@ -28,11 +23,9 @@ public class MatchResult {
 
   private String symbol;
 
-  @JSONField(deserialize = false)
-  private OrderTypeEnum type;
+  private String type;
 
-  @JSONField(deserialize = false)
-  private OrderSourceEnum source;
+  private String source;
 
   private BigDecimal price;
 
@@ -40,8 +33,7 @@ public class MatchResult {
 
   private BigDecimal filledFees;
 
-  @JSONField(deserialize = false)
-  private DealRoleEnum role;
+  private String role;
 
   private BigDecimal filledPoints;
 

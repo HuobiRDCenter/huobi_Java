@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.constant.enums.OrderStateEnum;
 import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.constant.enums.QueryDirectionEnum;
@@ -21,7 +20,7 @@ import com.huobi.constant.enums.QueryDirectionEnum;
 @ToString
 public class ReqOrderListRequest {
 
-  private AccountTypeEnum accountType;
+  private Long accountId;
 
   private String symbol;
 

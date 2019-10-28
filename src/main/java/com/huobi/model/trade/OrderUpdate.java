@@ -2,16 +2,11 @@ package com.huobi.model.trade;
 
 import java.math.BigDecimal;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import com.huobi.constant.enums.DealRoleEnum;
-import com.huobi.constant.enums.OrderStateEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 
 @Data
 @Builder
@@ -37,13 +32,10 @@ public class OrderUpdate {
 
   private BigDecimal filledCashAmount;
 
-  @JSONField(deserialize = false)
-  private OrderTypeEnum orderType;
+  private String orderType;
 
-  @JSONField(deserialize = false)
-  private OrderStateEnum orderState;
+  private String orderState;
 
-  @JSONField(deserialize = false)
-  private DealRoleEnum role;
+  private String role;
 
 }

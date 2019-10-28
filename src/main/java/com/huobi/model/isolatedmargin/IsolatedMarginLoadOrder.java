@@ -2,14 +2,11 @@ package com.huobi.model.isolatedmargin;
 
 import java.math.BigDecimal;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import com.huobi.constant.enums.LoanOrderStateEnum;
 
 @Data
 @Builder
@@ -48,8 +45,7 @@ public class IsolatedMarginLoadOrder {
 
   private BigDecimal interestBalance;
 
-  @JSONField(deserialize = false)
-  private LoanOrderStateEnum state;
+  private String state;
 
   private Long createdAt;
 

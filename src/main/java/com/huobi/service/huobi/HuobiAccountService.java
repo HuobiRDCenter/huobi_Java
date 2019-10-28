@@ -12,12 +12,9 @@ import com.huobi.client.AccountClient;
 import com.huobi.client.req.account.AccountBalanceRequest;
 import com.huobi.client.req.account.SubAccountChangeRequest;
 import com.huobi.client.req.account.TransferSubuserRequest;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.constant.enums.BalanceModeEnum;
 import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.AccountChangeEvent;
@@ -65,7 +62,6 @@ public class HuobiAccountService implements AccountClient {
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNTS_PATH, UrlParamsBuilder.build());
     JSONArray data = jsonObject.getJSONArray("data");
     List<Account> accountList = new AccountParser().parseArray(data);
-    initAccount(accountList);
     return accountList;
   }
 
@@ -123,11 +119,10 @@ public class HuobiAccountService implements AccountClient {
 
   public void getAccountHistory() {
 
-    Account account = getAccount(AccountTypeEnum.SPOT);
 
     System.out.println("");
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("account-id", account.getId());
+        .putToUrl("account-id", 123);
 
     JSONObject jsonObject = restConnection.executeGetWithSignature("/v1/account/history", builder);
     System.out.println(jsonObject.toJSONString());
@@ -165,37 +160,5 @@ public class HuobiAccountService implements AccountClient {
     HuobiWebSocketConnection.createAssetConnection(options, commandList, new AccountReqParser(), callback, true);
   }
 
-
-  public Account getAccount(AccountTypeEnum accountType) {
-    // 若accountMap为空，同步初始化该map
-    if (accountMap.isEmpty()) {
-      this.getAccounts();
-    }
-
-    return accountMap.get(accountType);
-  }
-
-  public  Account getMarginAccount(String symbol) {
-    if (marginAccountMap.isEmpty()) {
-      this.getAccounts();
-    }
-    return marginAccountMap.get(symbol);
-  }
-
-  public void initAccount(List<Account> accountList) {
-    synchronized (accountMap) {
-      if (accountList == null || accountList.size() <= 0) {
-        return;
-      }
-
-      accountList.forEach(account -> {
-        if (account.getType() == AccountTypeEnum.MARGIN) {
-          marginAccountMap.put(account.getSubtype(), account);
-        } else {
-          accountMap.put(account.getType(), account);
-        }
-      });
-    }
-  }
 
 }

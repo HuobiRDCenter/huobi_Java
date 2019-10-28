@@ -6,8 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.constant.enums.CrossMarginAccountStateEnum;
 import com.huobi.model.crossmargin.CrossMarginAccount;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 import com.huobi.service.huobi.parser.account.BalanceParser;
@@ -18,8 +16,8 @@ public class CrossMarginAccountParser implements HuobiModelParser<CrossMarginAcc
   public CrossMarginAccount parse(JSONObject json) {
     return CrossMarginAccount.builder()
         .id(json.getLong("id"))
-        .type(AccountTypeEnum.findAll(json.getString("type")))
-        .state(CrossMarginAccountStateEnum.find(json.getString("state")))
+        .type(json.getString("type"))
+        .state(json.getString("state"))
         .riskRate(json.getBigDecimal("risk-rate"))
         .acctBalanceSum(json.getBigDecimal("acct-balance-sum"))
         .debtBalanceSum(json.getBigDecimal("debt-balance-sum"))

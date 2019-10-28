@@ -6,9 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.DealRoleEnum;
-import com.huobi.constant.enums.OrderSourceEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.model.trade.MatchResult;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -20,12 +17,12 @@ public class MatchResultParser implements HuobiModelParser<MatchResult> {
     MatchResult result = json.toJavaObject(MatchResult.class);
     result.setOrderId(json.getLong("order-id"));
     result.setMatchId(json.getLong("match-id"));
-    result.setType(OrderTypeEnum.find(json.getString("type")));
-    result.setSource(OrderSourceEnum.find(json.getString("source")));
+    result.setType(json.getString("type"));
+    result.setSource(json.getString("source"));
     result.setFilledAmount(json.getBigDecimal("filled-amount"));
     result.setFilledFees(json.getBigDecimal("filled-fees"));
     result.setCreatedAt(json.getLong("created-at"));
-    result.setRole(DealRoleEnum.find(json.getString("role")));
+    result.setRole(json.getString("role"));
     result.setFilledPoints(json.getBigDecimal("filled-points"));
     result.setFeeDeductCurrency(json.getString("fee-deduct-currency"));
     return result;

@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.constant.enums.OrderSideEnum;
 import com.huobi.constant.enums.QueryDirectionEnum;
 
@@ -17,7 +16,7 @@ public class OpenOrdersRequest {
 
   private  String symbol;
 
-  private AccountTypeEnum accountType;
+  private Long accountId;
 
   private Integer size;
 

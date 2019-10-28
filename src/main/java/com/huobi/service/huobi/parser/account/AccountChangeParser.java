@@ -6,7 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.BalanceTypeEnum;
 import com.huobi.model.account.AccountChange;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -15,7 +14,7 @@ public class AccountChangeParser implements HuobiModelParser<AccountChange> {
   @Override
   public AccountChange parse(JSONObject json) {
     AccountChange change = json.toJavaObject(AccountChange.class);
-    change.setType(BalanceTypeEnum.find(json.getString("type")));
+    change.setType(json.getString("type"));
     return change;
   }
 

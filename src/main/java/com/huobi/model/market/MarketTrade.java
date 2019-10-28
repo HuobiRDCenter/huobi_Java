@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.TradeDirectionEnum;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -25,7 +23,7 @@ public class MarketTrade {
 
   private BigDecimal amount;
 
-  private TradeDirectionEnum direction;
+  private String direction;
 
   private Long ts;
 

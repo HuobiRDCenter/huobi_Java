@@ -6,7 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.model.account.SubuserAggregateBalance;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -15,7 +14,7 @@ public class SubuserAggregateBalanceParser implements HuobiModelParser<SubuserAg
   @Override
   public SubuserAggregateBalance parse(JSONObject json) {
     SubuserAggregateBalance balance = json.toJavaObject(SubuserAggregateBalance.class);
-    balance.setType(AccountTypeEnum.find(json.getString("type")));
+    balance.setType(json.getString("type"));
     return balance;
   }
 

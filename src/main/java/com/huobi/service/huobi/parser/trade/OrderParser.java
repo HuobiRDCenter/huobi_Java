@@ -7,9 +7,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.OrderSourceEnum;
-import com.huobi.constant.enums.OrderStateEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.constant.enums.StopOrderOperatorEnum;
 import com.huobi.model.trade.Order;
 import com.huobi.service.huobi.parser.HuobiModelParser;
@@ -37,14 +34,14 @@ public class OrderParser implements HuobiModelParser<Order> {
     Order order = json.toJavaObject(Order.class);
 
     order.setAccountId(json.getLong("account-id"));
-    order.setType(OrderTypeEnum.find(json.getString("type")));
+    order.setType(json.getString("type"));
 
     order.setFilledAmount(filledAmount);
     order.setFilledCashAmount(filledCashAmount);
     order.setFilledFees(filledFees);
 
-    order.setSource(OrderSourceEnum.find(json.getString("source")));
-    order.setState(OrderStateEnum.find(json.getString("state")));
+    order.setSource(json.getString("source"));
+    order.setState(json.getString("state"));
 
     order.setStopPrice(json.getBigDecimal("stop-price"));
     order.setOperator(StopOrderOperatorEnum.find(json.getString("operator")));

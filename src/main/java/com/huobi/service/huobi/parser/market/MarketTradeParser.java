@@ -7,7 +7,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.TradeDirectionEnum;
 import com.huobi.model.market.MarketTrade;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -26,7 +25,7 @@ public class MarketTradeParser implements HuobiModelParser<MarketTrade> {
         .tradeId(tradeId)
         .price(new BigDecimal(json.getString("price")))
         .amount(new BigDecimal(json.getString("amount")))
-        .direction(TradeDirectionEnum.find(json.getString("direction")))
+        .direction(json.getString("direction"))
         .ts(json.getLong("ts"))
         .build();
   }

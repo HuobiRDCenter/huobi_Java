@@ -6,7 +6,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.LoanOrderStateEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -30,7 +29,7 @@ public class IsolatedMarginLoadOrderParser implements HuobiModelParser<IsolatedM
         .interestBalance(json.getBigDecimal("interest-balance"))
         .interestRate(json.getBigDecimal("interest-rate"))
         .interestAmount(json.getBigDecimal("interest-amount"))
-        .state(LoanOrderStateEnum.find(json.getString("state")))
+        .state(json.getString("state"))
         .accruedAt(json.getLong("accrued-at"))
         .createdAt(json.getLong("created-at"))
         .updatedAt(json.getLong("updated-at"))

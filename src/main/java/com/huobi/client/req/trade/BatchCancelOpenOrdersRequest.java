@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.constant.enums.OrderSideEnum;
 
 @Data
@@ -16,7 +15,7 @@ import com.huobi.constant.enums.OrderSideEnum;
 @ToString
 public class BatchCancelOpenOrdersRequest {
 
-  private AccountTypeEnum accountType;
+  private Long accountId;
 
   private String symbol;
 

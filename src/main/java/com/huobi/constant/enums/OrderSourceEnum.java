@@ -15,13 +15,17 @@ public enum OrderSourceEnum {
   APP("app"),
   FLSYS("fl-sys"),
   FLMGT("fl-mgt"),
-  SPOTWEB("spot-web"),
-  SPOTAPI("spot-api"),
-  SPOTAPP("spot-app"),
-  MARGINAPI("margin-api"),
-  MARGINWEB("margin-web"),
-  MARGINAPP("margin-app");
+  SPOT_WEB("spot-web"),
+  SPOT_API("spot-api"),
+  SPOT_APP("spot-app"),
+  MARGIN_API("margin-api"),
+  MARGIN_WEB("margin-web"),
+  MARGIN_APP("margin-app"),
+  SUPER_MARGIN_WEB( "super-margin-web"),
+  SUPER_MARGIN_API("super-margin-api"),
+  SUPER_MARGIN_APP( "super-margin-app"),
 
+    ;
   private final String code;
 
   public static OrderSourceEnum find(String code) {

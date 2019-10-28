@@ -5,9 +5,6 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.DealRoleEnum;
-import com.huobi.constant.enums.OrderStateEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.model.trade.OrderUpdate;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -21,9 +18,9 @@ public class OrderUpdateParser implements HuobiModelParser<OrderUpdate> {
     update.setFilledCashAmount(json.getBigDecimal("filled-cash-amount"));
     update.setOrderId(json.getLong("order-id"));
     update.setMatchId(json.getLong("match-id"));
-    update.setRole(DealRoleEnum.find(json.getString("role")));
-    update.setOrderType(OrderTypeEnum.find(json.getString("order-type")));
-    update.setOrderState(OrderStateEnum.find(json.getString("order-state")));
+    update.setRole(json.getString("role"));
+    update.setOrderType(json.getString("order-type"));
+    update.setOrderState(json.getString("order-state"));
     update.setClientOrderId(json.getString("client-order-id"));
     return update;
   }

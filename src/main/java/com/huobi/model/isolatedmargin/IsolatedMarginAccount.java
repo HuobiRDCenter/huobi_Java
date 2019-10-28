@@ -3,16 +3,12 @@ package com.huobi.model.isolatedmargin;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.AccountStateEnum;
-import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.constant.enums.IsolatedMarginAccountStateEnum;
 import com.huobi.model.account.Balance;
 
 @Data
@@ -32,11 +28,9 @@ public class IsolatedMarginAccount {
 
   private BigDecimal riskRate;
 
-  @JSONField(deserialize = false)
-  private AccountTypeEnum type;
+  private String type;
 
-  @JSONField(deserialize = false)
-  private IsolatedMarginAccountStateEnum state;
+  private String state;
 
   private List<Balance> balanceList;
 

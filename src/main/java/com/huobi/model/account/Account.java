@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.huobi.constant.enums.AccountStateEnum;
-import com.huobi.constant.enums.AccountTypeEnum;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,9 +15,9 @@ public class Account {
 
   private Long id;
 
-  private AccountTypeEnum type;
+  private String type;
 
-  private AccountStateEnum state;
+  private String state;
 
   private String subtype;
 

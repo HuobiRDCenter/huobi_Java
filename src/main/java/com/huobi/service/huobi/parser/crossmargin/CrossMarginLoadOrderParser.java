@@ -6,9 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.huobi.constant.enums.LoanOrderStateEnum;
 import com.huobi.model.crossmargin.CrossMarginLoadOrder;
-import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
 public class CrossMarginLoadOrderParser implements HuobiModelParser<CrossMarginLoadOrder> {
@@ -26,7 +24,7 @@ public class CrossMarginLoadOrderParser implements HuobiModelParser<CrossMarginL
         .interestAmount(json.getBigDecimal("interest-amount"))
         .filledPoints(json.getBigDecimal("filled-points"))
         .filledHt(json.getBigDecimal("filled-ht"))
-        .state(LoanOrderStateEnum.find(json.getString("state")))
+        .state(json.getString("state"))
         .accruedAt(json.getLong("accrued-at"))
         .createdAt(json.getLong("created-at"))
         .build();

@@ -8,9 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.huobi.constant.enums.OrderSourceEnum;
-import com.huobi.constant.enums.OrderStateEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.constant.enums.StopOrderOperatorEnum;
 
 @Data
@@ -29,8 +26,7 @@ public class Order {
 
   private BigDecimal price;
 
-  @JSONField(deserialize = false)
-  private OrderTypeEnum type;
+  private String type;
 
   private BigDecimal filledAmount;
 
@@ -38,11 +34,9 @@ public class Order {
 
   private BigDecimal filledFees;
 
-  @JSONField(deserialize = false)
-  private OrderSourceEnum source;
+  private String source;
 
-  @JSONField(deserialize = false)
-  private OrderStateEnum state;
+  private String state;
 
   private Long createdAt;
 

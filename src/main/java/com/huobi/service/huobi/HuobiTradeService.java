@@ -1,8 +1,6 @@
 package com.huobi.service.huobi;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,22 +13,14 @@ import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
 import com.huobi.client.req.trade.CreateOrderRequest;
 import com.huobi.client.req.trade.FeeRateRequest;
 import com.huobi.client.req.trade.MatchResultRequest;
+import com.huobi.client.req.trade.OpenOrdersRequest;
 import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
 import com.huobi.client.req.trade.ReqOrderListRequest;
 import com.huobi.client.req.trade.SubOrderUpdateRequest;
-import com.huobi.constant.WebSocketConstants;
-import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.constant.enums.OrderStateEnum;
-import com.huobi.constant.enums.OrderTypeEnum;
-import com.huobi.constant.enums.QueryDirectionEnum;
-import com.huobi.constant.enums.StopOrderOperatorEnum;
-import com.huobi.exception.SDKException;
-import com.huobi.model.account.Account;
-import com.huobi.client.req.trade.OpenOrdersRequest;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
+import com.huobi.constant.WebSocketConstants;
+import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.model.trade.BatchCancelOpenOrdersResult;
 import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
@@ -93,9 +83,10 @@ public class HuobiTradeService implements TradeClient {
   public Long createOrder(CreateOrderRequest request) {
 
     InputChecker.checker().checkSymbol(request.getSymbol())
-        .shouldNotNull(request.getAccountType(), "AccountType")
+        .shouldNotNull(request.getAccountId(), "Account-Id")
         .shouldNotNull(request.getAmount(), "Amount")
-        .shouldNotNull(request.getType(), "Type");
+        .shouldNotNull(request.getType(), "Type")
+        .shouldNotNull(request.getOrderSource(), "order source");
 
     if (request.getType() == OrderTypeEnum.SELL_LIMIT
         || request.getType() == OrderTypeEnum.BUY_LIMIT
@@ -109,29 +100,14 @@ public class HuobiTradeService implements TradeClient {
       InputChecker.checker()
           .shouldNull(request.getPrice(), "Price");
     }
-
-    String source = "api";
-    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
-      source = "margin-api";
-    } else if (request.getAccountType() == AccountTypeEnum.SUPER_MARGIN) {
-      source = "super-margin-api";
-    }
-
-    Account account = null;
-    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
-      account = huobiAccountService.getMarginAccount(request.getSymbol());
-    } else {
-      account = huobiAccountService.getAccount(request.getAccountType());
-    }
-
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToPost("account-id", account.getId())
+        .putToPost("account-id", request.getAccountId())
         .putToPost("amount", request.getAmount())
         .putToPost("price", request.getPrice())
         .putToPost("symbol", request.getSymbol())
         .putToPost("type", request.getType().getCode())
-        .putToPost("source", source)
         .putToPost("client-order-id", request.getClientOrderId())
+        .putToPost("source", request.getOrderSource().getCode())
         .putToPost("stop-price", request.getStopPrice())
         .putToPost("operator", request.getOperator() == null ? null : request.getOperator().getOperator());
 
@@ -168,18 +144,14 @@ public class HuobiTradeService implements TradeClient {
   public BatchCancelOpenOrdersResult batchCancelOpenOrders(BatchCancelOpenOrdersRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getAccountType(), "accountType");
+        .shouldNotNull(request.getAccountId(), "account-id");
     if (request.getSize() != null) {
       InputChecker.checker()
           .checkRange(request.getSize(), 1, 100, "size");
     }
-    Account account = huobiAccountService.getAccount(request.getAccountType());
-    if (account == null) {
-      throw new SDKException(SDKException.EXEC_ERROR, "[Executing] Could not find account:" + request.getAccountType());
-    }
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToPost("account-id", account.getId())
+        .putToPost("account-id", request.getAccountId())
         .putToPost("symbol", request.getSymbol())
         .putToPost("side", request.getSide() == null ? null : request.getSide().getCode())
         .putToPost("size", request.getSize());
@@ -213,16 +185,12 @@ public class HuobiTradeService implements TradeClient {
 
     InputChecker.checker()
         .checkSymbol(request.getSymbol())
-        .shouldNotNull(request.getAccountType(), "accountType")
+        .shouldNotNull(request.getAccountId(), "account-id")
         .checkRange(request.getSize(), 1, 500, "size");
 
-    Account account = huobiAccountService.getAccount(request.getAccountType());
-    if (account == null) {
-      throw new SDKException(SDKException.EXEC_ERROR, "[Executing] Could not find account:" + request.getAccountType());
-    }
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("account-id", account.getId())
+        .putToUrl("account-id", request.getAccountId())
         .putToUrl("symbol", request.getSymbol())
         .putToUrl("side", request.getSide() == null ? null : request.getSide().getCode())
         .putToUrl("size", request.getSize())
@@ -377,16 +345,10 @@ public class HuobiTradeService implements TradeClient {
   public void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListReq> callback) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getAccountType(), "account-type")
+        .shouldNotNull(request.getAccountId(), "account-id")
         .shouldNotNull(request.getSymbol(), "symbol")
         .checkList(request.getStates(), 1, 100, "states");
 
-    Account account = null;
-    if (request.getAccountType() == AccountTypeEnum.MARGIN) {
-      account = huobiAccountService.getMarginAccount(request.getSymbol());
-    } else {
-      account = huobiAccountService.getAccount(request.getAccountType());
-    }
 
     String startDateString = request.getStartDate() == null
         ? null : DateFormatUtils.format(request.getStartDate(), "yyyy-MM-dd");
@@ -396,7 +358,7 @@ public class HuobiTradeService implements TradeClient {
     JSONObject command = new JSONObject();
     command.put("op", WebSocketConstants.OP_REQ);
     command.put("topic", WEBSOCKET_ORDER_LIST_TOPIC);
-    command.put("account-id", account.getId());
+    command.put("account-id", request.getAccountId());
     command.put("symbol", request.getSymbol());
     command.put("types", request.getTypesString());
     command.put("states", request.getStatesString());

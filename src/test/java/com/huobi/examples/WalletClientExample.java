@@ -39,18 +39,18 @@ public class WalletClientExample {
     });
 
 
-//    long withdrawId = walletService.createWithdraw(CreateWithdrawRequest.builder()
-//        .address(withdrawAddress)
-//        .addrTag(withdrawAddressTag)
-//        .currency("eos")
-//        .amount(new BigDecimal("1"))
-//        .fee(new BigDecimal("0.1"))
-//        .build());
-//
-//    System.out.println("-----------create withdraw : "+withdrawId+"------------------");
-//
-//    long res = walletService.cancelWithdraw(withdrawId);
-//    System.out.println("-----------cancel withdraw : "+res+"------------------");
+    long withdrawId = walletService.createWithdraw(CreateWithdrawRequest.builder()
+        .address(withdrawAddress)
+        .addrTag(withdrawAddressTag)
+        .currency("eos")
+        .amount(new BigDecimal("1"))
+        .fee(new BigDecimal("0.1"))
+        .build());
+
+    System.out.println("-----------create withdraw : "+withdrawId+"------------------");
+
+    long res = walletService.cancelWithdraw(withdrawId);
+    System.out.println("-----------cancel withdraw : "+res+"------------------");
 
 
     List<DepositWithdraw> depositWithdrawList = walletService.getDepositWithdraw(DepositWithdrawRequest.builder()
