@@ -252,6 +252,8 @@ public interface SyncRequestClient {
    */
   Account getAccountBalance(AccountType accountType);
 
+  Account getAccountBalance(AccountType accountType, String symbol);
+
   /**
    * Make an order in huobi.
    *

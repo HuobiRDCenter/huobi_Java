@@ -1,6 +1,7 @@
 package com.huobi.client.impl;
 
 import com.huobi.client.SyncRequestClient;
+import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
@@ -208,6 +209,25 @@ public class SyncRequestImpl implements SyncRequestClient {
       }
     }
     return null;
+  }
+
+  public Account getAccountBalance(AccountType accountType, String symbol) {
+    if (AccountType.MARGIN != accountType) {
+      return getAccountBalance(accountType);
+    }
+    if (symbol == null || symbol.trim().length() <= 0) {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR,"[INPUT] Margin Account Need Symbol");
+    }
+    List<Account> accounts = RestApiInvoker.callSync(requestImpl.getAccounts());
+    for (Account account : accounts) {
+      if (account.getType() == accountType && account.getSubtype().equals(symbol)) {
+        List<Balance> balances = RestApiInvoker.callSync(requestImpl.getBalance(account));
+        account.setBalances(balances);
+        return account;
+      }
+    }
+    return null;
+
   }
 
   @Override
