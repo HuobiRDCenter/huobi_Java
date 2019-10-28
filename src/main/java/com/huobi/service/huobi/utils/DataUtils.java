@@ -33,4 +33,12 @@ public class DataUtils {
     return false;
   }
 
+
+  public static void timeWait(Long millis) {
+    try {
+      System.out.println("time wait " + millis + " ms");
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+    }
+  }
 }

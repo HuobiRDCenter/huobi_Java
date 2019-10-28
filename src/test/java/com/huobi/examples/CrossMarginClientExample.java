@@ -13,8 +13,7 @@ import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.crossmargin.CrossMarginAccount;
 import com.huobi.model.crossmargin.CrossMarginLoadOrder;
-
-import static com.huobi.constant.Constants.timeWait;
+import com.huobi.service.huobi.utils.DataUtils;
 
 public class CrossMarginClientExample {
 
@@ -43,7 +42,7 @@ public class CrossMarginClientExample {
     });
 
     // 等待100ms
-    timeWait(1000);
+    DataUtils.timeWait(1000L);
 
     // 借款
     BigDecimal loanAmount = new BigDecimal("100");
@@ -62,7 +61,7 @@ public class CrossMarginClientExample {
     });
 
     // 等待100ms
-    timeWait(5000);
+    DataUtils.timeWait(5000L);
 
     // 还款
     marginService.repayLoan(CrossMarginRepayLoanRequest.builder()
@@ -80,7 +79,7 @@ public class CrossMarginClientExample {
     });
 
     // 等待100ms
-    timeWait(5000);
+    DataUtils.timeWait(5000L);
 
     // 转出至现货
     Long transferOutId = marginService.transfer(CrossMarginTransferRequest.builder()
