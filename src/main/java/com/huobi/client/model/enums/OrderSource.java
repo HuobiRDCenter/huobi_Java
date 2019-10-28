@@ -17,7 +17,12 @@ public enum OrderSource {
   SPOTAPP("spot-app"),
   MARGINAPI("margin-api"),
   MARGINWEB("margin-web"),
-  MARGINAPP("margin-app");
+  MARGINAPP("margin-app"),
+  SUPERMARGINAPI("super_margin_api"),
+  SUPERMARGINAPP("super_margin_app"),
+  SUPERMARGINWEB("super_margin_web"),
+  SUPERMARGINFLSYS("super_margin_fl_sys"),
+  SUPERMARGINFLMGT("super_margin_fl_mgt");
 
   private final String code;
 
