@@ -13,6 +13,8 @@ import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
@@ -35,6 +37,7 @@ import com.huobi.client.model.enums.AccountState;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.CrossMarginTransferType;
 import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.DepositState;
 import com.huobi.client.model.enums.EtfStatus;
@@ -49,6 +52,10 @@ import com.huobi.client.model.enums.WithdrawState;
 import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
+import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
+import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
+import com.huobi.client.model.request.CrossMarginTransferRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -677,6 +684,147 @@ class RestApiRequestImpl {
     return request;
 
   }
+
+
+  RestApiRequest<Long> transferCrossMargin(CrossMarginTransferRequest transferRequest) {
+    InputChecker.checker()
+        .shouldNotNull(transferRequest.getType(),"type")
+        .checkCurrency(transferRequest.getCurrency())
+        .shouldNotNull(transferRequest.getAmount(), "amount");
+    String address;
+    if (transferRequest.getType() == CrossMarginTransferType.SPOT_TO_SUPER_MARGIN) {
+      address = "/v1/cross-margin/transfer-in";
+    } else if (transferRequest.getType() == CrossMarginTransferType.SUPER_MARGIN_TO_SPOT) {
+      address = "/v1/cross-margin/transfer-out";
+    } else {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] incorrect transfer type");
+    }
+    RestApiRequest<Long> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("currency", transferRequest.getCurrency())
+        .putToPost("amount", transferRequest.getAmount());
+    request.request = createRequestByPostWithSignature(address, builder);
+    request.jsonParser = (jsonWrapper -> {
+      if ("ok".equals(jsonWrapper.getString("status"))) {
+        return jsonWrapper.getLong("data");
+      }
+      return null;
+    });
+    return request;
+
+  }
+
+  RestApiRequest<Long> applyCrossMarginLoan(CrossMarginApplyLoanRequest applyLoanRequest) {
+    InputChecker.checker()
+        .checkCurrency(applyLoanRequest.getCurrency())
+        .shouldNotNull(applyLoanRequest.getAmount(), "amount");
+
+    RestApiRequest<Long> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("currency", applyLoanRequest.getCurrency())
+        .putToPost("amount", applyLoanRequest.getAmount());
+    request.request = createRequestByPostWithSignature("/v1/cross-margin/orders", builder);
+    request.jsonParser = (jsonWrapper -> {
+      long id;
+      id = jsonWrapper.getLong("data");
+      return id;
+    });
+    return request;
+  }
+
+  RestApiRequest<Long> repayCrossMarginLoan(CrossMarginRepayLoanRequest repayLoanRequest) {
+
+    InputChecker.checker()
+        .shouldNotNull(repayLoanRequest.getOrderId(),"order-id")
+        .shouldNotNull(repayLoanRequest, "amount");
+    RestApiRequest<Long> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("amount", repayLoanRequest.getAmount());
+    String url = String.format("/v1/cross-margin/orders/%d/repay", repayLoanRequest.getOrderId());
+
+    request.request = createRequestByPostWithSignature(url, builder);
+    request.jsonParser = (jsonWrapper -> {
+      return 1L;
+    });
+    return request;
+  }
+
+
+  RestApiRequest<List<CrossMarginLoanOrder>> getCrossMarginLoanHistory(CrossMarginLoanOrderRequest loanOrderRequest) {
+
+    RestApiRequest<List<CrossMarginLoanOrder>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", loanOrderRequest.getCurrency())
+        .putToUrl("start-date", loanOrderRequest.getStartDate(), "yyyy-MM-dd")
+        .putToUrl("end-date", loanOrderRequest.getEndDate(), "yyyy-MM-dd")
+        .putToUrl("states", loanOrderRequest.getState())
+        .putToUrl("from", loanOrderRequest.getFrom())
+        .putToUrl("size", loanOrderRequest.getSize())
+        .putToUrl("direct", loanOrderRequest.getDirection());
+
+    request.request = createRequestByGetWithSignature("/v1/margin/loan-orders", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<CrossMarginLoanOrder> loans = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+
+        CrossMarginLoanOrder order = new CrossMarginLoanOrder();
+        order.setId(item.getLong("id"));
+        order.setAccountId(item.getLong("account-id"));
+        order.setUserId(item.getLongOrDefault("user-id",0));
+        order.setCurrency(item.getStringOrDefault("currency",null));
+        order.setLoanBalance(item.getBigDecimalOrDefault("loan-balance",null));
+        order.setLoanAmount(item.getBigDecimalOrDefault("loan-amount",null));
+        order.setInterestBalance(item.getBigDecimalOrDefault("interest-balance",null));
+        order.setInterestAmount(item.getBigDecimalOrDefault("interest-amount",null));
+        order.setFilledPoints(item.getBigDecimalOrDefault("filled-points",null));
+        order.setFilledHt(item.getBigDecimalOrDefault("filled-ht",null));
+        order.setState(item.getStringOrDefault("state",null));
+        order.setAccruedAt(item.getLongOrDefault("accrued-at",0));
+        order.setCreatedAt(item.getLong("created-at"));
+
+        loans.add(order);
+      });
+      return loans;
+    });
+    return request;
+
+  }
+
+
+
+  RestApiRequest<CrossMarginAccount> getCrossMarginAccount() {
+    RestApiRequest<CrossMarginAccount> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    request.request = createRequestByGetWithSignature("/v1/cross-margin/accounts/balance", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<CrossMarginAccount> accountList = new LinkedList<>();
+      JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
+
+        CrossMarginAccount account = new CrossMarginAccount();
+        account.setId(itemInData.getLong("id"));
+        account.setType(itemInData.getStringOrDefault("type",null));
+        account.setState(itemInData.getStringOrDefault("state",null));
+        account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate",null));
+        account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum",null));
+        account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum",null));
+        JsonWrapperArray array = itemInData.getJsonArray("list");
+        List<Balance> balanceList = new ArrayList<>();
+        array.forEach(balanceItem->{
+          Balance balance = new Balance();
+          balance.setCurrency(balanceItem.getStringOrDefault("currency",null));
+          balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+          balance.setBalance(balanceItem.getBigDecimalOrDefault("balance",null));
+          balanceList.add(balance);
+        });
+        account.setList(balanceList);
+
+      return account;
+    });
+    return request;
+  }
+
+
 
   RestApiRequest<Long> createOrder(NewOrderRequest newOrderRequest) {
     InputChecker.checker().checkSymbol(newOrderRequest.getSymbol())

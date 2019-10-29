@@ -8,6 +8,8 @@ import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
@@ -34,6 +36,10 @@ import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
+import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
+import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
+import com.huobi.client.model.request.CrossMarginTransferRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -240,6 +246,41 @@ public interface SyncRequestClient {
    * @return The list of the margin loan records, see {@link Loan}
    */
   List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest);
+
+
+  /**
+   * This endpoint transfer specific asset `from spot trading account to cross margin account` or `from cross margin account to spot trading account`.
+   * @param request
+   * @return
+   */
+  long transferCrossMargin(CrossMarginTransferRequest request);
+
+  /**
+   * This endpoint place an order to apply a margin loan.
+   * @param request
+   * @return
+   */
+  long applyCrossMarginLoan(CrossMarginApplyLoanRequest request);
+
+  /**
+   * This endpoint repays margin loan with you asset in your margin account.
+   * @param repayLoanRequest
+   */
+  void repayCrossMarginLoan(CrossMarginRepayLoanRequest repayLoanRequest);
+
+  /**
+   * This endpoint returns margin orders based on a specific searching criteria.
+   * @param request
+   * @return
+   */
+  List<CrossMarginLoanOrder> getCrossMarginLoanHistory(CrossMarginLoanOrderRequest request);
+
+  /**
+   * This endpoint returns the balance of the margin loan account.
+   * @return
+   */
+  CrossMarginAccount getCrossMarginAccount();
+
 
   /**
    * Get last trade, best bid and best ask of a symbol.

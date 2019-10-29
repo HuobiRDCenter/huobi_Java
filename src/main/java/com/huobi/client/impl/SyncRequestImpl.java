@@ -9,6 +9,8 @@ import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
@@ -34,6 +36,10 @@ import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
+import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
+import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
+import com.huobi.client.model.request.CrossMarginTransferRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -195,6 +201,28 @@ public class SyncRequestImpl implements SyncRequestClient {
   public List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest) {
     return RestApiInvoker.callSync(requestImpl.getLoan(loanOrderRequest));
   }
+
+  @Override
+  public long transferCrossMargin(CrossMarginTransferRequest request) {
+    return RestApiInvoker.callSync(requestImpl.transferCrossMargin(request));
+  }
+
+  public long applyCrossMarginLoan(CrossMarginApplyLoanRequest request) {
+    return RestApiInvoker.callSync(requestImpl.applyCrossMarginLoan(request));
+  }
+
+  public void repayCrossMarginLoan(CrossMarginRepayLoanRequest request) {
+    RestApiInvoker.callSync(requestImpl.repayCrossMarginLoan(request));
+  }
+
+  public List<CrossMarginLoanOrder> getCrossMarginLoanHistory(CrossMarginLoanOrderRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginLoanHistory(request));
+  }
+
+  public CrossMarginAccount getCrossMarginAccount() {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginAccount());
+  }
+
 
   @Override
   public List<Account> getAccountBalance() {
