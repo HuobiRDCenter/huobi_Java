@@ -43,35 +43,27 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 
 - 枚举：
 
-  - lookup方法中找不到对应的枚举时不再抛异常，而是返回`sdk_not_support`，在各个枚举中加入`sdk_not_support`
-
   - LoanOrderStates 缺少`failed`字段
 
-  - OrderState增加以下缺失字段
+  - OrderState增加如下值
 
     ```
-    pre_submmitted;
+    pre-submmitted;
     submitting;
     failed;
-    place_timeout;
+    place-timeout;
     canceling;  
     ```
 
-  - AccountType增加以下缺失字段
+  - AccountType增加如下值
     ```
   minepool;
     etf;
     agency;
-    super_margin;
+    super-margin;
     ```
   
 - 方法重载
-
-  - RequestClient类重载以下方法，增加subtype字段
-
-  ```
-  getAccountBalance 
-  ```
 
   - User类重载以下方法，增加subtype字段
 
