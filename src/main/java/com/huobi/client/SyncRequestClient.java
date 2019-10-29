@@ -2,12 +2,15 @@ package com.huobi.client;
 
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
@@ -23,9 +26,11 @@ import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
@@ -141,6 +146,13 @@ public interface SyncRequestClient {
   List<String> getCurrencies();
 
   /**
+   * Get the trading currency information detail in huobi.
+   * @param currency The name of currency
+   * @param authorizedUser if user authorized
+   * @return
+   */
+  List<Currency> getCurrencyInfo(String currency, Boolean authorizedUser);
+  /**
    * Get all the trading symbol supported in Huobi.
    * @return The information of trading symbol .
    */
@@ -254,6 +266,14 @@ public interface SyncRequestClient {
 
   Account getAccountBalance(AccountType accountType, String symbol);
 
+
+  /**
+   * Get account flow
+   * @param request account history request
+   * @return
+   */
+  List<AccountHistory> getAccountHistory(AccountHistoryRequest request);
+
   /**
    * Make an order in huobi.
    *
@@ -331,6 +351,20 @@ public interface SyncRequestClient {
    * @return The list of match result.
    */
   List<MatchResult> getMatchResults(MatchResultRequest matchResultRequest);
+
+  /**
+   * Get the deposit address of currency.
+   * @param currency The currency, like "btc". (mandatory)
+   * @return
+   */
+  List<DepositAddress> getDepositAddress(String currency);
+
+  /**
+   * Get the withdraw quota information.
+   * @param currency The currency, like "btc". (mandatory)
+   * @return
+   */
+  WithdrawQuota getWithdrawQuota(String currency);
 
   /**
    * Submit a request to withdraw some asset from an account.

@@ -7,12 +7,15 @@ import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.impl.utils.UrlParamsBuilder;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.DepthEntry;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
@@ -27,6 +30,7 @@ import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.UnitPrice;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountState;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.BalanceType;
@@ -42,6 +46,7 @@ import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.enums.WithdrawState;
+import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
@@ -58,6 +63,7 @@ import com.huobi.client.model.request.WithdrawRequest;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -203,12 +209,48 @@ class RestApiRequestImpl {
         account.setId(item.getLong("id"));
         account.setType(AccountType.lookup(item.getString("type")));
         account.setState(AccountState.lookup(item.getString("state")));
-        account.setSubtype(item.getStringOrDefault("subtype",""));
+        account.setSubtype(item.getStringOrDefault("subtype", ""));
         res.add(account);
       });
       return res;
     });
     return request;
+  }
+
+  RestApiRequest<List<AccountHistory>> getAccountHistory(AccountHistoryRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getAccountId(),"account-id");
+
+    RestApiRequest<List<AccountHistory>> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("account-id",request.getAccountId())
+        .putToUrl("currency",request.getCurrency())
+        .putToUrl("transact-types",request.getTypeString())
+        .putToUrl("start-time",request.getStartTime())
+        .putToUrl("end-time",request.getEndTime())
+        .putToUrl("sort",request.getSort() == null ? null : request.getSort().getCode())
+        .putToUrl("size",request.getSize())
+        ;
+    restApiRequest.request = createRequestByGetWithSignature("/v1/account/history", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      List<AccountHistory> res = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        AccountHistory history = new AccountHistory();
+        history.setAccountId(item.getLongOrDefault("account-id",0L));
+        history.setCurrency(item.getStringOrDefault("currency",null));
+        history.setTransactAmt(item.getBigDecimalOrDefault("transact-amt",null));
+        history.setTransactType(item.getStringOrDefault("transact-type",null));
+        history.setRecordId(item.getLongOrDefault("record-id",0L));
+        history.setAvailBalance(item.getBigDecimalOrDefault("avail-balance",null));
+        history.setAcctBalance(item.getBigDecimalOrDefault("acct-balance",null));
+        history.setTransactTime(item.getLongOrDefault("transact-time",0L));
+        res.add(history);
+      });
+      return res;
+    });
+    return restApiRequest;
   }
 
   RestApiRequest<PriceDepth> getPriceDepth(String symbol, Integer size) {
@@ -364,6 +406,26 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEachAsString(stringList::add);
       return stringList;
+    });
+    return request;
+  }
+
+  RestApiRequest<List<Currency>> getCurrencyInfo(String currency, Boolean authorizedUser) {
+    RestApiRequest<List<Currency>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", currency)
+        .putToUrl("authorizedUser", authorizedUser == null ? "true" : authorizedUser.toString());
+    request.request = createRequestByGet("/v2/reference/currencies", builder);
+    request.jsonParser = (jsonWrapper -> {
+
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<Currency> list = new ArrayList<>();
+      dataArray.forEach(item -> {
+        Currency cu = item.getJson().toJavaObject(Currency.class);
+        list.add(cu);
+      });
+
+      return list;
     });
     return request;
   }
@@ -634,7 +696,7 @@ class RestApiRequestImpl {
       InputChecker.checker()
           .shouldNull(newOrderRequest.getPrice(), "Price");
     }
-    Account account = AccountsInfoMap.getUser(apiKey).getAccount(newOrderRequest.getAccountType(),newOrderRequest.getSymbol());
+    Account account = AccountsInfoMap.getUser(apiKey).getAccount(newOrderRequest.getAccountType(), newOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
@@ -669,7 +731,7 @@ class RestApiRequestImpl {
         .shouldNotNull(openOrderRequest.getAccountType(), "accountType")
         .checkRange(openOrderRequest.getSize(), 1, 2000, "size");
     AccountType accountType = openOrderRequest.getAccountType();
-    Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType,openOrderRequest.getSymbol());
+    Account account = AccountsInfoMap.getUser(apiKey).getAccount(accountType, openOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
@@ -754,7 +816,7 @@ class RestApiRequestImpl {
         .checkSymbol(cancelOpenOrderRequest.getSymbol())
         .shouldNotNull(cancelOpenOrderRequest.getAccountType(), "AccountType");
     Account account = AccountsInfoMap.getUser(apiKey)
-        .getAccount(cancelOpenOrderRequest.getAccountType(),cancelOpenOrderRequest.getSymbol());
+        .getAccount(cancelOpenOrderRequest.getAccountType(), cancelOpenOrderRequest.getSymbol());
     if (account == null) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
     }
@@ -821,6 +883,44 @@ class RestApiRequestImpl {
         .putToUrl("size", matchResultRequest.getSize());
     request.request = createRequestByGetWithSignature("/v1/order/matchresults", builder);
     request.jsonParser = getMatchResultListParser();
+    return request;
+  }
+
+
+  RestApiRequest<List<DepositAddress>> getDepositAddress(String currency) {
+    InputChecker.checker()
+        .checkCurrency(currency);
+    RestApiRequest<List<DepositAddress>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", currency);
+
+    request.request = createRequestByGetWithSignature("/v2/account/deposit/address", builder);
+    request.jsonParser = (jsonWrapper -> {
+
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      List<DepositAddress> addressList = new ArrayList<>();
+      dataArray.forEach(item ->{
+        DepositAddress address = item.getJson().toJavaObject(DepositAddress.class);
+        addressList.add(address);
+      });
+      return addressList;
+    });
+    return request;
+  }
+
+
+  RestApiRequest<WithdrawQuota> getWithdrawQuota(String currency) {
+    InputChecker.checker()
+        .checkCurrency(currency);
+    RestApiRequest<WithdrawQuota> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", currency);
+
+    request.request = createRequestByGetWithSignature("/v2/account/withdraw/quota", builder);
+    request.jsonParser = (jsonWrapper -> {
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      return data.getJson().toJavaObject(WithdrawQuota.class);
+    });
     return request;
   }
 

@@ -3,12 +3,15 @@ package com.huobi.client.impl;
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
@@ -23,9 +26,11 @@ import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
@@ -139,6 +144,9 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getCurrencies());
   }
 
+  public List<Currency> getCurrencyInfo(String currency, Boolean authorizedUser) {
+    return RestApiInvoker.callSync(requestImpl.getCurrencyInfo(currency,authorizedUser));
+  }
 
   @Override
   public BestQuote getBestQuote(String symbol) {
@@ -231,6 +239,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public List<AccountHistory> getAccountHistory(AccountHistoryRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getAccountHistory(request));
+  }
+
+  @Override
   public Map<String, TradeStatistics> getTickers() {
     return RestApiInvoker.callSync(requestImpl.getTickers());
   }
@@ -284,6 +297,16 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<MatchResult> getMatchResults(MatchResultRequest matchResultRequest) {
     return RestApiInvoker.callSync(requestImpl.getMatchResults(matchResultRequest));
+  }
+
+  @Override
+  public List<DepositAddress> getDepositAddress(String currency) {
+    return RestApiInvoker.callSync(requestImpl.getDepositAddress(currency));
+  }
+
+  @Override
+  public WithdrawQuota getWithdrawQuota(String currency) {
+    return RestApiInvoker.callSync(requestImpl.getWithdrawQuota(currency));
   }
 
   @Override
