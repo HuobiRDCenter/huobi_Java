@@ -8,6 +8,7 @@ import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
@@ -42,8 +43,8 @@ public class WalletExamples {
       System.out.println("Deposit Address:" + JSON.toJSONString(address));
     });
 
-    WithdrawQuota withdrawQuota = syncRequestClient.getWithdrawQuota(currency);
 
+    WithdrawQuota withdrawQuota = syncRequestClient.getWithdrawQuota(currency);
     System.out.println("==============" + withdrawQuota.getCurrency() + "===============");
     withdrawQuota.getChains().forEach(chainQuota -> {
       System.out.println("Chain Quota :" + JSON.toJSONString(chainQuota));
@@ -62,9 +63,17 @@ public class WalletExamples {
     /**
      * Get withdraw history
      */
-    List<Withdraw> list = syncRequestClient.getWithdrawHistory(currency, 0, 10);
-    list.forEach(withdraw -> {
-      System.out.println("Withdraw History:" + withdraw.toString());
+    List<Withdraw> withdrawList = syncRequestClient.getWithdrawHistory(currency, 0, 10);
+    withdrawList.forEach(withdraw -> {
+      System.out.println("Withdraw History:" + JSON.toJSONString(withdraw));
+    });
+
+    /**
+     * Get Deposit history
+     */
+    List<Deposit> depositList = syncRequestClient.getDepositHistory(currency,0,10);
+    depositList.forEach(deposit -> {
+      System.out.println("Deposit History:" + JSON.toJSONString(deposit));
     });
   }
 

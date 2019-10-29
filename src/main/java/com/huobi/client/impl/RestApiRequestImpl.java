@@ -312,6 +312,7 @@ class RestApiRequestImpl {
         JsonWrapperArray dataArrayIn = item.getJsonArray("data");
         dataArrayIn.forEach((itemIn) -> {
           Trade trade = new Trade();
+          trade.setUniqueTradeId(item.getLongOrDefault("trade-id",0));
           trade.setPrice(itemIn.getBigDecimal("price"));
           trade.setAmount(itemIn.getBigDecimal("amount"));
           trade.setTradeId(itemIn.getString("id"));
@@ -338,6 +339,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = tick.getJsonArray("data");
       dataArray.forEach((item) -> {
         Trade trade = new Trade();
+        trade.setUniqueTradeId(item.getLongOrDefault("trade-id",0));
         trade.setPrice(item.getBigDecimal("price"));
         trade.setAmount(item.getBigDecimal("amount"));
         trade.setTradeId(item.getString("id"));
@@ -482,6 +484,7 @@ class RestApiRequestImpl {
         Withdraw withdraw = new Withdraw();
         withdraw.setId(item.getLong("id"));
         withdraw.setCurrency(item.getString("currency"));
+        withdraw.setChain(item.getStringOrDefault("chain",null));
         withdraw.setTxHash(item.getString("tx-hash"));
         withdraw.setAmount(item.getBigDecimal("amount"));
         withdraw.setAddress(item.getString("address"));
@@ -522,6 +525,7 @@ class RestApiRequestImpl {
         Deposit deposit = new Deposit();
         deposit.setId(item.getLong("id"));
         deposit.setCurrency(item.getString("currency"));
+        deposit.setChain(item.getStringOrDefault("chain",null));
         deposit.setTxHash(item.getString("tx-hash"));
         deposit.setAmount(item.getBigDecimal("amount"));
         deposit.setAddress(item.getString("address"));
@@ -670,13 +674,17 @@ class RestApiRequestImpl {
         loan.setCurrency(item.getString("currency"));
         loan.setId(item.getLong("id"));
         loan.setState(LoanOrderStates.lookup(item.getString("state")));
-        loan.setAccountType(
-            AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
+        loan.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         loan.setUserId(item.getLong("user-id"));
-        loan.setAccruedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("accrued-at")));
-        loan.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-point",null));
+        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-coin",null));
+        loan.setDeductCurrency(item.getStringOrDefault("deduct-currency",null));
+        loan.setDeductAmount(item.getBigDecimalOrDefault("deduct-amount",null));
+        loan.setDeductRate(item.getBigDecimalOrDefault("deduct-rate",null));
+        loan.setHourInterestRate(item.getBigDecimalOrDefault("hour-interest-rate",null));
+        loan.setDayInterestRate(item.getBigDecimalOrDefault("day-interest-rate",null));
+        loan.setAccruedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("accrued-at")));
+        loan.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
         loans.add(loan);
       });
       return loans;
