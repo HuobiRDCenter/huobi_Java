@@ -51,6 +51,13 @@ abstract class RestApiInvoker {
                 "[Executing] " + err_code + ": " + err_msg);
           }
         }
+      } else if (json.containKey("code")) {
+
+        int code = json.getInteger("code");
+        if (code != 200) {
+          String message = json.getString("message");
+          throw new HuobiApiException(HuobiApiException.EXEC_ERROR, "[Executing] " + code + ": " + message);
+        }
       } else {
         throw new HuobiApiException(
             HuobiApiException.RUNTIME_ERROR, "[Invoking] Status cannot be found in response.");

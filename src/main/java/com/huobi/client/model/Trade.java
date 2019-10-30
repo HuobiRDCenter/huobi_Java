@@ -8,11 +8,16 @@ import java.math.BigDecimal;
  */
 public class Trade {
 
+  private Long uniqueTradeId;
   private String tradeId;
   private long timestamp;
   private BigDecimal price;
   private BigDecimal amount;
   private TradeDirection direction;
+
+  public Long getUniqueTradeId() {
+    return uniqueTradeId;
+  }
 
   /**
    * Get the unique trade id of this trade.
@@ -57,6 +62,10 @@ public class Trade {
    */
   public TradeDirection getDirection() {
     return direction;
+  }
+
+  public void setUniqueTradeId(Long uniqueTradeId) {
+    this.uniqueTradeId = uniqueTradeId;
   }
 
   public void setTradeId(String tradeId) {

@@ -2,8 +2,11 @@ package com.huobi.client.examples;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+
 import com.huobi.client.AsyncRequestClient;
 import com.huobi.client.SyncRequestClient;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.Symbol;
 
@@ -30,6 +33,16 @@ public class GetExchangeInfo {
     List<String> currencyList = syncRequestClient.getCurrencies();
     currencyList.forEach(currency ->{
       System.out.println(currency);
+    });
+
+    List<Currency> currencyInfoList = syncRequestClient.getCurrencyInfo(null,null);
+    currencyInfoList.forEach(currency -> {
+      System.out.println("Currency:"+currency.getCurrency());
+      System.out.println("Status:"+currency.getInstStatus());
+      currency.getChains().forEach(chain -> {
+        System.out.println(JSON.toJSONString(chain));
+      });
+      System.out.println();
     });
 
     // Asynchronization mode

@@ -2,12 +2,17 @@ package com.huobi.client;
 
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanOrder;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
@@ -23,12 +28,18 @@ import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
+import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
+import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
+import com.huobi.client.model.request.CrossMarginTransferRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -141,6 +152,13 @@ public interface SyncRequestClient {
   List<String> getCurrencies();
 
   /**
+   * Get the trading currency information detail in huobi.
+   * @param currency The name of currency
+   * @param authorizedUser if user authorized
+   * @return
+   */
+  List<Currency> getCurrencyInfo(String currency, Boolean authorizedUser);
+  /**
    * Get all the trading symbol supported in Huobi.
    * @return The information of trading symbol .
    */
@@ -229,6 +247,41 @@ public interface SyncRequestClient {
    */
   List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest);
 
+
+  /**
+   * This endpoint transfer specific asset `from spot trading account to cross margin account` or `from cross margin account to spot trading account`.
+   * @param request
+   * @return
+   */
+  long transferCrossMargin(CrossMarginTransferRequest request);
+
+  /**
+   * This endpoint place an order to apply a margin loan.
+   * @param request
+   * @return
+   */
+  long applyCrossMarginLoan(CrossMarginApplyLoanRequest request);
+
+  /**
+   * This endpoint repays margin loan with you asset in your margin account.
+   * @param repayLoanRequest
+   */
+  void repayCrossMarginLoan(CrossMarginRepayLoanRequest repayLoanRequest);
+
+  /**
+   * This endpoint returns margin orders based on a specific searching criteria.
+   * @param request
+   * @return
+   */
+  List<CrossMarginLoanOrder> getCrossMarginLoanHistory(CrossMarginLoanOrderRequest request);
+
+  /**
+   * This endpoint returns the balance of the margin loan account.
+   * @return
+   */
+  CrossMarginAccount getCrossMarginAccount();
+
+
   /**
    * Get last trade, best bid and best ask of a symbol.
    *
@@ -253,6 +306,14 @@ public interface SyncRequestClient {
   Account getAccountBalance(AccountType accountType);
 
   Account getAccountBalance(AccountType accountType, String symbol);
+
+
+  /**
+   * Get account flow
+   * @param request account history request
+   * @return
+   */
+  List<AccountHistory> getAccountHistory(AccountHistoryRequest request);
 
   /**
    * Make an order in huobi.
@@ -331,6 +392,20 @@ public interface SyncRequestClient {
    * @return The list of match result.
    */
   List<MatchResult> getMatchResults(MatchResultRequest matchResultRequest);
+
+  /**
+   * Get the deposit address of currency.
+   * @param currency The currency, like "btc". (mandatory)
+   * @return
+   */
+  List<DepositAddress> getDepositAddress(String currency);
+
+  /**
+   * Get the withdraw quota information.
+   * @param currency The currency, like "btc". (mandatory)
+   * @return
+   */
+  WithdrawQuota getWithdrawQuota(String currency);
 
   /**
    * Submit a request to withdraw some asset from an account.

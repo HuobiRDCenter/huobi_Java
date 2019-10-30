@@ -3,12 +3,17 @@ package com.huobi.client.impl;
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanOrder;
+import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
@@ -23,12 +28,18 @@ import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
+import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
+import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
+import com.huobi.client.model.request.CrossMarginTransferRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -139,6 +150,9 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getCurrencies());
   }
 
+  public List<Currency> getCurrencyInfo(String currency, Boolean authorizedUser) {
+    return RestApiInvoker.callSync(requestImpl.getCurrencyInfo(currency,authorizedUser));
+  }
 
   @Override
   public BestQuote getBestQuote(String symbol) {
@@ -189,6 +203,28 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public long transferCrossMargin(CrossMarginTransferRequest request) {
+    return RestApiInvoker.callSync(requestImpl.transferCrossMargin(request));
+  }
+
+  public long applyCrossMarginLoan(CrossMarginApplyLoanRequest request) {
+    return RestApiInvoker.callSync(requestImpl.applyCrossMarginLoan(request));
+  }
+
+  public void repayCrossMarginLoan(CrossMarginRepayLoanRequest request) {
+    RestApiInvoker.callSync(requestImpl.repayCrossMarginLoan(request));
+  }
+
+  public List<CrossMarginLoanOrder> getCrossMarginLoanHistory(CrossMarginLoanOrderRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginLoanHistory(request));
+  }
+
+  public CrossMarginAccount getCrossMarginAccount() {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginAccount());
+  }
+
+
+  @Override
   public List<Account> getAccountBalance() {
     List<Account> accounts = RestApiInvoker.callSync(requestImpl.getAccounts());
     for (Account account : accounts) {
@@ -228,6 +264,11 @@ public class SyncRequestImpl implements SyncRequestClient {
     }
     return null;
 
+  }
+
+  @Override
+  public List<AccountHistory> getAccountHistory(AccountHistoryRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getAccountHistory(request));
   }
 
   @Override
@@ -284,6 +325,16 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<MatchResult> getMatchResults(MatchResultRequest matchResultRequest) {
     return RestApiInvoker.callSync(requestImpl.getMatchResults(matchResultRequest));
+  }
+
+  @Override
+  public List<DepositAddress> getDepositAddress(String currency) {
+    return RestApiInvoker.callSync(requestImpl.getDepositAddress(currency));
+  }
+
+  @Override
+  public WithdrawQuota getWithdrawQuota(String currency) {
+    return RestApiInvoker.callSync(requestImpl.getWithdrawQuota(currency));
   }
 
   @Override

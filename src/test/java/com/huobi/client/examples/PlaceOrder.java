@@ -27,7 +27,7 @@ public class PlaceOrder {
     String symbol = "htusdt";
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(
-        Constants.API_KEY,Constants.SECRET_KEY);
+        Constants.API_KEY, Constants.SECRET_KEY);
 
     // General Place Order
     String clientOrderId = "T" + System.nanoTime();
@@ -90,6 +90,42 @@ public class PlaceOrder {
     System.out.println("--- The new stop limit order created ---");
     System.out.println("--- " + sellStopLimitId + " ---");
 
+    String marginSymbol = "xrpusdt";
+    NewOrderRequest marginOrderRequest = new NewOrderRequest(
+        marginSymbol,
+        AccountType.MARGIN,
+        OrderType.BUY_LIMIT,
+        BigDecimal.valueOf(4),
+        BigDecimal.valueOf(0.28),
+        null,
+        null,
+        null
+    );
+
+    Long marginOrderId = syncRequestClient.createOrder(marginOrderRequest);
+    System.out.println("----------Margin order id:" + marginOrderId + "---------------");
+
+    syncRequestClient.cancelOrder(marginSymbol,marginOrderId);
+    System.out.println("--------------Margin order cancel finish----------------");
+
+    String superMarginSymbol = "xrpusdt";
+    NewOrderRequest superMarginOrderRequest = new NewOrderRequest(
+        superMarginSymbol,
+        AccountType.SUPER_MARGIN,
+        OrderType.BUY_LIMIT,
+        BigDecimal.valueOf(4),
+        BigDecimal.valueOf(0.28),
+        null,
+        null,
+        null
+    );
+
+    Long superMarginOrderId = syncRequestClient.createOrder(superMarginOrderRequest);
+    System.out.println("----------Super Margin order id:" + superMarginOrderId + "---------------");
+
+    syncRequestClient.cancelOrder(superMarginSymbol,superMarginOrderId);
+    System.out.println("--------------Super Margin order cancel finish----------------");
+
     // Get the order detail use order id
     Order orderInfo = syncRequestClient.getOrder(symbol, o1);
     System.out.println("GetById Id: " + orderInfo.getOrderId());
@@ -107,16 +143,15 @@ public class PlaceOrder {
     System.out.println("GetByClientOrderId Price: " + orderInfo1.getPrice());
 
     // Get the order match result use order id
-    List<MatchResult> matchResults = syncRequestClient.getMatchResults(symbol,marketBuyId);
+    List<MatchResult> matchResults = syncRequestClient.getMatchResults(symbol, marketBuyId);
     matchResults.forEach(matchResult -> {
-      System.out.println("Order Match Result : "+ matchResult.toString());
+      System.out.println("Order Match Result : " + matchResult.toString());
     });
 
     matchResults = syncRequestClient.getMatchResults(new MatchResultRequest(symbol));
     matchResults.forEach(matchResult -> {
-      System.out.println("Match Result list : "+ matchResult.toString());
+      System.out.println("Match Result list : " + matchResult.toString());
     });
-
 
     // Cancel order use order id
     syncRequestClient.cancelOrder(symbol, o1);
@@ -129,7 +164,7 @@ public class PlaceOrder {
     List<Order> openOrderList = syncRequestClient.getOpenOrders(new OpenOrderRequest(symbol, AccountType.SPOT));
 
     openOrderList.forEach(order -> {
-      System.out.println("Open Order :: "+order.toString());
+      System.out.println("Open Order :: " + order.toString());
       cancelOrderList.add(order.getOrderId());
     });
 
@@ -138,11 +173,10 @@ public class PlaceOrder {
       syncRequestClient.cancelOrders(symbol, cancelOrderList);
     }
 
-
     // Get all the orders
-    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol,OrderState.FILLED));
+    List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol, OrderState.FILLED));
     orderList.forEach(order -> {
-      System.out.println("Orders :: "+ order.toString());
+      System.out.println("Orders :: " + order.toString());
     });
 
     System.out.println("=================");
@@ -158,11 +192,10 @@ public class PlaceOrder {
     typeList.add(OrderType.SELL_MARKET);
 
     // Get all the orders
-    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol,stateList,typeList,null,null,null,null,null));
+    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol, stateList, typeList, null, null, null, null, null));
     orderList1.forEach(order -> {
-      System.out.println("Orders :: "+ order.toString());
+      System.out.println("Orders :: " + order.toString());
     });
-
 
     // Get order history
     List<Order> orderHistoryList = syncRequestClient.getOrderHistory(new OrdersHistoryRequest(symbol));
@@ -173,7 +206,7 @@ public class PlaceOrder {
     // Get fee rate about symbol
     List<FeeRate> feeRateList = syncRequestClient.getFeeRate("htusdt,ethusdt");
     feeRateList.forEach(feeRate -> {
-      System.out.println("FeeRate : "+ feeRate.toString());
+      System.out.println("FeeRate : " + feeRate.toString());
     });
   }
 }

@@ -196,6 +196,7 @@ class WebsocketRequestImpl {
       List<Trade> trades = new LinkedList<>();
       dataArray.forEach((item) -> {
         Trade trade = new Trade();
+        trade.setUniqueTradeId(item.getLongOrDefault("trade-id",0));
         trade.setAmount(item.getBigDecimal("amount"));
         trade.setPrice(item.getBigDecimal("price"));
         trade.setTradeId(item.getString("id"));

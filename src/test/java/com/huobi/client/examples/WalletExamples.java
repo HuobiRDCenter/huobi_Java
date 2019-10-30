@@ -7,8 +7,14 @@ import com.alibaba.fastjson.JSON;
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.Account;
+import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.Deposit;
+import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.QuerySort;
+import com.huobi.client.model.request.AccountHistoryRequest;
 
 
 public class WalletExamples {
@@ -16,30 +22,58 @@ public class WalletExamples {
   public static void main(String[] args) {
     String currency = "usdt";
 
-    SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY,Constants.SECRET_KEY);
+    SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
     List<Account> accountList = syncRequestClient.getAccountBalance();
     accountList.forEach(account -> {
       System.out.println(JSON.toJSONString(account));
     });
 
-
     Account spotAccount = syncRequestClient.getAccountBalance(AccountType.SPOT);
     System.out.println(JSON.toJSONString(spotAccount));
 
-    Account marginAccount = syncRequestClient.getAccountBalance(AccountType.MARGIN,"xrpusdt");
+    Account marginAccount = syncRequestClient.getAccountBalance(AccountType.MARGIN, "xrpusdt");
     System.out.println(JSON.toJSONString(marginAccount));
 
     Account superMarginAccount = syncRequestClient.getAccountBalance(AccountType.SUPER_MARGIN);
     System.out.println(JSON.toJSONString(superMarginAccount));
 
+    List<DepositAddress> addressList = syncRequestClient.getDepositAddress(currency);
+    addressList.forEach(address -> {
+      System.out.println("Deposit Address:" + JSON.toJSONString(address));
+    });
+
+
+    WithdrawQuota withdrawQuota = syncRequestClient.getWithdrawQuota(currency);
+    System.out.println("==============" + withdrawQuota.getCurrency() + "===============");
+    withdrawQuota.getChains().forEach(chainQuota -> {
+      System.out.println("Chain Quota :" + JSON.toJSONString(chainQuota));
+    });
+
+
+    List<AccountHistory> accountHistoryList = syncRequestClient.getAccountHistory(AccountHistoryRequest.builder()
+        .accountId(290082L)
+        .build());
+
+    accountHistoryList.forEach(accountHistory -> {
+      System.out.println("Account History:"+JSON.toJSONString(accountHistory));
+    });
+
 
     /**
      * Get withdraw history
      */
-    List<Withdraw> list = syncRequestClient.getWithdrawHistory(currency,0,10);
-    list.forEach(withdraw -> {
-      System.out.println("Withdraw History:"+withdraw.toString());
+    List<Withdraw> withdrawList = syncRequestClient.getWithdrawHistory(currency, 0, 10);
+    withdrawList.forEach(withdraw -> {
+      System.out.println("Withdraw History:" + JSON.toJSONString(withdraw));
+    });
+
+    /**
+     * Get Deposit history
+     */
+    List<Deposit> depositList = syncRequestClient.getDepositHistory(currency,0,10);
+    depositList.forEach(deposit -> {
+      System.out.println("Deposit History:" + JSON.toJSONString(deposit));
     });
   }
 
