@@ -1,13 +1,9 @@
 package com.huobi.client.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  *  The aggregation depth type.
  */
-@Getter
-@AllArgsConstructor
 public enum  DepthStep {
 
   /**
@@ -23,4 +19,11 @@ public enum  DepthStep {
 
   private final String step;
 
+  DepthStep(String step) {
+    this.step = step;
+  }
+
+  public String getStep() {
+    return step;
+  }
 }

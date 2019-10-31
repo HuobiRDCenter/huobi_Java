@@ -2,11 +2,6 @@ package com.huobi.client.model.event;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import com.huobi.client.model.Account;
 
@@ -14,15 +9,25 @@ import com.huobi.client.model.Account;
  * The account list event information received by request of account list.
  */
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class AccountListEvent {
 
   private Long timestamp;
 
   private List<Account> accountList;
 
+  public Long getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(Long timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public List<Account> getAccountList() {
+    return accountList;
+  }
+
+  public void setAccountList(List<Account> accountList) {
+    this.accountList = accountList;
+  }
 }

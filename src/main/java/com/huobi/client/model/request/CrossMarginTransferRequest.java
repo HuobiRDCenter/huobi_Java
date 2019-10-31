@@ -2,19 +2,8 @@ package com.huobi.client.model.request;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 import com.huobi.client.model.enums.CrossMarginTransferType;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class CrossMarginTransferRequest {
 
   /**
@@ -32,4 +21,27 @@ public class CrossMarginTransferRequest {
    */
   private BigDecimal amount;
 
+  public CrossMarginTransferType getType() {
+    return type;
+  }
+
+  public void setType(CrossMarginTransferType type) {
+    this.type = type;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
+
+  public BigDecimal getAmount() {
+    return amount;
+  }
+
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
+  }
 }

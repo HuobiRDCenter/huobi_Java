@@ -1,10 +1,5 @@
 package com.huobi.client.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum  SymbolState {
 
   /**
@@ -15,6 +10,14 @@ public enum  SymbolState {
   SUSPEND("suspend")
   ;
   private final String state;
+
+  SymbolState(String state) {
+    this.state = state;
+  }
+
+  public String getState() {
+    return state;
+  }
 
   public static SymbolState find(String state) {
     for (SymbolState st : SymbolState.values()) {

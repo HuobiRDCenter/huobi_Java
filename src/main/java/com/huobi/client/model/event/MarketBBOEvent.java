@@ -1,10 +1,5 @@
 package com.huobi.client.model.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import com.huobi.client.impl.RestApiJsonParser;
 import com.huobi.client.impl.utils.JsonWrapper;
@@ -15,11 +10,6 @@ import com.huobi.client.model.MarketBBO;
  * The Market BBO data received by request of market bbo.
  */
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class MarketBBOEvent {
 
   private String ch;
@@ -28,6 +18,30 @@ public class MarketBBOEvent {
 
   private MarketBBO data;
 
+  public String getCh() {
+    return ch;
+  }
+
+  public void setCh(String ch) {
+    this.ch = ch;
+  }
+
+  public Long getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(Long timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public MarketBBO getData() {
+    return data;
+  }
+
+  public void setData(MarketBBO data) {
+    this.data = data;
+  }
+
   public static RestApiJsonParser<MarketBBOEvent> getParser(){
     return (jsonWrapper) -> {
       return parse(jsonWrapper);
@@ -35,11 +49,11 @@ public class MarketBBOEvent {
   }
 
   public static MarketBBOEvent parse(JsonWrapper jsonWrapper) {
-    return MarketBBOEvent.builder()
-        .ch(jsonWrapper.getStringOrDefault("ch",null))
-        .timestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")))
-        .data(MarketBBO.parse(jsonWrapper.getJsonObject("tick")))
-        .build();
+    MarketBBOEvent event = new MarketBBOEvent();
+    event.setCh(jsonWrapper.getStringOrDefault("ch",null));
+    event.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+    event.setData(MarketBBO.parse(jsonWrapper.getJsonObject("tick")));
+    return event;
   }
 
 }

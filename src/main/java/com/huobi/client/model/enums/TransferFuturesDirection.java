@@ -1,10 +1,6 @@
 package com.huobi.client.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 public enum  TransferFuturesDirection {
 
   /**
@@ -15,6 +11,14 @@ public enum  TransferFuturesDirection {
   ;
 
   private String direction;
+
+  TransferFuturesDirection(String direction) {
+    this.direction = direction;
+  }
+
+  public String getDirection() {
+    return direction;
+  }
 
   public static TransferFuturesDirection find(String direction){
     for (TransferFuturesDirection d : TransferFuturesDirection.values()) {

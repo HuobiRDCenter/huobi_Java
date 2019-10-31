@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import lombok.Getter;
 
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
@@ -13,7 +12,6 @@ import com.huobi.client.model.enums.QueryDirection;
 /**
  * The request of historical orders.
  */
-@Getter
 public class OrdersRequest {
 
   /**
@@ -132,4 +130,64 @@ public class OrdersRequest {
     return stateString;
   }
 
+
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public List<OrderState> getStates() {
+    return states;
+  }
+
+  public void setStates(List<OrderState> states) {
+    this.states = states;
+  }
+
+  public List<OrderType> getTypes() {
+    return types;
+  }
+
+  public void setTypes(List<OrderType> types) {
+    this.types = types;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
+
+  public Long getStartId() {
+    return startId;
+  }
+
+  public void setStartId(Long startId) {
+    this.startId = startId;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+
+  public void setSize(Integer size) {
+    this.size = size;
+  }
+
+  public QueryDirection getDirect() {
+    return direct;
+  }
+
+  public void setDirect(QueryDirection direct) {
+    this.direct = direct;
+  }
 }

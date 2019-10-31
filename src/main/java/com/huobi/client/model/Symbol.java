@@ -2,12 +2,10 @@ package com.huobi.client.model;
 
 import java.math.BigDecimal;
 
-import lombok.ToString;
 
 /**
  * The Huobi supported symbols.
  */
-@ToString
 public class Symbol {
 
   private String baseCurrency;

@@ -35,46 +35,48 @@ public class CrossMarginExamples {
     System.out.println();
 
 
+    CrossMarginTransferRequest toMarginRequest = new CrossMarginTransferRequest();
+    toMarginRequest.setType(CrossMarginTransferType.SPOT_TO_SUPER_MARGIN);
+    toMarginRequest.setCurrency(currency);
+    toMarginRequest.setAmount(transferAmount);
 
-    long transferToCrossMargin = syncRequestClient.transferCrossMargin(CrossMarginTransferRequest.builder()
-        .type(CrossMarginTransferType.SPOT_TO_SUPER_MARGIN)
-        .currency(currency)
-        .amount(transferAmount)
-        .build());
+    long transferToCrossMargin = syncRequestClient.transferCrossMargin(toMarginRequest);
 
     System.out.println(" transfer to cross margin :" + transferToCrossMargin);
 
-    long loanOrderId = syncRequestClient.applyCrossMarginLoan(CrossMarginApplyLoanRequest.builder()
-        .currency(currency)
-        .amount(loanAmount)
-        .build());
+    CrossMarginApplyLoanRequest loanRequest = new CrossMarginApplyLoanRequest();
+    loanRequest.setCurrency(currency);
+    loanRequest.setAmount(loanAmount);
+
+    long loanOrderId = syncRequestClient.applyCrossMarginLoan(loanRequest);
 
     System.out.println(" apply loan order id:" + loanOrderId);
 
 
-    timeWait(3000);
+    timeWait(5000);
 
-    syncRequestClient.repayCrossMarginLoan(CrossMarginRepayLoanRequest.builder()
-        .orderId(loanOrderId)
-        .amount(loanAmount)
-        .build());
+
+    CrossMarginRepayLoanRequest repayRequest = new CrossMarginRepayLoanRequest();
+    repayRequest.setOrderId(loanOrderId);
+    repayRequest.setAmount(loanAmount);
+
+    syncRequestClient.repayCrossMarginLoan(repayRequest);
 
     System.out.println(" repay loan finish . ");
 
 
     timeWait(10000);
 
-    long transferToSpot = syncRequestClient.transferCrossMargin(CrossMarginTransferRequest.builder()
-        .type(CrossMarginTransferType.SUPER_MARGIN_TO_SPOT)
-        .currency(currency)
-        .amount(transferAmount)
-        .build());
+    CrossMarginTransferRequest toSpotRequest = new CrossMarginTransferRequest();
+    toSpotRequest.setType(CrossMarginTransferType.SUPER_MARGIN_TO_SPOT);
+    toSpotRequest.setCurrency(currency);
+    toSpotRequest.setAmount(transferAmount);
+    long transferToSpot = syncRequestClient.transferCrossMargin(toSpotRequest);
 
     System.out.println(" transfer to spot :" + transferToSpot);
 
 
-    List<CrossMarginLoanOrder> orderList = syncRequestClient.getCrossMarginLoanHistory(CrossMarginLoanOrderRequest.builder()
-        .build());
+    List<CrossMarginLoanOrder> orderList = syncRequestClient.getCrossMarginLoanHistory(new CrossMarginLoanOrderRequest());
 
     orderList.forEach(order->{
       System.out.println("Cross Loan Order:"+new Date(order.getCreatedAt()) +":"+ JSON.toJSONString(order));

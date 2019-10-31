@@ -8,12 +8,10 @@ import com.huobi.client.model.enums.StopOrderOperator;
 
 import java.math.BigDecimal;
 
-import lombok.ToString;
 
 /**
  * The detail order information.
  */
-@ToString
 public class Order {
 
   private AccountType accountType;

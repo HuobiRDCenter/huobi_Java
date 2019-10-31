@@ -1,12 +1,8 @@
 package com.huobi.client.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import com.huobi.client.impl.utils.EnumLookup;
 
-@AllArgsConstructor
-@Getter
 public enum  StopOrderOperator {
   /**
    * GTE,greater than and equal (>=) ,LTE  less than and equal (<=)
@@ -19,6 +15,19 @@ public enum  StopOrderOperator {
   private String desc;
 
   private static final EnumLookup<StopOrderOperator> lookup = new EnumLookup<>(StopOrderOperator.class);
+
+  StopOrderOperator(String operator, String desc) {
+    this.operator = operator;
+    this.desc = desc;
+  }
+
+  public String getOperator() {
+    return operator;
+  }
+
+  public String getDesc() {
+    return desc;
+  }
 
   public static StopOrderOperator find(String operator) {
     for (StopOrderOperator op : StopOrderOperator.values()) {
