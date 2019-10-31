@@ -76,8 +76,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import okhttp3.Request;
 
 class RestApiRequestImpl {
@@ -1210,12 +1208,11 @@ class RestApiRequestImpl {
       List<FeeRate> rateList = new LinkedList<>();
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
-
-        rateList.add(FeeRate.builder()
-            .symbol(item.getString("symbol"))
-            .makerFee(item.getBigDecimalOrDefault("maker-fee", null))
-            .takerFee(item.getBigDecimalOrDefault("taker-fee", null))
-            .build());
+        FeeRate rate = new FeeRate();
+        rate.setSymbol(item.getString("symbol"));
+        rate.setMakerFee(item.getBigDecimalOrDefault("maker-fee", null));
+        rate.setTakerFee(item.getBigDecimalOrDefault("taker-fee", null));
+        rateList.add(rate);
       });
       return rateList;
     });

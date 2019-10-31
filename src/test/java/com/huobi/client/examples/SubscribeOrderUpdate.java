@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.huobi.client.SubscriptionClient;
@@ -14,7 +13,6 @@ import com.huobi.client.model.enums.OrderType;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.OrdersRequest;
 
-@Slf4j
 public class SubscribeOrderUpdate {
 
   public static void main(String[] args) {
@@ -25,14 +23,14 @@ public class SubscribeOrderUpdate {
      * subscribe order updateEvent ,old interface
      */
     client.subscribeOrderUpdateEvent(symbol,(event ->{
-      log.info(event.getData().toString());
+      System.out.println(event.getData().toString());
     }));
 
     /**
      * subscribe order updateEvent ,new interface (recommend)
      */
     client.subscribeOrderUpdateNewEvent(symbol,(event ->{
-      log.info(event.getData().toString());
+      System.out.println(event.getData().toString());
     }));
 
     /**

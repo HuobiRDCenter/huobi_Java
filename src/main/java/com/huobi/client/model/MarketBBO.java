@@ -2,24 +2,13 @@ package com.huobi.client.model;
 
 import java.math.BigDecimal;
 
-import com.alibaba.fastjson.JSONObject;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.TimeService;
 
 /**
  * The market bbo.
  */
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+
 public class MarketBBO {
 
   private String symbol;
@@ -36,16 +25,61 @@ public class MarketBBO {
 
 
   public static MarketBBO parse(JsonWrapper jsonWrapper) {
-    return MarketBBO.builder()
-        .symbol(jsonWrapper.getStringOrDefault("symbol",null))
-        .quoteTime(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("quoteTime")))
-        .bid(jsonWrapper.getBigDecimalOrDefault("bid",null))
-        .bidSize(jsonWrapper.getBigDecimalOrDefault("bidSize",null))
-        .ask(jsonWrapper.getBigDecimalOrDefault("ask",null))
-        .askSize(jsonWrapper.getBigDecimalOrDefault("askSize",null))
-        .build();
+    MarketBBO bbo = new MarketBBO();
+    bbo.setSymbol(jsonWrapper.getStringOrDefault("symbol",null));
+    bbo.setQuoteTime(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("quoteTime")));
+    bbo.setBid(jsonWrapper.getBigDecimalOrDefault("bid",null));
+    bbo.setBidSize(jsonWrapper.getBigDecimalOrDefault("bidSize",null));
+    bbo.setAsk(jsonWrapper.getBigDecimalOrDefault("ask",null));
+    bbo.setAskSize(jsonWrapper.getBigDecimalOrDefault("askSize",null));
+    return bbo;
   }
 
+  public String getSymbol() {
+    return symbol;
+  }
 
+  public void setSymbol(String symbol) {
+    this.symbol = symbol;
+  }
 
+  public Long getQuoteTime() {
+    return quoteTime;
+  }
+
+  public void setQuoteTime(Long quoteTime) {
+    this.quoteTime = quoteTime;
+  }
+
+  public BigDecimal getBid() {
+    return bid;
+  }
+
+  public void setBid(BigDecimal bid) {
+    this.bid = bid;
+  }
+
+  public BigDecimal getBidSize() {
+    return bidSize;
+  }
+
+  public void setBidSize(BigDecimal bidSize) {
+    this.bidSize = bidSize;
+  }
+
+  public BigDecimal getAsk() {
+    return ask;
+  }
+
+  public void setAsk(BigDecimal ask) {
+    this.ask = ask;
+  }
+
+  public BigDecimal getAskSize() {
+    return askSize;
+  }
+
+  public void setAskSize(BigDecimal askSize) {
+    this.askSize = askSize;
+  }
 }

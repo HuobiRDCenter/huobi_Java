@@ -2,7 +2,6 @@ package com.huobi.client.impl;
 
 import java.io.IOException;
 
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;

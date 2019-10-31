@@ -2,15 +2,9 @@ package com.huobi.client.model.request;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 
 import com.huobi.client.model.enums.TransferFuturesDirection;
 
-@Data
-@Builder
-@AllArgsConstructor
 public class TransferFuturesRequest {
 
   private String currency;
@@ -19,4 +13,27 @@ public class TransferFuturesRequest {
 
   private TransferFuturesDirection direction;
 
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
+
+  public BigDecimal getAmount() {
+    return amount;
+  }
+
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
+  }
+
+  public TransferFuturesDirection getDirection() {
+    return direction;
+  }
+
+  public void setDirection(TransferFuturesDirection direction) {
+    this.direction = direction;
+  }
 }

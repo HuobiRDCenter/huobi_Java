@@ -1,10 +1,5 @@
 package com.huobi.client.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum DealRole {
 
   /**
@@ -16,6 +11,14 @@ public enum DealRole {
   ;
 
   private final String role;
+
+  DealRole(String role) {
+    this.role = role;
+  }
+
+  public String getRole() {
+    return role;
+  }
 
   public static DealRole find(String role) {
     for (DealRole fr : DealRole.values()) {

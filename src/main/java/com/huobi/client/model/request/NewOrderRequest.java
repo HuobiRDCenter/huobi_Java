@@ -6,14 +6,10 @@ import com.huobi.client.model.enums.StopOrderOperator;
 
 import java.math.BigDecimal;
 
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * The request of placing a new order.
  */
-@Getter
-@ToString
 public class NewOrderRequest {
 
   /**
@@ -118,4 +114,67 @@ public class NewOrderRequest {
 
   private StopOrderOperator operator;
 
+  public AccountType getAccountType() {
+    return accountType;
+  }
+
+  public void setAccountType(AccountType accountType) {
+    this.accountType = accountType;
+  }
+
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(String symbol) {
+    this.symbol = symbol;
+  }
+
+  public BigDecimal getAmount() {
+    return amount;
+  }
+
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
+
+  public OrderType getType() {
+    return type;
+  }
+
+  public void setType(OrderType type) {
+    this.type = type;
+  }
+
+  public String getClientOrderId() {
+    return clientOrderId;
+  }
+
+  public void setClientOrderId(String clientOrderId) {
+    this.clientOrderId = clientOrderId;
+  }
+
+  public BigDecimal getStopPrice() {
+    return stopPrice;
+  }
+
+  public void setStopPrice(BigDecimal stopPrice) {
+    this.stopPrice = stopPrice;
+  }
+
+  public StopOrderOperator getOperator() {
+    return operator;
+  }
+
+  public void setOperator(StopOrderOperator operator) {
+    this.operator = operator;
+  }
 }

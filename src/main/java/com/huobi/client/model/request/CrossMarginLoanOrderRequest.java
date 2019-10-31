@@ -2,20 +2,10 @@ package com.huobi.client.model.request;
 
 import java.util.Date;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import com.huobi.client.model.enums.LoanOrderStates;
 import com.huobi.client.model.enums.QueryDirection;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class CrossMarginLoanOrderRequest {
 
   /**
@@ -53,4 +43,59 @@ public class CrossMarginLoanOrderRequest {
    */
   private Integer size;
 
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
+
+  public LoanOrderStates getState() {
+    return state;
+  }
+
+  public void setState(LoanOrderStates state) {
+    this.state = state;
+  }
+
+  public Long getFrom() {
+    return from;
+  }
+
+  public void setFrom(Long from) {
+    this.from = from;
+  }
+
+  public QueryDirection getDirection() {
+    return direction;
+  }
+
+  public void setDirection(QueryDirection direction) {
+    this.direction = direction;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+
+  public void setSize(Integer size) {
+    this.size = size;
+  }
 }

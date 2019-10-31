@@ -2,20 +2,10 @@ package com.huobi.client.model.request;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import com.huobi.client.model.enums.QuerySort;
 import com.huobi.client.model.enums.TransactType;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class AccountHistoryRequest {
 
   /**
@@ -66,4 +56,59 @@ public class AccountHistoryRequest {
     return typeString;
   }
 
+  public Long getAccountId() {
+    return accountId;
+  }
+
+  public void setAccountId(Long accountId) {
+    this.accountId = accountId;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
+
+  public List<TransactType> getTypeList() {
+    return typeList;
+  }
+
+  public void setTypeList(List<TransactType> typeList) {
+    this.typeList = typeList;
+  }
+
+  public Long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(Long startTime) {
+    this.startTime = startTime;
+  }
+
+  public Long getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(Long endTime) {
+    this.endTime = endTime;
+  }
+
+  public QuerySort getSort() {
+    return sort;
+  }
+
+  public void setSort(QuerySort sort) {
+    this.sort = sort;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+
+  public void setSize(Integer size) {
+    this.size = size;
+  }
 }

@@ -467,19 +467,19 @@ class WebsocketRequestImpl {
       orderUpdateEvent.setSymbol(symbol);
       orderUpdateEvent.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
 
-      orderUpdateEvent.setData(OrderUpdate.builder()
-          .matchId(data.getLong("match-id"))
-          .orderId(data.getLong("order-id"))
-          .symbol(symbol)
-          .state(OrderState.lookup(data.getString("order-state")))
-          .type(OrderType.lookup(data.getString("order-type")))
-          .role(DealRole.find(data.getString("role")))
-          .price(data.getBigDecimal("price"))
-          .filledAmount(data.getBigDecimal("filled-amount"))
-          .filledCashAmount(data.getBigDecimal("filled-cash-amount"))
-          .unfilledAmount(data.getBigDecimal("unfilled-amount"))
-          .clientOrderId(data.getStringOrDefault("client-order-id", null))
-          .build());
+      OrderUpdate update = new OrderUpdate();
+      update.setMatchId(data.getLong("match-id"));
+      update.setOrderId(data.getLong("order-id"));
+      update.setSymbol(symbol);
+      update.setState(OrderState.lookup(data.getString("order-state")));
+      update.setType(OrderType.lookup(data.getString("order-type")));
+      update.setRole(DealRole.find(data.getString("role")));
+      update.setPrice(data.getBigDecimal("price"));
+      update.setFilledAmount(data.getBigDecimal("filled-amount"));
+      update.setFilledCashAmount(data.getBigDecimal("filled-cash-amount"));
+      update.setUnfilledAmount(data.getBigDecimal("unfilled-amount"));
+      update.setClientOrderId(data.getStringOrDefault("client-order-id", null));
+      orderUpdateEvent.setData(update);
       return orderUpdateEvent;
     };
     return request;
@@ -633,10 +633,10 @@ class WebsocketRequestImpl {
         accountList.add(account);
       });
 
-      return AccountListEvent.builder()
-          .timestamp(ts)
-          .accountList(accountList)
-          .build();
+      AccountListEvent event = new AccountListEvent();
+      event.setTimestamp(ts);
+      event.setAccountList(accountList);
+      return event;
     };
 
     return request;

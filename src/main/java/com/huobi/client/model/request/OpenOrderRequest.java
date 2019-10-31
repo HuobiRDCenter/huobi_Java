@@ -1,6 +1,5 @@
 package com.huobi.client.model.request;
 
-import lombok.Getter;
 
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderSide;
@@ -9,7 +8,6 @@ import com.huobi.client.model.enums.QueryDirection;
 /**
  * The request of get open orders.
  */
-@Getter
 public class OpenOrderRequest {
 
   /**
@@ -77,4 +75,43 @@ public class OpenOrderRequest {
 
   private Long from = null;
 
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public AccountType getAccountType() {
+    return accountType;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+
+  public void setSize(Integer size) {
+    this.size = size;
+  }
+
+  public OrderSide getSide() {
+    return side;
+  }
+
+  public void setSide(OrderSide side) {
+    this.side = side;
+  }
+
+  public String getDirect() {
+    return direct;
+  }
+
+  public void setDirect(String direct) {
+    this.direct = direct;
+  }
+
+  public Long getFrom() {
+    return from;
+  }
+
+  public void setFrom(Long from) {
+    this.from = from;
+  }
 }

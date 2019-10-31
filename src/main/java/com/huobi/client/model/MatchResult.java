@@ -5,12 +5,10 @@ import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderType;
 import java.math.BigDecimal;
 
-import lombok.ToString;
 
 /**
  * The match result information.
  */
-@ToString
 public class MatchResult {
 
   private long createdTimestamp;

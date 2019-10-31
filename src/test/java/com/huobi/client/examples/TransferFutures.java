@@ -17,24 +17,25 @@ public class TransferFutures {
     /**
      * transfer from pro to futures
      */
-    long transferToFuturesId = syncRequestClient.transferFutures(TransferFuturesRequest.builder()
-        .currency(currency)
-        .amount(new BigDecimal("0.1"))
-        .direction(TransferFuturesDirection.PRO_TO_FUTURES)
-        .build());
+    TransferFuturesRequest toFutureRequest = new TransferFuturesRequest();
+    toFutureRequest.setCurrency(currency);
+    toFutureRequest.setAmount(new BigDecimal("0.1"));
+    toFutureRequest.setDirection(TransferFuturesDirection.PRO_TO_FUTURES);
+
+    long transferToFuturesId = syncRequestClient.transferFutures(toFutureRequest);
 
     System.out.println(" transfer to futures result:" + transferToFuturesId);
 
     /**
      * transfer from futures to pro
      */
-    long transferToProId = syncRequestClient.transferFutures(TransferFuturesRequest.builder()
-        .currency(currency)
-        .amount(new BigDecimal("0.1"))
-        .direction(TransferFuturesDirection.FUTURES_TO_PRO)
-        .build());
+    TransferFuturesRequest toSpotRequest = new TransferFuturesRequest();
+    toSpotRequest.setCurrency(currency);
+    toSpotRequest.setAmount(new BigDecimal("0.1"));
+    toSpotRequest.setDirection(TransferFuturesDirection.FUTURES_TO_PRO);
+    long transferToProId = syncRequestClient.transferFutures(toSpotRequest);
 
-    System.out.println(" transfer to futures result:" + transferToProId);
+    System.out.println(" transfer to spot result:" + transferToProId);
 
   }
 

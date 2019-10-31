@@ -51,9 +51,9 @@ public class WalletExamples {
     });
 
 
-    List<AccountHistory> accountHistoryList = syncRequestClient.getAccountHistory(AccountHistoryRequest.builder()
-        .accountId(290082L)
-        .build());
+    AccountHistoryRequest accountHistoryRequest = new AccountHistoryRequest();
+    accountHistoryRequest.setAccountId(290082L);
+    List<AccountHistory> accountHistoryList = syncRequestClient.getAccountHistory(accountHistoryRequest);
 
     accountHistoryList.forEach(accountHistory -> {
       System.out.println("Account History:"+JSON.toJSONString(accountHistory));

@@ -3,12 +3,10 @@ package com.huobi.client.model;
 import com.huobi.client.model.enums.WithdrawState;
 import java.math.BigDecimal;
 
-import lombok.ToString;
 
 /**
  * The latest status for withdraws.
  */
-@ToString
 public class Withdraw {
 
   private long id;
