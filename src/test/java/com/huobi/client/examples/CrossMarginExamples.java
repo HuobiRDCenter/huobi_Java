@@ -53,7 +53,7 @@ public class CrossMarginExamples {
     System.out.println(" apply loan order id:" + loanOrderId);
 
 
-    timeWait(3000);
+    timeWait(5000);
 
 
     CrossMarginRepayLoanRequest repayRequest = new CrossMarginRepayLoanRequest();
@@ -68,9 +68,9 @@ public class CrossMarginExamples {
     timeWait(10000);
 
     CrossMarginTransferRequest toSpotRequest = new CrossMarginTransferRequest();
-    toMarginRequest.setType(CrossMarginTransferType.SUPER_MARGIN_TO_SPOT);
-    toMarginRequest.setCurrency(currency);
-    toMarginRequest.setAmount(transferAmount);
+    toSpotRequest.setType(CrossMarginTransferType.SUPER_MARGIN_TO_SPOT);
+    toSpotRequest.setCurrency(currency);
+    toSpotRequest.setAmount(transferAmount);
     long transferToSpot = syncRequestClient.transferCrossMargin(toSpotRequest);
 
     System.out.println(" transfer to spot :" + transferToSpot);
