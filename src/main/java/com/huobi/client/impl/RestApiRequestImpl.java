@@ -310,7 +310,7 @@ class RestApiRequestImpl {
         JsonWrapperArray dataArrayIn = item.getJsonArray("data");
         dataArrayIn.forEach((itemIn) -> {
           Trade trade = new Trade();
-          trade.setUniqueTradeId(item.getLongOrDefault("trade-id",0));
+          trade.setUniqueTradeId(itemIn.getLongOrDefault("trade-id",0));
           trade.setPrice(itemIn.getBigDecimal("price"));
           trade.setAmount(itemIn.getBigDecimal("amount"));
           trade.setTradeId(itemIn.getString("id"));
