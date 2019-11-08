@@ -20,6 +20,13 @@ public class WithdrawRequest {
     this.currency = currency;
   }
 
+  public WithdrawRequest(String address, BigDecimal amount, String currency,String chain) {
+    this.address = address;
+    this.amount = amount;
+    this.currency = currency;
+    this.chain = chain;
+  }
+
   /**
    * The criteria for a withdraw request.
    *
@@ -38,6 +45,15 @@ public class WithdrawRequest {
     this.addressTag = addressTag;
   }
 
+  public WithdrawRequest(String address, BigDecimal amount, String currency,String chain, BigDecimal fee, String addressTag) {
+    this.address = address;
+    this.amount = amount;
+    this.currency = currency;
+    this.chain = chain;
+    this.fee = fee;
+    this.addressTag = addressTag;
+  }
+
   private final String address;
 
   private final BigDecimal amount;
@@ -47,6 +63,8 @@ public class WithdrawRequest {
   private BigDecimal fee;
 
   private String addressTag;
+
+  private String chain;
 
   public String getAddress() {
     return address;
@@ -66,5 +84,9 @@ public class WithdrawRequest {
 
   public String getAddressTag() {
     return addressTag;
+  }
+
+  public String getChain() {
+    return chain;
   }
 }

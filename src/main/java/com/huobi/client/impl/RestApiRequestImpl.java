@@ -1088,6 +1088,7 @@ class RestApiRequestImpl {
         .putToPost("address", withdrawRequest.getAddress())
         .putToPost("amount", withdrawRequest.getAmount())
         .putToPost("currency", withdrawRequest.getCurrency())
+        .putToPost("chain",withdrawRequest.getChain())
         .putToPost("fee", withdrawRequest.getFee())
         .putToPost("addr-tag", withdrawRequest.getAddressTag());
     request.request = createRequestByPostWithSignature("/v1/dw/withdraw/api/create", builder);
