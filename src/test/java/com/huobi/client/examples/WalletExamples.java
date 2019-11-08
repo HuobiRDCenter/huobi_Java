@@ -1,5 +1,6 @@
 package com.huobi.client.examples;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
@@ -13,8 +14,8 @@ import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.QuerySort;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.WithdrawRequest;
 
 
 public class WalletExamples {
@@ -23,6 +24,12 @@ public class WalletExamples {
     String currency = "usdt";
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
+
+
+    Long withdrawId = syncRequestClient.withdraw(new WithdrawRequest("address",new BigDecimal(10),currency,"usdterc20"));
+    System.out.println(withdrawId);
+
+    syncRequestClient.cancelWithdraw(currency,withdrawId);
 
     List<Account> accountList = syncRequestClient.getAccountBalance();
     accountList.forEach(account -> {
