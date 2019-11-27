@@ -1,15 +1,8 @@
 package com.huobi.client.impl;
 
-import static com.huobi.client.impl.utils.InternalUtils.decode;
-
-import com.huobi.client.SubscriptionOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.InternalUtils;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
 import java.io.IOException;
 import java.net.URI;
+
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -17,6 +10,14 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.InternalUtils;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.UrlParamsBuilder;
+
+import static com.huobi.client.impl.utils.InternalUtils.decode;
 
 public class WebSocketConnection extends WebSocketListener {
 
@@ -159,7 +160,7 @@ public class WebSocketConnection extends WebSocketListener {
   @Override
   public void onMessage(WebSocket webSocket, String text) {
     super.onMessage(webSocket, text);
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime = System.currentTimeMillis();
   }
 
   @SuppressWarnings("unchecked")
@@ -174,7 +175,7 @@ public class WebSocketConnection extends WebSocketListener {
         return;
       }
 
-      lastReceivedTime = TimeService.getCurrentTimeStamp();
+      lastReceivedTime = System.currentTimeMillis();
 
       String data;
       try {
@@ -290,7 +291,7 @@ public class WebSocketConnection extends WebSocketListener {
       request.connectionHandler.handle(this);
     }
     state = ConnectionState.CONNECTED;
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime = System.currentTimeMillis();
     if (request.authHandler != null) {
       ApiSignature as = new ApiSignature();
       UrlParamsBuilder builder = UrlParamsBuilder.build();
@@ -303,7 +304,7 @@ public class WebSocketConnection extends WebSocketListener {
         return;
       }
       builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
-          .putToUrl("cid", TimeService.getCurrentTimeStamp());
+          .putToUrl("cid", System.currentTimeMillis());
       send(builder.buildUrlToJsonString());
       InternalUtils.await(100);
     }

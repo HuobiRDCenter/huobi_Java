@@ -1,22 +1,23 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Trade;
-import com.huobi.client.model.enums.TradeDirection;
 import java.math.BigDecimal;
 import java.util.List;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Trade;
+import com.huobi.client.model.enums.TradeDirection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestGetHistoricalTrade {
@@ -131,8 +132,7 @@ public class TestGetHistoricalTrade {
     assertEquals(3, tradeList.size());
     assertEquals(new BigDecimal("122.18"), tradeList.get(0).getPrice());
     assertEquals(new BigDecimal("0.0071"), tradeList.get(0).getAmount());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550222502562L),
-        tradeList.get(0).getTimestamp());
+    assertEquals(1550222502562L, tradeList.get(0).getTimestamp());
     assertEquals("10041695849124569905216", tradeList.get(0).getTradeId());
     assertEquals(TradeDirection.SELL, tradeList.get(0).getDirection());
 

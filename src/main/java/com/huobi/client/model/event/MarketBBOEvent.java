@@ -3,7 +3,6 @@ package com.huobi.client.model.event;
 
 import com.huobi.client.impl.RestApiJsonParser;
 import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.model.MarketBBO;
 
 /**
@@ -51,7 +50,7 @@ public class MarketBBOEvent {
   public static MarketBBOEvent parse(JsonWrapper jsonWrapper) {
     MarketBBOEvent event = new MarketBBOEvent();
     event.setCh(jsonWrapper.getStringOrDefault("ch",null));
-    event.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+    event.setTimestamp(jsonWrapper.getLong("ts"));
     event.setData(MarketBBO.parse(jsonWrapper.getJsonObject("tick")));
     return event;
   }

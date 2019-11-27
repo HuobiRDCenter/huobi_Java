@@ -3,7 +3,6 @@ package com.huobi.client.model;
 import java.math.BigDecimal;
 
 import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
 
 /**
  * The market bbo.
@@ -27,7 +26,7 @@ public class MarketBBO {
   public static MarketBBO parse(JsonWrapper jsonWrapper) {
     MarketBBO bbo = new MarketBBO();
     bbo.setSymbol(jsonWrapper.getStringOrDefault("symbol",null));
-    bbo.setQuoteTime(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("quoteTime")));
+    bbo.setQuoteTime(jsonWrapper.getLong("quoteTime"));
     bbo.setBid(jsonWrapper.getBigDecimalOrDefault("bid",null));
     bbo.setBidSize(jsonWrapper.getBigDecimalOrDefault("bidSize",null));
     bbo.setAsk(jsonWrapper.getBigDecimalOrDefault("ask",null));

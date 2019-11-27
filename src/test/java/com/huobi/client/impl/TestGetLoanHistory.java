@@ -1,25 +1,10 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.Loan;
-import com.huobi.client.model.User;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.LoanOrderStates;
-import com.huobi.client.model.enums.QueryDirection;
-import com.huobi.client.model.request.LoanOrderRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,6 +15,22 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.Loan;
+import com.huobi.client.model.User;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.LoanOrderStates;
+import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.LoanOrderRequest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -178,10 +179,8 @@ public class TestGetLoanHistory {
     assertEquals(LoanOrderStates.ACCRUAL, loan.get(0).getState());
     assertEquals(AccountType.SPOT, loan.get(0).getAccountType());
     assertEquals(119910L, loan.get(0).getUserId());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1511169724000L),
-        loan.get(0).getAccruedTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1511169724530L),
-        loan.get(0).getCreatedTimestamp());
+    assertEquals(1511169724000L, loan.get(0).getAccruedTimestamp());
+    assertEquals(1511169724530L, loan.get(0).getCreatedTimestamp());
 
     assertEquals(new BigDecimal("1.1"), loan.get(1).getLoanBalance());
     assertEquals(new BigDecimal("1.0002"), loan.get(1).getInterestBalance());
@@ -193,10 +192,8 @@ public class TestGetLoanHistory {
     assertEquals(LoanOrderStates.ACCRUAL, loan.get(1).getState());
     assertEquals(AccountType.MARGIN, loan.get(1).getAccountType());
     assertEquals(119911L, loan.get(1).getUserId());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1511169724531L),
-        loan.get(1).getAccruedTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1511169724531L),
-        loan.get(1).getCreatedTimestamp());
+    assertEquals(1511169724531L, loan.get(1).getAccruedTimestamp());
+    assertEquals(1511169724531L, loan.get(1).getCreatedTimestamp());
   }
 
   @Test

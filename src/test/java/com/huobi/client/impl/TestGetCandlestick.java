@@ -139,7 +139,7 @@ public class TestGetCandlestick {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     List<Candlestick> candlestickList = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(2, candlestickList.size());
-    assertEquals(1550131200000L, candlestickList.get(0).getTimestamp());
+    assertEquals(1550160000L, candlestickList.get(0).getTimestamp());
     assertEquals(new BigDecimal("3612.19"), candlestickList.get(0).getHigh());
     assertEquals(new BigDecimal("3575"), candlestickList.get(0).getLow());
     assertEquals(new BigDecimal("3600.77"), candlestickList.get(0).getOpen());
@@ -149,7 +149,7 @@ public class TestGetCandlestick {
         candlestickList.get(0).getVolume());
     assertEquals(28891L, candlestickList.get(0).getCount());
 
-    assertEquals(1550131200000L, candlestickList.get(0).getTimestamp());
+    assertEquals(1550160000L, candlestickList.get(0).getTimestamp());
     assertEquals(new BigDecimal("3624.3"), candlestickList.get(1).getHigh());
     assertEquals(new BigDecimal("3570"), candlestickList.get(1).getLow());
     assertEquals(new BigDecimal("3594.85"), candlestickList.get(1).getOpen());
