@@ -1,21 +1,22 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Deposit;
-import com.huobi.client.model.enums.DepositState;
 import java.math.BigDecimal;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Deposit;
+import com.huobi.client.model.enums.DepositState;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestGetDepositHistory {
@@ -89,10 +90,8 @@ public class TestGetDepositHistory {
     List<Deposit> withdrawDepositList = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(new BigDecimal("345"), withdrawDepositList.get(0).getFee());
     assertEquals(1171L, withdrawDepositList.get(0).getId());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1510912472199L),
-        withdrawDepositList.get(0).getCreatedTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1511145876575L),
-        withdrawDepositList.get(0).getUpdatedTimestamp());
+    assertEquals(1510912472199L, withdrawDepositList.get(0).getCreatedTimestamp());
+    assertEquals(1511145876575L, withdrawDepositList.get(0).getUpdatedTimestamp());
     assertEquals(new BigDecimal("7.457467"), withdrawDepositList.get(0).getAmount());
     assertEquals("rae93V8d2mdoUQHwBDBdM4NHCMehRJAsbm", withdrawDepositList.get(0).getAddress());
     assertEquals("100040", withdrawDepositList.get(0).getAddressTag());

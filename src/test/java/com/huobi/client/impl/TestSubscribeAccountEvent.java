@@ -1,22 +1,9 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.SubscriptionOptions;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.User;
-import com.huobi.client.model.enums.AccountChangeType;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.BalanceMode;
-import com.huobi.client.model.enums.BalanceType;
-import com.huobi.client.model.event.AccountEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +11,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.User;
+import com.huobi.client.model.enums.AccountChangeType;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.BalanceMode;
+import com.huobi.client.model.enums.BalanceType;
+import com.huobi.client.model.event.AccountEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -87,7 +88,7 @@ public class TestSubscribeAccountEvent {
         BalanceMode.AVAILABLE, (AccountEvent) -> {
         }, null);
     AccountEvent event = request.jsonParser.parseJson(JsonWrapper.parseFromString(accountEvent));
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550556381242L), event.getTimestamp());
+    assertEquals(1550556381242L, event.getTimestamp());
     assertEquals(1, event.getData().size());
     assertEquals(AccountChangeType.NEWORDER, event.getChangeType());
     assertEquals(AccountType.SPOT, event.getData().get(0).getAccountType());

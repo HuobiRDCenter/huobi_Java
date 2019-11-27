@@ -4,11 +4,13 @@ import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DepthStep;
+import com.huobi.client.model.enums.MBPLevelEnums;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
+import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
@@ -450,6 +452,16 @@ public interface SubscriptionClient {
    * @param errorHandler The error handler will be called if request failed or error happen between client and Huobi server.
    */
   void requestAccountListEvent(boolean autoClose, SubscriptionListener<AccountListEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void subscribeMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback);
+
+  void subscribeMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback,
+      SubscriptionErrorHandler errorHandler);
+
+  void requestMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback);
+
+  void requestMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback,
       SubscriptionErrorHandler errorHandler);
 
   /**

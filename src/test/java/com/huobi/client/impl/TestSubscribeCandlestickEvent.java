@@ -1,16 +1,17 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.enums.CandlestickInterval;
-import com.huobi.client.model.event.CandlestickEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Test;
+
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.event.CandlestickEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestSubscribeCandlestickEvent {
 
@@ -68,7 +69,7 @@ public class TestSubscribeCandlestickEvent {
         }, null);
     CandlestickEvent event = request.jsonParser.parseJson(JsonWrapper.parseFromString(data));
     assertEquals("btcusdt", event.getSymbol());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550469651403L), event.getTimestamp());
+    assertEquals(1550469651403L, event.getTimestamp());
     assertEquals(CandlestickInterval.MIN1, event.getInterval());
     assertEquals(new BigDecimal("3719.88"), event.getData().getOpen());
     assertEquals(new BigDecimal("3719.91"), event.getData().getClose());

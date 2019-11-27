@@ -1,21 +1,19 @@
 package com.huobi.client.impl;
 
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Candlestick;
-import com.huobi.client.model.enums.CandlestickInterval;
+import java.math.BigDecimal;
+import java.util.List;
 
+import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import okhttp3.Request;
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Candlestick;
+import com.huobi.client.model.enums.CandlestickInterval;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -128,7 +126,7 @@ public class TestGetETFCandlestick {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     List<Candlestick> candlestickList = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(1, candlestickList.size());
-    assertEquals(TimeService.convertCSTInSecondToUTC(1499184000L), candlestickList.get(0).getTimestamp());
+    assertEquals(1499184000L, candlestickList.get(0).getTimestamp());
     assertEquals(new BigDecimal("0.7694"), candlestickList.get(0).getHigh());
     assertEquals(new BigDecimal("0.769"), candlestickList.get(0).getLow());
     assertEquals(new BigDecimal("0.7794"), candlestickList.get(0).getOpen());

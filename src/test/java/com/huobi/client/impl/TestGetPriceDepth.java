@@ -1,19 +1,20 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.PriceDepth;
-import com.huobi.client.model.User;
 import java.math.BigDecimal;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.User;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class TestGetPriceDepth {
@@ -116,8 +117,7 @@ public class TestGetPriceDepth {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     PriceDepth priceDepth = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(1, priceDepth.getBids().size());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550218546020L),
-        priceDepth.getTimestamp());
+    assertEquals(1550218546020L, priceDepth.getTimestamp());
     assertEquals(new BigDecimal("122.92"), priceDepth.getBids().get(0).getPrice());
     assertEquals(new BigDecimal("2.7468"), priceDepth.getBids().get(0).getAmount());
     assertEquals(new BigDecimal("122.94"), priceDepth.getAsks().get(0).getPrice());

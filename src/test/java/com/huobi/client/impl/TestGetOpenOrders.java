@@ -1,26 +1,10 @@
 package com.huobi.client.impl;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.Order;
-import com.huobi.client.model.User;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderSide;
-import com.huobi.client.model.enums.OrderSource;
-import com.huobi.client.model.enums.OrderState;
-import com.huobi.client.model.enums.OrderType;
-import com.huobi.client.model.request.OpenOrderRequest;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +15,23 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.Order;
+import com.huobi.client.model.User;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderSide;
+import com.huobi.client.model.enums.OrderSource;
+import com.huobi.client.model.enums.OrderState;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.request.OpenOrderRequest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -184,8 +185,7 @@ public class TestGetOpenOrders {
     assertEquals(AccountType.SPOT, orderList.get(0).getAccountType());
     assertEquals(OrderState.SUBMITTED, orderList.get(0).getState());
     assertEquals(OrderType.SELL_LIMIT, orderList.get(0).getType());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550628731111L),
-        orderList.get(0).getCreatedTimestamp());
+    assertEquals(1550628731111L, orderList.get(0).getCreatedTimestamp());
 
     assertEquals("htbtc", orderList.get(1).getSymbol());
     assertEquals(OrderSource.API, orderList.get(1).getSource());
@@ -198,8 +198,7 @@ public class TestGetOpenOrders {
     assertEquals(AccountType.MARGIN, orderList.get(1).getAccountType());
     assertEquals(OrderState.SUBMITTED, orderList.get(1).getState());
     assertEquals(OrderType.BUY_LIMIT, orderList.get(1).getType());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550628730000L),
-        orderList.get(1).getCreatedTimestamp());
+    assertEquals(1550628730000L, orderList.get(1).getCreatedTimestamp());
   }
 
   @Test
