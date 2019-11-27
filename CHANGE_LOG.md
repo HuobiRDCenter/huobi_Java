@@ -43,7 +43,12 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
     ```
     remove timeserver
     ```
-  
+    
+- add subscribe mbp and request mbp
+    ```
+    market.$symbol.mbp.$levels
+    ```
+    
 - UT code update
     ```
     UT code update
