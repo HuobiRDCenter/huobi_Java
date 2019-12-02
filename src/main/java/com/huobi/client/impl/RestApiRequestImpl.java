@@ -1,10 +1,19 @@
 package com.huobi.client.impl;
 
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import okhttp3.Request;
+
 import com.huobi.client.RequestOptions;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.JsonWrapperArray;
-import com.huobi.client.impl.utils.TimeService;
 import com.huobi.client.impl.utils.UrlParamsBuilder;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
@@ -41,6 +50,7 @@ import com.huobi.client.model.enums.CrossMarginTransferType;
 import com.huobi.client.model.enums.DealRole;
 import com.huobi.client.model.enums.DepositState;
 import com.huobi.client.model.enums.EtfStatus;
+import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.LoanOrderStates;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
@@ -51,7 +61,6 @@ import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.enums.WithdrawState;
 import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
-import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
@@ -67,16 +76,6 @@ import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
-
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import okhttp3.Request;
 
 class RestApiRequestImpl {
 
@@ -161,8 +160,7 @@ class RestApiRequestImpl {
   RestApiRequest<Long> getExchangeTimestamp() {
     RestApiRequest<Long> request = new RestApiRequest<>();
     request.request = createRequestByGet("/v1/common/timestamp", null);
-    request.jsonParser = (json ->
-        TimeService.convertCSTInMillisecondToUTC(json.getLong("data")));
+    request.jsonParser = (json -> json.getLong("data"));
     return request;
   }
 
@@ -186,8 +184,7 @@ class RestApiRequestImpl {
       dataArray.forEach((item) -> {
         Candlestick candlestick = new Candlestick();
         candlestick.setId(item.getLong("id"));
-        candlestick.setTimestamp(
-            TimeService.convertCSTInSecondToUTC(item.getLong("id")));
+        candlestick.setTimestamp(item.getLong("id"));
         candlestick.setOpen(item.getBigDecimal("open"));
         candlestick.setClose(item.getBigDecimal("close"));
         candlestick.setLow(item.getBigDecimal("low"));
@@ -269,7 +266,7 @@ class RestApiRequestImpl {
     request.jsonParser = (jsonWrapper -> {
       JsonWrapper tick = jsonWrapper.getJsonObject("tick");
       PriceDepth dp = new PriceDepth();
-      long ts = TimeService.convertCSTInMillisecondToUTC(tick.getLong("ts"));
+      long ts = tick.getLong("ts");
       JsonWrapperArray bids = tick.getJsonArray("bids");
       JsonWrapperArray asks = tick.getJsonArray("asks");
       List<DepthEntry> bidList = new LinkedList<>();
@@ -314,7 +311,7 @@ class RestApiRequestImpl {
           trade.setPrice(itemIn.getBigDecimal("price"));
           trade.setAmount(itemIn.getBigDecimal("amount"));
           trade.setTradeId(itemIn.getString("id"));
-          trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(itemIn.getLong("ts")));
+          trade.setTimestamp(itemIn.getLong("ts"));
           trade.setDirection(TradeDirection.lookup(itemIn.getString("direction")));
           res.add(trade);
         });
@@ -341,7 +338,7 @@ class RestApiRequestImpl {
         trade.setPrice(item.getBigDecimal("price"));
         trade.setAmount(item.getBigDecimal("amount"));
         trade.setTradeId(item.getString("id"));
-        trade.setTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("ts")));
+        trade.setTimestamp(item.getLong("ts"));
         trade.setDirection(TradeDirection.lookup(item.getString("direction")));
         res.add(trade);
       });
@@ -358,8 +355,7 @@ class RestApiRequestImpl {
     request.request = createRequestByGet("/market/detail", builder);
     request.jsonParser = (jsonWrapper -> {
       TradeStatistics tradeStatistics = new TradeStatistics();
-      tradeStatistics.setTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      tradeStatistics.setTimestamp(jsonWrapper.getLong("ts"));
       JsonWrapper tick = jsonWrapper.getJsonObject("tick");
       tradeStatistics.setAmount(tick.getBigDecimal("amount"));
       tradeStatistics.setOpen(tick.getBigDecimal("open"));
@@ -446,7 +442,7 @@ class RestApiRequestImpl {
     request.request = createRequestByGet("/market/detail/merged", builder);
     request.jsonParser = (jsonWrapper -> {
       BestQuote bestQuote = new BestQuote();
-      bestQuote.setTimestamp(TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts")));
+      bestQuote.setTimestamp(jsonWrapper.getLong("ts"));
       JsonWrapper jsonObject = jsonWrapper.getJsonObject("tick");
       JsonWrapperArray askArray = jsonObject.getJsonArray("ask");
       bestQuote.setAskPrice(askArray.getBigDecimalAt(0));
@@ -489,10 +485,8 @@ class RestApiRequestImpl {
         withdraw.setAddressTag(item.getString("address-tag"));
         withdraw.setFee(item.getBigDecimal("fee"));
         withdraw.setWithdrawState(WithdrawState.lookup(item.getString("state")));
-        withdraw.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        withdraw.setUpdatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
+        withdraw.setCreatedTimestamp(item.getLong("created-at"));
+        withdraw.setUpdatedTimestamp(item.getLong("updated-at"));
         withdraws.add(withdraw);
       });
       return withdraws;
@@ -530,10 +524,8 @@ class RestApiRequestImpl {
         deposit.setAddressTag(item.getString("address-tag"));
         deposit.setFee(item.getBigDecimal("fee"));
         deposit.setDepositState(DepositState.lookup(item.getString("state")));
-        deposit.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
-        deposit.setUpdatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("updated-at")));
+        deposit.setCreatedTimestamp(item.getLong("created-at"));
+        deposit.setUpdatedTimestamp(item.getLong("updated-at"));
         deposits.add(deposit);
       });
       return deposits;
@@ -681,8 +673,8 @@ class RestApiRequestImpl {
         loan.setDeductRate(item.getBigDecimalOrDefault("deduct-rate",null));
         loan.setHourInterestRate(item.getBigDecimalOrDefault("hour-interest-rate",null));
         loan.setDayInterestRate(item.getBigDecimalOrDefault("day-interest-rate",null));
-        loan.setAccruedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("accrued-at")));
-        loan.setCreatedTimestamp(TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        loan.setAccruedTimestamp(item.getLong("accrued-at"));
+        loan.setCreatedTimestamp(item.getLong("created-at"));
         loans.add(loan);
       });
       return loans;
@@ -768,7 +760,7 @@ class RestApiRequestImpl {
         .putToUrl("size", loanOrderRequest.getSize())
         .putToUrl("direct", loanOrderRequest.getDirection());
 
-    request.request = createRequestByGetWithSignature("/v1/margin/loan-orders", builder);
+    request.request = createRequestByGetWithSignature("/v1/cross-margin/loan-orders", builder);
     request.jsonParser = (jsonWrapper -> {
       List<CrossMarginLoanOrder> loans = new LinkedList<>();
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
@@ -910,8 +902,7 @@ class RestApiRequestImpl {
         order.setAmount(item.getBigDecimal("amount"));
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setCreatedTimestamp(item.getLong("created-at"));
         order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("filled-amount"));
         order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
@@ -1133,15 +1124,12 @@ class RestApiRequestImpl {
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         order.setAmount(item.getBigDecimal("amount"));
-        order.setCanceledTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
-        order.setFinishedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+        order.setCanceledTimestamp(item.getLongOrDefault("canceled-at", 0));
+        order.setFinishedTimestamp(item.getLongOrDefault("finished-at", 0));
         order.setOrderId(item.getLong("id"));
         order.setSymbol(item.getString("symbol"));
         order.setPrice(item.getBigDecimal("price"));
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setCreatedTimestamp(item.getLong("created-at"));
         order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("field-amount"));
         order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
@@ -1175,15 +1163,12 @@ class RestApiRequestImpl {
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         order.setAmount(item.getBigDecimal("amount"));
-        order.setCanceledTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("canceled-at", 0)));
-        order.setFinishedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLongOrDefault("finished-at", 0)));
+        order.setCanceledTimestamp(item.getLongOrDefault("canceled-at", 0));
+        order.setFinishedTimestamp(item.getLongOrDefault("finished-at", 0));
         order.setOrderId(item.getLong("id"));
         order.setSymbol(item.getString("symbol"));
         order.setPrice(item.getBigDecimal("price"));
-        order.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        order.setCreatedTimestamp(item.getLong("created-at"));
         order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("field-amount"));
         order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
@@ -1303,8 +1288,7 @@ class RestApiRequestImpl {
       dataArray.forEach((item) -> {
         Candlestick candlestick = new Candlestick();
         candlestick.setId(item.getLong("id"));
-        candlestick.setTimestamp(
-            TimeService.convertCSTInSecondToUTC(item.getLong("id")));
+        candlestick.setTimestamp(item.getLong("id"));
         candlestick.setOpen(item.getBigDecimal("open"));
         candlestick.setClose(item.getBigDecimal("close"));
         candlestick.setLow(item.getBigDecimal("low"));
@@ -1456,7 +1440,7 @@ class RestApiRequestImpl {
     request.jsonParser = (jsonWrapper -> {
       Map<String, TradeStatistics> map = new HashMap<>();
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      long ts = TimeService.convertCSTInMillisecondToUTC(jsonWrapper.getLong("ts"));
+      long ts = jsonWrapper.getLong("ts");
       dataArray.forEach(item -> {
         TradeStatistics statistics = new TradeStatistics();
         statistics.setTimestamp(ts);
@@ -1484,12 +1468,9 @@ class RestApiRequestImpl {
       order
           .setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
       order.setAmount(data.getBigDecimal("amount"));
-      order.setCanceledTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("canceled-at")));
-      order.setCreatedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("created-at")));
-      order.setFinishedTimestamp(
-          TimeService.convertCSTInMillisecondToUTC(data.getLong("finished-at")));
+      order.setCanceledTimestamp(data.getLong("canceled-at"));
+      order.setCreatedTimestamp(data.getLong("created-at"));
+      order.setFinishedTimestamp(data.getLong("finished-at"));
       order.setFilledAmount(data.getBigDecimal("field-amount"));
       order.setFilledCashAmount(data.getBigDecimal("field-cash-amount"));
       order.setFilledFees(data.getBigDecimal("field-fees"));
@@ -1510,8 +1491,7 @@ class RestApiRequestImpl {
       dataArray.forEach((item) -> {
         MatchResult matchResult = new MatchResult();
         matchResult.setId(item.getLong("id"));
-        matchResult.setCreatedTimestamp(
-            TimeService.convertCSTInMillisecondToUTC(item.getLong("created-at")));
+        matchResult.setCreatedTimestamp(item.getLong("created-at"));
         matchResult.setFilledAmount(item.getBigDecimal("filled-amount"));
         matchResult.setFilledFees(item.getBigDecimal("filled-fees"));
         matchResult.setMatchId(item.getLong("match-id"));

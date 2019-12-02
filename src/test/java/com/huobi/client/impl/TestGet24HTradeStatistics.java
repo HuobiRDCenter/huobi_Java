@@ -1,18 +1,19 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.TradeStatistics;
 import java.math.BigDecimal;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.TradeStatistics;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class TestGet24HTradeStatistics {
@@ -80,8 +81,7 @@ public class TestGet24HTradeStatistics {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     TradeStatistics tradeStatistics = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(new BigDecimal("224419.35108158883"), tradeStatistics.getAmount());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550224944129L),
-        tradeStatistics.getTimestamp());
+    assertEquals(1550224944129L, tradeStatistics.getTimestamp());
     assertEquals(new BigDecimal("121.97"), tradeStatistics.getClose());
     assertEquals(new BigDecimal("123.42"), tradeStatistics.getHigh());
     assertEquals(new BigDecimal("120.25"), tradeStatistics.getLow());

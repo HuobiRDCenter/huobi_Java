@@ -1,25 +1,10 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.Order;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderSource;
-import com.huobi.client.model.enums.OrderState;
-import com.huobi.client.model.enums.OrderType;
-import com.huobi.client.model.request.HistoricalOrdersRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +14,22 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.Order;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderSource;
+import com.huobi.client.model.enums.OrderState;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.request.HistoricalOrdersRequest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -182,12 +183,9 @@ public class TestGetHistoryOrders {
     List<Order> orders = restApiRequest.jsonParser.parseJson(jsonWrapper);
     assertEquals(24965104183L, orders.get(0).getOrderId());
     assertEquals(AccountType.SPOT, orders.get(0).getAccountType());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550630155568L),
-        orders.get(0).getCanceledTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550630155647L),
-        orders.get(0).getFinishedTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550630155350L),
-        orders.get(0).getCreatedTimestamp());
+    assertEquals(1550630155568L, orders.get(0).getCanceledTimestamp());
+    assertEquals(1550630155647L, orders.get(0).getFinishedTimestamp());
+    assertEquals(1550630155350L, orders.get(0).getCreatedTimestamp());
     assertEquals(new BigDecimal("0.0888"), orders.get(0).getFilledAmount());
     assertEquals(new BigDecimal("0.011"), orders.get(0).getFilledCashAmount());
     assertEquals(new BigDecimal("0.03445"), orders.get(0).getFilledFees());

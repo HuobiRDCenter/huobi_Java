@@ -1,20 +1,7 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.Order;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderSource;
-import com.huobi.client.model.enums.OrderState;
-import com.huobi.client.model.enums.OrderType;
 import java.math.BigDecimal;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +11,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.Order;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderSource;
+import com.huobi.client.model.enums.OrderState;
+import com.huobi.client.model.enums.OrderType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -97,13 +98,10 @@ public class TestGetOrder {
         impl.getOrder("htbtc", 24962048654L);
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     Order order = restApiRequest.jsonParser.parseJson(jsonWrapper);
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550626936504L),
-        order.getCreatedTimestamp());
+    assertEquals(1550626936504L, order.getCreatedTimestamp());
     assertEquals(AccountType.SPOT, order.getAccountType());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550626936722L),
-        order.getCanceledTimestamp());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550626936798L),
-        order.getFinishedTimestamp());
+    assertEquals(1550626936722L, order.getCanceledTimestamp());
+    assertEquals(1550626936798L, order.getFinishedTimestamp());
     assertEquals(24962048654L, order.getOrderId());
     assertEquals(new BigDecimal("0.08888"), order.getFilledAmount());
     assertEquals(new BigDecimal("0.204"), order.getFilledCashAmount());

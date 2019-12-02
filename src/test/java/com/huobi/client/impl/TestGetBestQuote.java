@@ -1,19 +1,20 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.BestQuote;
 import java.math.BigDecimal;
+
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.BestQuote;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestGetBestQuote {
@@ -94,8 +95,7 @@ public class TestGetBestQuote {
         impl.getBestQuote("btcusdt");
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     BestQuote bestQuote = restApiRequest.jsonParser.parseJson(jsonWrapper);
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550223581490L),
-        bestQuote.getTimestamp());
+    assertEquals(1550223581490L, bestQuote.getTimestamp());
     assertEquals(new BigDecimal("122.26"), bestQuote.getAskPrice());
     assertEquals(new BigDecimal("0.8271"), bestQuote.getAskAmount());
     assertEquals(new BigDecimal("122.24"), bestQuote.getBidPrice());

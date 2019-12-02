@@ -1,18 +1,19 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.event.TradeStatisticsEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.event.TradeStatisticsEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestSubTradeStatistics {
@@ -74,7 +75,7 @@ public class TestSubTradeStatistics {
         }, null);
     TradeStatisticsEvent event = request.jsonParser.parseJson(JsonWrapper.parseFromString(data));
     assertEquals("btcusdt", event.getSymbol());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550740513421L), event.getTimeStamp());
+    assertEquals(1550740513421L, event.getTimeStamp());
     //assertEquals(100359274519L, event.getData().getId());
     assertEquals(204966L, event.getData().getCount());
     assertEquals(new BigDecimal("115320213.26007387"), event.getData().getVolume());

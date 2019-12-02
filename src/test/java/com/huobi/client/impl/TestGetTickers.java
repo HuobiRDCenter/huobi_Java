@@ -1,22 +1,18 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Symbol;
-import com.huobi.client.model.TradeStatistics;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
+
 import okhttp3.Request;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.TradeStatistics;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestGetTickers {
   private RestApiRequestImpl impl = null;
@@ -72,8 +68,7 @@ public class TestGetTickers {
     assertTrue(result.containsKey("socusdt"));
     TradeStatistics socusdt = result.get("socusdt");
     assertEquals(new BigDecimal("115547050.74898805"), socusdt.getAmount());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1554793531966L),
-        socusdt.getTimestamp());
+    assertEquals(1554793531966L, socusdt.getTimestamp());
     assertEquals(new BigDecimal("0.008017"), socusdt.getClose());
     assertEquals(new BigDecimal("0.0088"), socusdt.getHigh());
     assertEquals(new BigDecimal("0.007701"), socusdt.getLow());
