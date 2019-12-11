@@ -61,6 +61,13 @@ public class JsonWrapper {
     return getString(name);
   }
 
+  public Boolean getBooleanOrDefault(String name,Boolean defaultValue) {
+    if (!containKey(name)) {
+      return defaultValue;
+    }
+    return getBoolean(name);
+  }
+
   public boolean getBoolean(String name) {
     checkMandatoryField(name);
     try {

@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.huobi.client.SubscriptionClient;
 import com.huobi.client.impl.utils.InternalUtils;
 import com.huobi.client.model.DepthEntry;
@@ -20,6 +23,7 @@ import com.huobi.client.model.event.MarketDepthMBPEvent;
 
 public class OrderBookCacheExamples {
 
+  private static final Logger log = LoggerFactory.getLogger(OrderBookCacheExamples.class);
 
   public static void main(String[] args) {
 
@@ -35,10 +39,10 @@ public class OrderBookCacheExamples {
 
       System.out.println(
           " ask1: price:" + priceDepth.getAsks().get(0).getPrice().toPlainString() + " amount:" + priceDepth.getAsks().get(0).getAmount()
-              .toPlainString());
+              .toPlainString() + "   size:"+priceDepth.getAsks().size());
       System.out.println(
           " bid1: price:" + priceDepth.getBids().get(0).getPrice().toPlainString() + " amount:" + priceDepth.getBids().get(0).getAmount()
-              .toPlainString());
+              .toPlainString() + "   size:"+priceDepth.getBids().size());
       System.out.println("------------------------------------------------");
 
       InternalUtils.await(500);
@@ -147,13 +151,15 @@ public class OrderBookCacheExamples {
     for (MarketDepthMBPEvent event : eventList) {
 
       if (event.getPrevSeqNum() < lastSeqNum) {
+        log.debug(" skip seqNum ! lastSeqNum:"+lastSeqNum+"  snapshot seqNum:"+event.getPrevSeqNum());
         continue;
       }
 
       if (event.getPrevSeqNum() > lastSeqNum) {
+        log.debug(" find error seqNum ! lastSeqNum:"+lastSeqNum+"  snapshot seqNum:"+event.getPrevSeqNum());
         lastSeqNum = -1L;
         initializeDepthCache();
-        continue;
+        break;
       }
 
       lastSeqNum = event.getSeqNum();

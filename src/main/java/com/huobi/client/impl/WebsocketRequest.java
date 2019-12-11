@@ -11,6 +11,7 @@ class WebsocketRequest<T> {
     this.errorHandler = errorHandler;
   }
 
+  String signatureVersion = "2";
   String name;
   Handler<WebSocketConnection> connectionHandler;
   Handler<WebSocketConnection> authHandler = null;

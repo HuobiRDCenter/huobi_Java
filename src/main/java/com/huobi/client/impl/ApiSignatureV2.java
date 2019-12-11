@@ -1,7 +1,5 @@
 package com.huobi.client.impl;
 
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -9,20 +7,24 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-class ApiSignature {
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.UrlParamsBuilder;
+
+class ApiSignatureV2 {
 
   static final String op = "op";
   static final String opValue = "auth";
-  private static final String accessKeyId = "AccessKeyId";
-  private static final String signatureMethod = "SignatureMethod";
-  private static final String signatureMethodValue = "HmacSHA256";
-  private static final String signatureVersion = "SignatureVersion";
-  public static final String signatureVersionValue = "2";
-  private static final String timestamp = "Timestamp";
-  private static final String signature = "Signature";
+  private static final String ACCESS_KEY_NAME = "accessKey";
+  private static final String SIGNATURE_METHOD_NAME = "signatureMethod";
+  private static final String SIGNATURE_METHOD_VALUE = "HmacSHA256";
+  private static final String SIGNATURE_VERSION_NAME = "signatureVersion";
+  public static final String SIGNATURE_VERSION_VALUE = "2.1";
+  private static final String TIMESTAMP_NAME = "timestamp";
+  private static final String SIGNATURE_NAME = "signature";
 
   private static final DateTimeFormatter DT_FORMAT = DateTimeFormatter
       .ofPattern("uuuu-MM-dd'T'HH:mm:ss");
@@ -42,31 +44,28 @@ class ApiSignature {
         .append(host.toLowerCase()).append('\n')
         .append(uri).append('\n');
 
-    builder.putToUrl(accessKeyId, accessKey)
-        .putToUrl(signatureVersion, signatureVersionValue)
-        .putToUrl(signatureMethod, signatureMethodValue)
-        .putToUrl(timestamp, gmtNow());
+    builder.putToUrl(ACCESS_KEY_NAME, accessKey)
+        .putToUrl(SIGNATURE_VERSION_NAME, SIGNATURE_VERSION_VALUE)
+        .putToUrl(SIGNATURE_METHOD_NAME, SIGNATURE_METHOD_VALUE)
+        .putToUrl(TIMESTAMP_NAME, gmtNow());
 
     sb.append(builder.buildSignature());
     Mac hmacSha256;
     try {
-      hmacSha256 = Mac.getInstance(signatureMethodValue);
-      SecretKeySpec secKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
-          signatureMethodValue);
+      hmacSha256 = Mac.getInstance(SIGNATURE_METHOD_VALUE);
+      SecretKeySpec secKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), SIGNATURE_METHOD_VALUE);
       hmacSha256.init(secKey);
     } catch (NoSuchAlgorithmException e) {
-      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
-          "[Signature] No such algorithm: " + e.getMessage());
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR, "[Signature] No such algorithm: " + e.getMessage());
     } catch (InvalidKeyException e) {
-      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
-          "[Signature] Invalid key: " + e.getMessage());
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR, "[Signature] Invalid key: " + e.getMessage());
     }
     String payload = sb.toString();
     byte[] hash = hmacSha256.doFinal(payload.getBytes(StandardCharsets.UTF_8));
 
     String actualSign = Base64.getEncoder().encodeToString(hash);
 
-    builder.putToUrl(signature, actualSign);
+    builder.putToUrl(SIGNATURE_NAME, actualSign);
 
   }
 

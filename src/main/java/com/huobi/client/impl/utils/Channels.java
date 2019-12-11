@@ -2,6 +2,7 @@ package com.huobi.client.impl.utils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import com.huobi.client.model.enums.AccountChangeModeEnum;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DepthStep;
@@ -72,6 +73,20 @@ public abstract class Channels {
     return json.toJSONString();
   }
 
+  public static String accountV2Channel(AccountChangeModeEnum mode) {
+    JSONObject json = new JSONObject();
+    json.put("action", "sub");
+    json.put("ch", "accounts.update#" + mode.getCode());
+    return json.toJSONString();
+  }
+
+  public static String tradeClearingChannel(String symbol) {
+    JSONObject json = new JSONObject();
+    json.put("action", "sub");
+    json.put("ch", "trade.clearing#" + symbol);
+    return json.toJSONString();
+  }
+
   public static String ordersChannel(String symbol) {
     JSONObject json = new JSONObject();
     json.put("op", "sub");
@@ -117,7 +132,7 @@ public abstract class Channels {
 
   public static String marketDepthMBPChannel(String op, String symbol, MBPLevelEnums level) {
     JSONObject json = new JSONObject();
-    String topic = "market."+symbol+".mbp."+level.getLevels();
+    String topic = "market." + symbol + ".mbp." + level.getLevels();
     json.put(op, topic);
     json.put("cid", System.currentTimeMillis() + "");
     return json.toJSONString();
