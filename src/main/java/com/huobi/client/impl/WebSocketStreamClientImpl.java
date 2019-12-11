@@ -4,10 +4,12 @@ import com.huobi.client.SubscriptionClient;
 import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
 import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.model.enums.AccountChangeModeEnum;
 import com.huobi.client.model.enums.BalanceMode;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.DepthStep;
 import com.huobi.client.model.enums.MBPLevelEnums;
+import com.huobi.client.model.event.AccountChangeV2Event;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
@@ -18,6 +20,7 @@ import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
+import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
 import com.huobi.client.model.request.OrdersRequest;
@@ -297,6 +300,25 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.subscribeAccountEvent(mode, subscriptionListener, errorHandler));
   }
+
+
+  public void subscribeAccountChangeV2Event(AccountChangeModeEnum mode, SubscriptionListener<AccountChangeV2Event> callback) {
+    subscribeAccountChangeV2Event(mode, callback, null);
+  }
+
+  public void subscribeAccountChangeV2Event(AccountChangeModeEnum mode, SubscriptionListener<AccountChangeV2Event> callback,
+      SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.subscribeAccountChangeV2Event(mode, callback, errorHandler));
+  }
+
+  public void subscribeTradeClearing(String symbols,SubscriptionListener<TradeClearingEvent> callback) {
+    subscribeTradeClearing(symbols,callback,null);
+  }
+
+  public void subscribeTradeClearing(String symbols,SubscriptionListener<TradeClearingEvent> callback, SubscriptionErrorHandler errorHandler) {
+    createConnection(requestImpl.subscribeTradeClearing(parseSymbols(symbols), callback, errorHandler));
+  }
+
 
   @Override
   public void subscribe24HTradeStatisticsEvent(String symbols,

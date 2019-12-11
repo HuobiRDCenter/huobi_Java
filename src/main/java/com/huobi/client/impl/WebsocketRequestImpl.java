@@ -11,10 +11,12 @@ import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.Channels;
+import com.huobi.client.impl.utils.InternalUtils;
 import com.huobi.client.impl.utils.JsonWrapper;
 import com.huobi.client.impl.utils.JsonWrapperArray;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountChange;
+import com.huobi.client.model.AccountChangeV2;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.DepthEntry;
@@ -22,7 +24,9 @@ import com.huobi.client.model.Order;
 import com.huobi.client.model.OrderUpdate;
 import com.huobi.client.model.PriceDepth;
 import com.huobi.client.model.Trade;
+import com.huobi.client.model.TradeClearing;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.enums.AccountChangeModeEnum;
 import com.huobi.client.model.enums.AccountChangeType;
 import com.huobi.client.model.enums.AccountState;
 import com.huobi.client.model.enums.AccountType;
@@ -37,6 +41,7 @@ import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
 import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
+import com.huobi.client.model.event.AccountChangeV2Event;
 import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
@@ -47,6 +52,7 @@ import com.huobi.client.model.event.OrderListEvent;
 import com.huobi.client.model.event.OrderUpdateEvent;
 import com.huobi.client.model.event.OrderUpdateNewEvent;
 import com.huobi.client.model.event.PriceDepthEvent;
+import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
 import com.huobi.client.model.request.OrdersRequest;
@@ -513,6 +519,86 @@ class WebsocketRequestImpl {
     return request;
   }
 
+  WebsocketRequest<AccountChangeV2Event> subscribeAccountChangeV2Event(
+      AccountChangeModeEnum mode,
+      SubscriptionListener<AccountChangeV2Event> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker().shouldNotNull(subscriptionListener, "listener");
+    WebsocketRequest<AccountChangeV2Event> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    request.name = "AccountChangeV2";
+    // 新版本需设置版本号
+    request.signatureVersion = ApiSignatureV2.SIGNATURE_VERSION_VALUE;
+    request.authHandler = (connection) -> {
+      connection.send(Channels.accountV2Channel(mode));
+    };
+    request.jsonParser = (jsonWrapper) -> {
+      AccountChangeV2Event accountEvent = new AccountChangeV2Event();
+      accountEvent.setCh(jsonWrapper.getStringOrDefault("ch", null));
+
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+
+      AccountChangeV2 changeV2 = new AccountChangeV2();
+      changeV2.setCurrency(data.getStringOrDefault("currency", null));
+      changeV2.setAccountId(data.getLongOrDefault("accountId", -1));
+      changeV2.setAccountType(data.getStringOrDefault("accountType", null));
+      changeV2.setBalance(data.getBigDecimalOrDefault("balance", null));
+      changeV2.setChangeType(data.getStringOrDefault("changeType", null));
+      changeV2.setChangeTime(data.getLongOrDefault("changeTime", -1));
+      accountEvent.setAccountChange(changeV2);
+      return accountEvent;
+    };
+    return request;
+  }
+
+  WebsocketRequest<TradeClearingEvent> subscribeTradeClearing(
+      List<String> symbolList,
+      SubscriptionListener<TradeClearingEvent> subscriptionListener,
+      SubscriptionErrorHandler errorHandler) {
+    InputChecker.checker()
+        .checkList(symbolList,0,500,"symbolList")
+        .shouldNotNull(subscriptionListener, "listener");
+    WebsocketRequest<TradeClearingEvent> request =
+        new WebsocketRequest<>(subscriptionListener, errorHandler);
+    request.name = "TradeClearing";
+    // 新版本需设置版本号
+    request.signatureVersion = ApiSignatureV2.SIGNATURE_VERSION_VALUE;
+    request.authHandler = (connection) -> {
+
+      for (String symbol : symbolList) {
+        connection.send(Channels.tradeClearingChannel(symbol));
+        InternalUtils.await(20);
+      }
+
+    };
+
+    request.jsonParser = (jsonWrapper) -> {
+      TradeClearingEvent event = new TradeClearingEvent();
+      event.setCh(jsonWrapper.getStringOrDefault("ch", null));
+
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+
+      TradeClearing clearing = new TradeClearing();
+      clearing.setSymbol(data.getStringOrDefault("symbol", null));
+      clearing.setTradeId(data.getLongOrDefault("tradeId", 0));
+      clearing.setOrderId(data.getLongOrDefault("orderId", 0));
+      clearing.setTradePrice(data.getBigDecimalOrDefault("tradePrice", null));
+      clearing.setTradeVolume(data.getBigDecimalOrDefault("tradeVolume", null));
+      clearing.setOrderSide(data.getStringOrDefault("orderSide", null));
+      clearing.setOrderType(data.getStringOrDefault("orderType", null));
+      clearing.setAggressor(data.getBooleanOrDefault("aggressor", null));
+      clearing.setTradeTime(data.getLongOrDefault("tradeTime", 0));
+      clearing.setTransactFee(data.getBigDecimalOrDefault("transactFee", null));
+      clearing.setFeeDeduct(data.getBigDecimalOrDefault("feeDeduct", null));
+      clearing.setFeeDeductType(data.getStringOrDefault("feeDeductType", null));
+
+      event.setData(clearing);
+      return event;
+    };
+    return request;
+  }
+
+
   WebsocketRequest<TradeStatisticsEvent> subscribe24HTradeStatisticsEvent(
       List<String> symbols,
       SubscriptionListener<TradeStatisticsEvent> subscriptionListener,
@@ -768,7 +854,7 @@ class WebsocketRequestImpl {
 
     WebsocketRequest<MarketDepthMBPEvent> request = new WebsocketRequest<MarketDepthMBPEvent>(subscriptionListener, errorHandler);
     request.connectionHandler = (connection) -> {
-      connection.send(Channels.marketDepthMBPChannel(symbol,level));
+      connection.send(Channels.marketDepthMBPChannel(symbol, level));
     };
 
     request.jsonParser = (jsonWrapper) -> {
@@ -803,14 +889,13 @@ class WebsocketRequestImpl {
   }
 
 
-
   WebsocketRequest<MarketDepthMBPEvent> requestMarketDepthMBPEvent(String symbol, MBPLevelEnums level,
       SubscriptionListener<MarketDepthMBPEvent> subscriptionListener,
       SubscriptionErrorHandler errorHandler) {
 
     WebsocketRequest<MarketDepthMBPEvent> request = new WebsocketRequest<MarketDepthMBPEvent>(subscriptionListener, errorHandler);
     request.connectionHandler = (connection) -> {
-      connection.send(Channels.requestMarketDepthMBPChannel(symbol,level));
+      connection.send(Channels.requestMarketDepthMBPChannel(symbol, level));
     };
 
     request.jsonParser = (jsonWrapper) -> {
@@ -818,7 +903,7 @@ class WebsocketRequestImpl {
 
       MarketDepthMBPEvent event = new MarketDepthMBPEvent();
       event.setSeqNum(data.getLong("seqNum"));
-      event.setPrevSeqNum(data.getLong("prevSeqNum"));
+//      event.setPrevSeqNum(data.getLong("prevSeqNum"));
 
       List<DepthEntry> bidList = new LinkedList<>();
       JsonWrapperArray bids = data.getJsonArray("bids");
