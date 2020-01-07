@@ -16,6 +16,8 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 
 ## Table of Contents
 
+- [Huobi Global API Java SDK version 1.0.9](#Huobi-Global-API-Java-SDK-version-1.0.9)
+
 - [Huobi Global API Java SDK version 1.0.8](#Huobi-Global-API-Java-SDK-version-1.0.8)
 
 - [Huobi Global API Java SDK version 1.0.7](#Huobi-Global-API-Java-SDK-version-1.0.7)
@@ -31,6 +33,24 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 - [Huobi Global API Java SDK version 1.0.2](#Huobi-Global-API-Java-SDK-version-1.0.2)
 
 - [Huobi Global API Java SDK version 1.0.1](#Huobi-Global-API-Java-SDK-version-1.0.1)
+
+# Huobi Global API JAVA SDK version 1.0.9
+
+## 1.RELEASE NOTE - Huobi Global API SDK  1.0.9
+***2020-01-07***
+
+   
+- add new api
+    ```
+     1. POST /v1/order/batch-orders
+     2. POST /v2/sub-user/management
+    ```
+- modify api
+    ```
+     1. POST /v1/order/orders/batchcancel
+        param add client-order-ids 
+        return success and failed detail info
+    ```    
 
 # Huobi Global API JAVA SDK version 1.0.8
 
