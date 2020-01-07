@@ -19,9 +19,12 @@ import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
+import com.huobi.client.model.CancelResult;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
@@ -36,6 +39,7 @@ import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -60,6 +64,7 @@ import com.huobi.client.model.enums.StopOrderOperator;
 import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.enums.WithdrawState;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
@@ -72,6 +77,7 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
@@ -222,35 +228,56 @@ class RestApiRequestImpl {
   RestApiRequest<List<AccountHistory>> getAccountHistory(AccountHistoryRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getAccountId(),"account-id");
+        .shouldNotNull(request.getAccountId(), "account-id");
 
     RestApiRequest<List<AccountHistory>> restApiRequest = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("account-id",request.getAccountId())
-        .putToUrl("currency",request.getCurrency())
-        .putToUrl("transact-types",request.getTypeString())
-        .putToUrl("start-time",request.getStartTime())
-        .putToUrl("end-time",request.getEndTime())
-        .putToUrl("sort",request.getSort() == null ? null : request.getSort().getCode())
-        .putToUrl("size",request.getSize())
-        ;
+        .putToUrl("account-id", request.getAccountId())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("transact-types", request.getTypeString())
+        .putToUrl("start-time", request.getStartTime())
+        .putToUrl("end-time", request.getEndTime())
+        .putToUrl("sort", request.getSort() == null ? null : request.getSort().getCode())
+        .putToUrl("size", request.getSize());
     restApiRequest.request = createRequestByGetWithSignature("/v1/account/history", builder);
     restApiRequest.jsonParser = (jsonWrapper -> {
       List<AccountHistory> res = new LinkedList<>();
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
         AccountHistory history = new AccountHistory();
-        history.setAccountId(item.getLongOrDefault("account-id",0L));
-        history.setCurrency(item.getStringOrDefault("currency",null));
-        history.setTransactAmt(item.getBigDecimalOrDefault("transact-amt",null));
-        history.setTransactType(item.getStringOrDefault("transact-type",null));
-        history.setRecordId(item.getLongOrDefault("record-id",0L));
-        history.setAvailBalance(item.getBigDecimalOrDefault("avail-balance",null));
-        history.setAcctBalance(item.getBigDecimalOrDefault("acct-balance",null));
-        history.setTransactTime(item.getLongOrDefault("transact-time",0L));
+        history.setAccountId(item.getLongOrDefault("account-id", 0L));
+        history.setCurrency(item.getStringOrDefault("currency", null));
+        history.setTransactAmt(item.getBigDecimalOrDefault("transact-amt", null));
+        history.setTransactType(item.getStringOrDefault("transact-type", null));
+        history.setRecordId(item.getLongOrDefault("record-id", 0L));
+        history.setAvailBalance(item.getBigDecimalOrDefault("avail-balance", null));
+        history.setAcctBalance(item.getBigDecimalOrDefault("acct-balance", null));
+        history.setTransactTime(item.getLongOrDefault("transact-time", 0L));
         res.add(history);
       });
       return res;
+    });
+    return restApiRequest;
+  }
+
+
+  RestApiRequest<SubuserManagementResult> subuserManagement(SubuserManagementRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getSubUid(), "sub-uid")
+        .shouldNotNull(request.getAction(), "action");
+
+    RestApiRequest<SubuserManagementResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("subUid", request.getSubUid())
+        .putToPost("action", request.getAction().getAction());
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/management", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+      SubuserManagementResult result = new SubuserManagementResult();
+      result.setSubUid(data.getLongOrDefault("subUid", -1));
+      result.setUserState(data.getStringOrDefault("userState", null));
+      return result;
     });
     return restApiRequest;
   }
@@ -307,7 +334,7 @@ class RestApiRequestImpl {
         JsonWrapperArray dataArrayIn = item.getJsonArray("data");
         dataArrayIn.forEach((itemIn) -> {
           Trade trade = new Trade();
-          trade.setUniqueTradeId(itemIn.getLongOrDefault("trade-id",0));
+          trade.setUniqueTradeId(itemIn.getLongOrDefault("trade-id", 0));
           trade.setPrice(itemIn.getBigDecimal("price"));
           trade.setAmount(itemIn.getBigDecimal("amount"));
           trade.setTradeId(itemIn.getString("id"));
@@ -334,7 +361,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = tick.getJsonArray("data");
       dataArray.forEach((item) -> {
         Trade trade = new Trade();
-        trade.setUniqueTradeId(item.getLongOrDefault("trade-id",0));
+        trade.setUniqueTradeId(item.getLongOrDefault("trade-id", 0));
         trade.setPrice(item.getBigDecimal("price"));
         trade.setAmount(item.getBigDecimal("amount"));
         trade.setTradeId(item.getString("id"));
@@ -478,7 +505,7 @@ class RestApiRequestImpl {
         Withdraw withdraw = new Withdraw();
         withdraw.setId(item.getLong("id"));
         withdraw.setCurrency(item.getString("currency"));
-        withdraw.setChain(item.getStringOrDefault("chain",null));
+        withdraw.setChain(item.getStringOrDefault("chain", null));
         withdraw.setTxHash(item.getString("tx-hash"));
         withdraw.setAmount(item.getBigDecimal("amount"));
         withdraw.setAddress(item.getString("address"));
@@ -517,7 +544,7 @@ class RestApiRequestImpl {
         Deposit deposit = new Deposit();
         deposit.setId(item.getLong("id"));
         deposit.setCurrency(item.getString("currency"));
-        deposit.setChain(item.getStringOrDefault("chain",null));
+        deposit.setChain(item.getStringOrDefault("chain", null));
         deposit.setTxHash(item.getString("tx-hash"));
         deposit.setAmount(item.getBigDecimal("amount"));
         deposit.setAddress(item.getString("address"));
@@ -666,13 +693,13 @@ class RestApiRequestImpl {
         loan.setState(LoanOrderStates.lookup(item.getString("state")));
         loan.setAccountType(AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         loan.setUserId(item.getLong("user-id"));
-        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-point",null));
-        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-coin",null));
-        loan.setDeductCurrency(item.getStringOrDefault("deduct-currency",null));
-        loan.setDeductAmount(item.getBigDecimalOrDefault("deduct-amount",null));
-        loan.setDeductRate(item.getBigDecimalOrDefault("deduct-rate",null));
-        loan.setHourInterestRate(item.getBigDecimalOrDefault("hour-interest-rate",null));
-        loan.setDayInterestRate(item.getBigDecimalOrDefault("day-interest-rate",null));
+        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-point", null));
+        loan.setPaidCoin(item.getBigDecimalOrDefault("paid-coin", null));
+        loan.setDeductCurrency(item.getStringOrDefault("deduct-currency", null));
+        loan.setDeductAmount(item.getBigDecimalOrDefault("deduct-amount", null));
+        loan.setDeductRate(item.getBigDecimalOrDefault("deduct-rate", null));
+        loan.setHourInterestRate(item.getBigDecimalOrDefault("hour-interest-rate", null));
+        loan.setDayInterestRate(item.getBigDecimalOrDefault("day-interest-rate", null));
         loan.setAccruedTimestamp(item.getLong("accrued-at"));
         loan.setCreatedTimestamp(item.getLong("created-at"));
         loans.add(loan);
@@ -686,7 +713,7 @@ class RestApiRequestImpl {
 
   RestApiRequest<Long> transferCrossMargin(CrossMarginTransferRequest transferRequest) {
     InputChecker.checker()
-        .shouldNotNull(transferRequest.getType(),"type")
+        .shouldNotNull(transferRequest.getType(), "type")
         .checkCurrency(transferRequest.getCurrency())
         .shouldNotNull(transferRequest.getAmount(), "amount");
     String address;
@@ -733,7 +760,7 @@ class RestApiRequestImpl {
   RestApiRequest<Long> repayCrossMarginLoan(CrossMarginRepayLoanRequest repayLoanRequest) {
 
     InputChecker.checker()
-        .shouldNotNull(repayLoanRequest.getOrderId(),"order-id")
+        .shouldNotNull(repayLoanRequest.getOrderId(), "order-id")
         .shouldNotNull(repayLoanRequest, "amount");
     RestApiRequest<Long> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -769,16 +796,16 @@ class RestApiRequestImpl {
         CrossMarginLoanOrder order = new CrossMarginLoanOrder();
         order.setId(item.getLong("id"));
         order.setAccountId(item.getLong("account-id"));
-        order.setUserId(item.getLongOrDefault("user-id",0));
-        order.setCurrency(item.getStringOrDefault("currency",null));
-        order.setLoanBalance(item.getBigDecimalOrDefault("loan-balance",null));
-        order.setLoanAmount(item.getBigDecimalOrDefault("loan-amount",null));
-        order.setInterestBalance(item.getBigDecimalOrDefault("interest-balance",null));
-        order.setInterestAmount(item.getBigDecimalOrDefault("interest-amount",null));
-        order.setFilledPoints(item.getBigDecimalOrDefault("filled-points",null));
-        order.setFilledHt(item.getBigDecimalOrDefault("filled-ht",null));
-        order.setState(item.getStringOrDefault("state",null));
-        order.setAccruedAt(item.getLongOrDefault("accrued-at",0));
+        order.setUserId(item.getLongOrDefault("user-id", 0));
+        order.setCurrency(item.getStringOrDefault("currency", null));
+        order.setLoanBalance(item.getBigDecimalOrDefault("loan-balance", null));
+        order.setLoanAmount(item.getBigDecimalOrDefault("loan-amount", null));
+        order.setInterestBalance(item.getBigDecimalOrDefault("interest-balance", null));
+        order.setInterestAmount(item.getBigDecimalOrDefault("interest-amount", null));
+        order.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
+        order.setFilledHt(item.getBigDecimalOrDefault("filled-ht", null));
+        order.setState(item.getStringOrDefault("state", null));
+        order.setAccruedAt(item.getLongOrDefault("accrued-at", 0));
         order.setCreatedAt(item.getLong("created-at"));
 
         loans.add(order);
@@ -790,7 +817,6 @@ class RestApiRequestImpl {
   }
 
 
-
   RestApiRequest<CrossMarginAccount> getCrossMarginAccount() {
     RestApiRequest<CrossMarginAccount> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
@@ -799,29 +825,28 @@ class RestApiRequestImpl {
       List<CrossMarginAccount> accountList = new LinkedList<>();
       JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
 
-        CrossMarginAccount account = new CrossMarginAccount();
-        account.setId(itemInData.getLong("id"));
-        account.setType(itemInData.getStringOrDefault("type",null));
-        account.setState(itemInData.getStringOrDefault("state",null));
-        account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate",null));
-        account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum",null));
-        account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum",null));
-        JsonWrapperArray array = itemInData.getJsonArray("list");
-        List<Balance> balanceList = new ArrayList<>();
-        array.forEach(balanceItem->{
-          Balance balance = new Balance();
-          balance.setCurrency(balanceItem.getStringOrDefault("currency",null));
-          balance.setType(BalanceType.lookup(balanceItem.getString("type")));
-          balance.setBalance(balanceItem.getBigDecimalOrDefault("balance",null));
-          balanceList.add(balance);
-        });
-        account.setList(balanceList);
+      CrossMarginAccount account = new CrossMarginAccount();
+      account.setId(itemInData.getLong("id"));
+      account.setType(itemInData.getStringOrDefault("type", null));
+      account.setState(itemInData.getStringOrDefault("state", null));
+      account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate", null));
+      account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum", null));
+      account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum", null));
+      JsonWrapperArray array = itemInData.getJsonArray("list");
+      List<Balance> balanceList = new ArrayList<>();
+      array.forEach(balanceItem -> {
+        Balance balance = new Balance();
+        balance.setCurrency(balanceItem.getStringOrDefault("currency", null));
+        balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+        balance.setBalance(balanceItem.getBigDecimalOrDefault("balance", null));
+        balanceList.add(balance);
+      });
+      account.setList(balanceList);
 
       return account;
     });
     return request;
   }
-
 
 
   RestApiRequest<Long> createOrder(NewOrderRequest newOrderRequest) {
@@ -868,6 +893,69 @@ class RestApiRequestImpl {
     request.jsonParser = (json -> {
       String data = json.getString("data");
       return Long.valueOf(data);
+    });
+    return request;
+  }
+
+
+  RestApiRequest<List<CreateOrderResult>> batchCreateOrder(List<NewOrderRequest> requestList) {
+    InputChecker.checker().checkList(requestList, 0, 10, "request list");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    builder.setArrayMode(true);
+    for (NewOrderRequest newOrderRequest : requestList) {
+      Account account = AccountsInfoMap.getUser(apiKey).getAccount(newOrderRequest.getAccountType(), newOrderRequest.getSymbol());
+      if (account == null) {
+        throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] No such account");
+      }
+
+      // 基本验证
+      InputChecker.checker()
+          .shouldNotNull(newOrderRequest.getType(), "Type")
+          .shouldNotNull(newOrderRequest.getAmount(), "Amount");
+
+      if (newOrderRequest.getType() == OrderType.SELL_LIMIT
+          || newOrderRequest.getType() == OrderType.BUY_LIMIT
+          || newOrderRequest.getType() == OrderType.BUY_LIMIT_MAKER
+          || newOrderRequest.getType() == OrderType.SELL_LIMIT_MAKER) {
+        InputChecker.checker()
+            .shouldNotNull(newOrderRequest.getPrice(), "Price");
+      }
+
+      if (newOrderRequest.getType() == OrderType.SELL_MARKET
+          || newOrderRequest.getType() == OrderType.BUY_MARKET) {
+        InputChecker.checker()
+            .shouldNull(newOrderRequest.getPrice(), "Price");
+      }
+
+      Map<String, Object> param = new HashMap<>();
+      String stopOp = newOrderRequest.getOperator() != null ? newOrderRequest.getOperator().getOperator() : null;
+      param.put("account-id", account.getId());
+      param.put("symbol", newOrderRequest.getSymbol());
+      param.put("type", newOrderRequest.getType().toString());
+      param.put("amount", newOrderRequest.getAmount());
+      param.put("price", newOrderRequest.getPrice());
+      param.put("client-order-id", newOrderRequest.getClientOrderId());
+      param.put("stop-price", newOrderRequest.getStopPrice());
+      param.put("operator", stopOp);
+      builder.putToList(param);
+    }
+
+    RestApiRequest<List<CreateOrderResult>> request = new RestApiRequest<>();
+    request.request = createRequestByPostWithSignature("/v1/order/batch-orders", builder);
+    request.jsonParser = (json -> {
+      JsonWrapperArray data = json.getJsonArray("data");
+
+      List<CreateOrderResult> results = new ArrayList<>();
+      data.forEach(result -> {
+        CreateOrderResult orderResult = new CreateOrderResult();
+        orderResult.setOrderId(result.getLongOrDefault("order-id", -1));
+        orderResult.setClientOrderId(result.getStringOrDefault("client-order-id", null));
+        orderResult.setErrCode(result.getStringOrDefault("err-code", null));
+        orderResult.setErrMsg(result.getStringOrDefault("err-msg", null));
+        results.add(orderResult);
+      });
+      return results;
     });
     return request;
   }
@@ -938,20 +1026,65 @@ class RestApiRequestImpl {
     return request;
   }
 
-  RestApiRequest<Void> cancelOrders(String symbol, List<Long> orderIds) {
+  RestApiRequest<BatchCancelResultV1> cancelOrders(BatchCancelRequest batchCancelRequest) {
     InputChecker.checker()
-        .checkSymbol(symbol)
-        .shouldNotNull(orderIds, "orderIds")
-        .checkList(orderIds, 1, 50, "orderIds");
-    RestApiRequest<Void> request = new RestApiRequest<>();
-    List<String> stringList = new LinkedList<>();
-    for (Object obj : orderIds) {
-      stringList.add(obj.toString());
+        .shouldNotNull(batchCancelRequest, "reqeust")
+        .checkSymbol(batchCancelRequest.getSymbol());
+
+    if ((batchCancelRequest.getOrderIds() == null || batchCancelRequest.getOrderIds().size() <= 0)
+        && (batchCancelRequest.getClientOrderIds() == null || batchCancelRequest.getClientOrderIds().size() <= 0)) {
+      throw new HuobiApiException(HuobiApiException.INPUT_ERROR, "[Input] both orderIds and clientOrderIds not null");
     }
+
+    List<String> stringIdList = null;
+    if (batchCancelRequest.getOrderIds() != null && batchCancelRequest.getOrderIds().size() > 0) {
+      InputChecker.checker().checkList(batchCancelRequest.getOrderIds(), 0, 50, "orderIds");
+      stringIdList = new LinkedList<>();
+      for (Object obj : batchCancelRequest.getOrderIds()) {
+        stringIdList.add(obj.toString());
+      }
+    }
+
+    if (batchCancelRequest.getClientOrderIds() != null && batchCancelRequest.getClientOrderIds().size() > 0) {
+      InputChecker.checker().checkList(batchCancelRequest.getClientOrderIds(), 0, 50, "orderIds");
+    }
+
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToPost("order-ids", stringList);
+        .putToPost("order-ids", stringIdList)
+        .putToPost("client-order-ids", batchCancelRequest.getClientOrderIds());
+
+    RestApiRequest<BatchCancelResultV1> request = new RestApiRequest<>();
     request.request = createRequestByPostWithSignature("/v1/order/orders/batchcancel", builder);
-    request.jsonParser = (json -> (null));
+    request.jsonParser = (json -> {
+      JsonWrapper data = json.getJsonObject("data");
+      JsonWrapperArray successArray = data.getJsonArray("success");
+      List<String> successList = new ArrayList<>();
+      if (successArray != null) {
+        successArray.forEachAsString(str -> {
+          successList.add(str);
+        });
+      }
+
+      JsonWrapperArray failedArray = data.getJsonArray("failed");
+      List<CancelResult> failedList = new ArrayList<>();
+      if (failedArray != null) {
+        failedArray.forEach(failedResult -> {
+
+          CancelResult cancelResult = new CancelResult();
+          cancelResult.setOrderId(failedResult.getLongOrDefault("order-id", -1));
+          cancelResult.setClientOrderId(failedResult.getStringOrDefault("client-order-id", null));
+          cancelResult.setErrCode(failedResult.getStringOrDefault("err-code", null));
+          cancelResult.setErrMsg(failedResult.getStringOrDefault("err-msg", null));
+          cancelResult.setOrderState(failedResult.getStringOrDefault("order-state", null));
+          failedList.add(cancelResult);
+        });
+      }
+
+      BatchCancelResultV1 resultV1 = new BatchCancelResultV1();
+      resultV1.setSuccessList(successList);
+      resultV1.setFailedList(failedList);
+      return resultV1;
+    });
     return request;
   }
 
@@ -1044,7 +1177,7 @@ class RestApiRequestImpl {
 
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       List<DepositAddress> addressList = new ArrayList<>();
-      dataArray.forEach(item ->{
+      dataArray.forEach(item -> {
         DepositAddress address = item.getJson().toJavaObject(DepositAddress.class);
         addressList.add(address);
       });
@@ -1079,7 +1212,7 @@ class RestApiRequestImpl {
         .putToPost("address", withdrawRequest.getAddress())
         .putToPost("amount", withdrawRequest.getAmount())
         .putToPost("currency", withdrawRequest.getCurrency())
-        .putToPost("chain",withdrawRequest.getChain())
+        .putToPost("chain", withdrawRequest.getChain())
         .putToPost("fee", withdrawRequest.getFee())
         .putToPost("addr-tag", withdrawRequest.getAddressTag());
     request.request = createRequestByPostWithSignature("/v1/dw/withdraw/api/create", builder);

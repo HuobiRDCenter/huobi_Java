@@ -6,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.huobi.client.RequestOptions;
 import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.model.BatchCancelResultV1;
+import com.huobi.client.model.request.BatchCancelRequest;
+
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
@@ -40,7 +43,13 @@ public class TestCancelOrder {
     List<Long> longList = new LinkedList<>();
     longList.add(12443L);
     longList.add(2344L);
-    RestApiRequest<Void> restApiRequest = impl.cancelOrders("htbtc", longList);
+
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol("htbtc");
+    request.setOrderIds(longList);
+
+
+    RestApiRequest<BatchCancelResultV1> restApiRequest = impl.cancelOrders(request);
 
     assertTrue(restApiRequest.request.url().toString().contains("/v1/order/orders/batchcancel"));
     assertEquals("POST", restApiRequest.request.method());
@@ -63,15 +72,22 @@ public class TestCancelOrder {
     List<Long> longList = new LinkedList<>();
     longList.add(12443L);
     longList.add(2344L);
-    impl.cancelOrders("?", longList);
+
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol("?");
+    request.setOrderIds(longList);
+
+    impl.cancelOrders(request);
 
   }
 
   @Test
   public void testNullOrderIdList() {
     thrown.expect(HuobiApiException.class);
-    thrown.expectMessage("should not be null");
-    impl.cancelOrders("btcusdt", null);
+    thrown.expectMessage("both orderIds and clientOrderIds not null");
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol("htbtc");
+    impl.cancelOrders(request);
   }
 
   @Test
@@ -82,14 +98,22 @@ public class TestCancelOrder {
       longList.add((long) i);
     }
     thrown.expectMessage("is out of bound");
-    impl.cancelOrders("btcusdt", longList);
+
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol("btcusdt");
+    request.setOrderIds(longList);
+    impl.cancelOrders(request);
   }
 
   @Test
   public void testEmptyOrderIdList() {
     thrown.expect(HuobiApiException.class);
     List<Long> longList = new LinkedList<>();
-    thrown.expectMessage("should contain");
-    impl.cancelOrders("btcusdt", longList);
+    thrown.expectMessage("both orderIds and clientOrderIds not null");
+
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol("btcusdt");
+    request.setOrderIds(longList);
+    impl.cancelOrders(request);
   }
 }

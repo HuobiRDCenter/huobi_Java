@@ -6,9 +6,11 @@ import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
@@ -24,6 +26,7 @@ import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -33,6 +36,7 @@ import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
 import com.huobi.client.model.enums.EtfSwapType;
@@ -47,6 +51,7 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
@@ -271,6 +276,10 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getAccountHistory(request));
   }
 
+  public SubuserManagementResult subuserManagement(SubuserManagementRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserManagement(request));
+  }
+
   @Override
   public Map<String, TradeStatistics> getTickers() {
     return RestApiInvoker.callSync(requestImpl.getTickers());
@@ -279,6 +288,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public long createOrder(NewOrderRequest newOrderRequest) {
     return RestApiInvoker.callSync(requestImpl.createOrder(newOrderRequest));
+  }
+
+  @Override
+  public List<CreateOrderResult> batchCreateOrder(List<NewOrderRequest> requestList) {
+    return RestApiInvoker.callSync(requestImpl.batchCreateOrder(requestList));
   }
 
   @Override
@@ -297,8 +311,17 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
-  public void cancelOrders(String symbol, List<Long> orderIds) {
-    RestApiInvoker.callSync(requestImpl.cancelOrders(symbol, orderIds));
+  public BatchCancelResultV1 cancelOrders(String symbol, List<Long> orderIds) {
+
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol(symbol);
+    request.setOrderIds(orderIds);
+
+    return RestApiInvoker.callSync(requestImpl.cancelOrders(request));
+  }
+
+  public BatchCancelResultV1 cancelOrders(BatchCancelRequest BatchCancelRequest) {
+    return RestApiInvoker.callSync(requestImpl.cancelOrders(BatchCancelRequest));
   }
 
 
