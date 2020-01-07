@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +57,20 @@ public class UrlParamsBuilder {
   private static final MediaType JSON_TYPE = MediaType.parse("application/json");
   private final ParamsMap paramsMap = new ParamsMap();
   private final ParamsMap postBodyMap = new ParamsMap();
+  private List paramList = new ArrayList();
   private boolean postMode = false;
+  private boolean arrayMode = false;
 
   public static UrlParamsBuilder build() {
     return new UrlParamsBuilder();
   }
 
   private UrlParamsBuilder() {
+  }
+
+  public UrlParamsBuilder setArrayMode(boolean mode) {
+    arrayMode = mode;
+    return this;
   }
 
   public UrlParamsBuilder setPostMode(boolean mode) {
@@ -139,6 +147,11 @@ public class UrlParamsBuilder {
     return this;
   }
 
+  public <T> UrlParamsBuilder putToList(T t) {
+    paramList.add(t);
+    return this;
+  }
+
   public String buildUrl() {
     Map<String, String> map = new HashMap<>(paramsMap.map);
     StringBuilder head = new StringBuilder("?");
@@ -166,6 +179,12 @@ public class UrlParamsBuilder {
   }
 
   public RequestBody buildPostBody() {
+
+    // 判断是否为数组模式
+    if (this.arrayMode) {
+      return RequestBody.create(JSON_TYPE, JSON.toJSONString(this.paramList));
+    }
+
     if (postBodyMap.stringListMap.isEmpty()) {
       if (postBodyMap.map.isEmpty()) {
         return RequestBody.create(JSON_TYPE, "");

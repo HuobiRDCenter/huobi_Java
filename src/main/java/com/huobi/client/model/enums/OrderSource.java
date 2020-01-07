@@ -22,8 +22,19 @@ public enum OrderSource {
   SUPERMARGINAPP("super_margin_app"),
   SUPERMARGINWEB("super_margin_web"),
   SUPERMARGINFLSYS("super_margin_fl_sys"),
-  SUPERMARGINFLMGT("super_margin_fl_mgt");
-
+  SUPERMARGINFLMGT("super_margin_fl_mgt"),
+  SPOTIOS("spot-ios"),
+  SPOTANDROID("spot-android"),
+  SPOTMAC("spot-mac"),
+  SPOTWINDOWS("spot-windows"),
+  MARGINIOS("margin-ios"),
+  MARGINANDROID("margin-android"),
+  MARGINMAC("margin-mac"),
+  MARGINWINDOWS("margin-windows"),
+  SUPERMARGINIOS("super-margin-ios"),
+  SUPERMARGINANDROID("super-margin-android"),
+  SUPERMARGINMAC("super-margin-mac"),
+  SUPERMARGINWINDOWS("super-margin-windows");
   private final String code;
 
   OrderSource(String code) {

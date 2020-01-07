@@ -4,6 +4,7 @@ import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
@@ -322,7 +323,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void cancelOrders(String symbol, List<Long> orderIds,
-      ResponseCallback<AsyncResult<Void>> callback);
+      ResponseCallback<AsyncResult<BatchCancelResultV1>> callback);
 
   /**
    * request to cancel open orders.

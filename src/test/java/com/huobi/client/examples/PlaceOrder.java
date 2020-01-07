@@ -4,8 +4,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
+import com.huobi.client.model.BatchCancelResultV1;
+import com.huobi.client.model.CancelResult;
+import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
@@ -13,6 +18,7 @@ import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
 import com.huobi.client.model.enums.StopOrderOperator;
+import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.MatchResultRequest;
 import com.huobi.client.model.request.NewOrderRequest;
@@ -35,7 +41,7 @@ public class PlaceOrder {
         symbol,
         AccountType.SPOT,
         OrderType.SELL_LIMIT,
-        BigDecimal.valueOf(1.0),
+        BigDecimal.valueOf(0.5),
         BigDecimal.valueOf(4.04),
         clientOrderId,
         null,
@@ -48,13 +54,13 @@ public class PlaceOrder {
     System.out.println("--- " + clientOrderId + " ---");
 
     // Create Buy Limit Order
-    NewOrderRequest requestLimitBuy = NewOrderRequest.spotBuyLimit(symbol, new BigDecimal("3.98"), new BigDecimal("1"));
+    NewOrderRequest requestLimitBuy = NewOrderRequest.spotBuyLimit(symbol, new BigDecimal("1"), new BigDecimal("1"));
     long orderBuyId = syncRequestClient.createOrder(requestLimitBuy);
     System.out.println("--- The new order created ---");
     System.out.println("--- " + orderBuyId + " ---");
 
     // Create Sell Limit Order
-    NewOrderRequest requestLimitSell = NewOrderRequest.spotSellLimit(symbol, new BigDecimal("4.04"), new BigDecimal("1"));
+    NewOrderRequest requestLimitSell = NewOrderRequest.spotSellLimit(symbol, new BigDecimal("4.04"), new BigDecimal("0.5"));
     long orderSellId = syncRequestClient.createOrder(requestLimitSell);
     System.out.println("--- The new order created ---");
     System.out.println("--- " + orderSellId + " ---");
@@ -71,6 +77,7 @@ public class PlaceOrder {
     System.out.println("--- The new order created ---");
     System.out.println("--- " + marketSellId + " ---");
 
+    // Create Buy Stop Limit Order
     NewOrderRequest buyStopLimit = NewOrderRequest.spotBuyStopOrder(symbol,
         new BigDecimal("4.6"),
         new BigDecimal("4.6"),
@@ -81,50 +88,59 @@ public class PlaceOrder {
     System.out.println("--- The new stop limit order created ---");
     System.out.println("--- " + buyStopLimitId + " ---");
 
+    // Create Sell Stop Limit Order
     NewOrderRequest sellStopLimit = NewOrderRequest.spotSellStopOrder(symbol,
-        new BigDecimal("3.5"),
-        new BigDecimal("3.4"),
+        new BigDecimal("2"),
+        new BigDecimal("2"),
         new BigDecimal("1"),
         StopOrderOperator.LTE);
     long sellStopLimitId = syncRequestClient.createOrder(sellStopLimit);
     System.out.println("--- The new stop limit order created ---");
     System.out.println("--- " + sellStopLimitId + " ---");
 
-    String marginSymbol = "xrpusdt";
-    NewOrderRequest marginOrderRequest = new NewOrderRequest(
-        marginSymbol,
-        AccountType.MARGIN,
-        OrderType.BUY_LIMIT,
-        BigDecimal.valueOf(4),
-        BigDecimal.valueOf(0.28),
-        null,
-        null,
-        null
-    );
+    // Batch Create Order
+    List<NewOrderRequest> batchOrderRequestList = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      String cid = "T_" + System.currentTimeMillis() + "_" + i;
+      batchOrderRequestList.add(NewOrderRequest.spotBuyLimit(cid, symbol, new BigDecimal("1"), new BigDecimal("1")));
+    }
 
-    Long marginOrderId = syncRequestClient.createOrder(marginOrderRequest);
-    System.out.println("----------Margin order id:" + marginOrderId + "---------------");
+    List<CreateOrderResult> batchOrderResultList = syncRequestClient.batchCreateOrder(batchOrderRequestList);
 
-    syncRequestClient.cancelOrder(marginSymbol,marginOrderId);
-    System.out.println("--------------Margin order cancel finish----------------");
+    // Print Batch Create Order Result
+    List<Long> orderIdList = new ArrayList<>(10);
+    List<String> clientOrderIdList = new ArrayList<>(10);
+    int i = 0;
+    for (CreateOrderResult orderResult : batchOrderResultList) {
+      System.out.println(
+          " order-id:" + orderResult.getOrderId()
+              + "  client-order-id:" + orderResult.getClientOrderId()
+              + "  err-code:" + orderResult.getErrCode()
+              + "  err-msg:" + orderResult.getErrMsg());
+      if (i % 2 == 0) {
+        orderIdList.add(orderResult.getOrderId());
+      } else {
+        clientOrderIdList.add(orderResult.getClientOrderId());
+        System.out.println("oid:"+orderResult.getOrderId());
+      }
+      i++;
+    }
 
-    String superMarginSymbol = "xrpusdt";
-    NewOrderRequest superMarginOrderRequest = new NewOrderRequest(
-        superMarginSymbol,
-        AccountType.SUPER_MARGIN,
-        OrderType.BUY_LIMIT,
-        BigDecimal.valueOf(4),
-        BigDecimal.valueOf(0.28),
-        null,
-        null,
-        null
-    );
+    // Batch cancel order use order-ids
+    BatchCancelRequest orderIdBatchRequest = new BatchCancelRequest();
+    orderIdBatchRequest.setSymbol(symbol);
+    orderIdBatchRequest.setOrderIds(orderIdList);
+    BatchCancelResultV1 batchCancelResultV1 = syncRequestClient.cancelOrders(orderIdBatchRequest);
 
-    Long superMarginOrderId = syncRequestClient.createOrder(superMarginOrderRequest);
-    System.out.println("----------Super Margin order id:" + superMarginOrderId + "---------------");
+    printBatchResult(batchCancelResultV1);
 
-    syncRequestClient.cancelOrder(superMarginSymbol,superMarginOrderId);
-    System.out.println("--------------Super Margin order cancel finish----------------");
+    // Batch cancel order use client-order-ids
+    BatchCancelRequest clientOrderIdBatchRequest = new BatchCancelRequest();
+    clientOrderIdBatchRequest.setSymbol(symbol);
+    clientOrderIdBatchRequest.setClientOrderIds(clientOrderIdList);
+    BatchCancelResultV1 clientBatchCancelResultV1 = syncRequestClient.cancelOrders(clientOrderIdBatchRequest);
+
+    printBatchResult(clientBatchCancelResultV1);
 
     // Get the order detail use order id
     Order orderInfo = syncRequestClient.getOrder(symbol, o1);
@@ -145,12 +161,12 @@ public class PlaceOrder {
     // Get the order match result use order id
     List<MatchResult> matchResults = syncRequestClient.getMatchResults(symbol, marketBuyId);
     matchResults.forEach(matchResult -> {
-      System.out.println("Order Match Result : " + matchResult.toString());
+      System.out.println("Order Match Result : " + JSON.toJSONString(matchResult));
     });
 
     matchResults = syncRequestClient.getMatchResults(new MatchResultRequest(symbol));
     matchResults.forEach(matchResult -> {
-      System.out.println("Match Result list : " + matchResult.toString());
+      System.out.println("Match Result list : " + JSON.toJSONString(matchResult));
     });
 
     // Cancel order use order id
@@ -164,7 +180,7 @@ public class PlaceOrder {
     List<Order> openOrderList = syncRequestClient.getOpenOrders(new OpenOrderRequest(symbol, AccountType.SPOT));
 
     openOrderList.forEach(order -> {
-      System.out.println("Open Order :: " + order.toString());
+      System.out.println("Open Order :: " + JSON.toJSONString(order));
       cancelOrderList.add(order.getOrderId());
     });
 
@@ -176,7 +192,7 @@ public class PlaceOrder {
     // Get all the orders
     List<Order> orderList = syncRequestClient.getHistoricalOrders(new HistoricalOrdersRequest(symbol, OrderState.FILLED));
     orderList.forEach(order -> {
-      System.out.println("Orders :: " + order.toString());
+      System.out.println("Orders :: " + JSON.toJSONString(order));
     });
 
     System.out.println("=================");
@@ -192,21 +208,37 @@ public class PlaceOrder {
     typeList.add(OrderType.SELL_MARKET);
 
     // Get all the orders
-    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest(symbol, stateList, typeList, null, null, null, null, null));
+    List<Order> orderList1 = syncRequestClient.getOrders(new OrdersRequest("adausdt", stateList, typeList, null, null, null, null, null));
     orderList1.forEach(order -> {
-      System.out.println("Orders :: " + order.toString());
+      System.out.println("Orders :: " + JSON.toJSONString(order));
     });
 
     // Get order history
     List<Order> orderHistoryList = syncRequestClient.getOrderHistory(new OrdersHistoryRequest(symbol));
     orderHistoryList.forEach(order -> {
-      System.out.println("History Order :: " + order.toString());
+      System.out.println("History Order :: " + JSON.toJSONString(order));
     });
 
     // Get fee rate about symbol
     List<FeeRate> feeRateList = syncRequestClient.getFeeRate("htusdt,ethusdt");
     feeRateList.forEach(feeRate -> {
-      System.out.println("FeeRate : " + feeRate.toString());
+      System.out.println("FeeRate : " + JSON.toJSONString(feeRate));
     });
+  }
+
+  public static void printBatchResult(BatchCancelResultV1 batchCancelResultV1) {
+    System.out.println("-----------------------------------");
+    for (String id : batchCancelResultV1.getSuccessList()) {
+      System.out.println("success order:" + id);
+    }
+
+    for (CancelResult cancelResult : batchCancelResultV1.getFailedList()) {
+      System.out.println(
+          " order-id:" + cancelResult.getOrderId()
+              + "  client-order-id:" + cancelResult.getClientOrderId()
+              + "  err-code:" + cancelResult.getErrCode()
+              + "  err-msg:" + cancelResult.getErrMsg()
+              + "  order-state:" + cancelResult.getOrderState());
+    }
   }
 }

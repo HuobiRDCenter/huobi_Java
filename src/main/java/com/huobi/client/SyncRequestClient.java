@@ -1,13 +1,19 @@
 package com.huobi.client;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
+import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
@@ -23,7 +29,7 @@ import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
-
+import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -31,11 +37,12 @@ import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
+import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
-import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
@@ -47,14 +54,11 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -315,6 +319,9 @@ public interface SyncRequestClient {
    */
   List<AccountHistory> getAccountHistory(AccountHistoryRequest request);
 
+
+  SubuserManagementResult subuserManagement(SubuserManagementRequest request);
+
   /**
    * Make an order in huobi.
    *
@@ -322,6 +329,8 @@ public interface SyncRequestClient {
    * @return The order id.
    */
   long createOrder(NewOrderRequest newOrderRequest);
+
+  List<CreateOrderResult> batchCreateOrder(List<NewOrderRequest> requestList);
 
   /**
    * Provide open orders of a symbol for an account<br> When neither account-id nor symbol defined
@@ -349,7 +358,9 @@ public interface SyncRequestClient {
    * @param symbol The symbol, like "btcusdt". (mandatory)
    * @param orderIds The list of order id. the max size is 50. (mandatory)
    */
-  void cancelOrders(String symbol, List<Long> orderIds);
+  BatchCancelResultV1 cancelOrders(String symbol, List<Long> orderIds);
+
+  BatchCancelResultV1 cancelOrders(BatchCancelRequest BatchCancelRequest);
 
   /**
    * Request to cancel open orders.

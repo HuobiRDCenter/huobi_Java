@@ -9,6 +9,7 @@ import com.huobi.client.impl.utils.SucceededAsyncResult;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
@@ -26,6 +27,7 @@ import com.huobi.client.model.PriceDepth;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
@@ -294,8 +296,11 @@ public class AsyncRequestImpl implements AsyncRequestClient {
 
   @Override
   public void cancelOrders(String symbol, List<Long> orderIds,
-                           ResponseCallback<AsyncResult<Void>> callback) {
-    RestApiInvoker.callASync(requestImpl.cancelOrders(symbol, orderIds), callback);
+                           ResponseCallback<AsyncResult<BatchCancelResultV1>> callback) {
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol(symbol);
+    request.setOrderIds(orderIds);
+    RestApiInvoker.callASync(requestImpl.cancelOrders(request), callback);
   }
 
   @Override

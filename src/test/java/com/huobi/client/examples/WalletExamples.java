@@ -11,10 +11,12 @@ import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
+import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 
 
@@ -23,8 +25,18 @@ public class WalletExamples {
   public static void main(String[] args) {
     String currency = "usdt";
 
+    Long subUid = 87654321L;
+
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
+
+    // Lock sub user
+    SubuserManagementResult lockResult = syncRequestClient.subuserManagement(SubuserManagementRequest.lock(subUid));
+    System.out.println(" subuser lock result: uid:"+lockResult.getSubUid()+"   state:"+lockResult.getUserState());
+
+    // Unlock sub user
+    SubuserManagementResult unlockResult = syncRequestClient.subuserManagement(SubuserManagementRequest.unlock(subUid));
+    System.out.println(" subuser unlock result: uid:"+unlockResult.getSubUid()+"   state:"+unlockResult.getUserState());
 
     Long withdrawId = syncRequestClient.withdraw(new WithdrawRequest("address",new BigDecimal(10),currency,"usdterc20"));
     System.out.println(withdrawId);
