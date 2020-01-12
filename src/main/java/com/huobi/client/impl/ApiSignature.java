@@ -20,7 +20,7 @@ class ApiSignature {
   private static final String signatureMethod = "SignatureMethod";
   private static final String signatureMethodValue = "HmacSHA256";
   private static final String signatureVersion = "SignatureVersion";
-  private static final String signatureVersionValue = "2";
+  public static final String signatureVersionValue = "2";
   private static final String timestamp = "Timestamp";
   private static final String signature = "Signature";
 

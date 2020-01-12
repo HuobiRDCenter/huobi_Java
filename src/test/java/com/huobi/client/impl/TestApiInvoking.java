@@ -58,13 +58,6 @@ public class TestApiInvoking {
     }
   }
 
-  @Test
-  public void testSync() {
-    RestApiRequest<Long> restApiRequest = new RestApiRequest<>();
-    restApiRequest.jsonParser = (jsonWrapper) -> jsonWrapper.getLong("data");
-    Long res = RestApiInvoker.callSync(restApiRequest);
-    assertEquals(123L, res.longValue());
-  }
 
   @Test
   public void testASync() {

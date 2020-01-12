@@ -1,15 +1,10 @@
 package com.huobi.client.impl;
 
-import static com.huobi.client.impl.utils.InternalUtils.decode;
-
-import com.huobi.client.SubscriptionOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.InternalUtils;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
 import java.io.IOException;
 import java.net.URI;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -17,6 +12,14 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.InternalUtils;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.UrlParamsBuilder;
+
+import static com.huobi.client.impl.utils.InternalUtils.decode;
 
 public class WebSocketConnection extends WebSocketListener {
 
@@ -32,19 +35,21 @@ public class WebSocketConnection extends WebSocketListener {
   }
 
   /**
-   * 1000 indicates a normal closure, meaning that the purpose for which the connection was
-   * established has been fulfilled.
+   * 1000 indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
    */
   private static final int CLOSE_CODE_1000 = 1000;
   /**
-   * 1001 indicates that an endpoint is "going away", such as a server going down or a browser
-   * having navigated away from a page.
+   * 1001 indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
    */
   private static final int CLOSE_CODE_1001 = 1001;
   /**
    * 1002 indicates that an endpoint is terminating the connection due to a protocol error.
    */
   private static final int CLOSE_CODE_1002 = 1002;
+
+
+  private static final String WEBSOCKET_HEADER_EXCHANGE_KEY = "X-HB-Exchange-Code";
+
   private WebSocket webSocket = null;
 
   private volatile long lastReceivedTime = 0;
@@ -58,6 +63,7 @@ public class WebSocketConnection extends WebSocketListener {
   private final String secretKey;
   private final WebSocketWatchDog watchDog;
   private final int connectionId;
+  private final boolean autoClose;
 
   private String subscriptionMarketUrl = "wss://api.huobi.pro/ws";
   private String subscriptionTradingUrl = "wss://api.huobi.pro/ws/v1";
@@ -69,19 +75,31 @@ public class WebSocketConnection extends WebSocketListener {
       SubscriptionOptions options,
       WebsocketRequest request,
       WebSocketWatchDog watchDog) {
+    this(apiKey, secretKey, options, request, watchDog, false);
+  }
+
+  WebSocketConnection(
+      String apiKey,
+      String secretKey,
+      SubscriptionOptions options,
+      WebsocketRequest request,
+      WebSocketWatchDog watchDog,
+      boolean autoClose) {
     this.connectionId = WebSocketConnection.connectionCounter++;
     this.apiKey = apiKey;
     this.secretKey = secretKey;
     this.request = request;
+    this.autoClose = autoClose;
     try {
       String host = new URI(options.getUri()).getHost();
       this.tradingHost = host;
+      String tradingPath = ApiSignatureV2.SIGNATURE_VERSION_VALUE.equals(request.signatureVersion) ? "/ws/v2" : "/ws/v1";
       if (host.indexOf("api") == 0) {
         this.subscriptionMarketUrl = "wss://" + host + "/ws";
-        this.subscriptionTradingUrl = "wss://" + host + "/ws/v1";
+        this.subscriptionTradingUrl = "wss://" + host + tradingPath;
       } else {
         this.subscriptionMarketUrl = "wss://" + host + "/api/ws";
-        this.subscriptionTradingUrl = "wss://" + host + "/ws/v1";
+        this.subscriptionTradingUrl = "wss://" + host + tradingPath;
       }
     } catch (Exception e) {
       System.out.println(e.getMessage());
@@ -134,6 +152,7 @@ public class WebSocketConnection extends WebSocketListener {
 
   void send(String str) {
     boolean result = false;
+    log.debug("[Send]{}", str);
     if (webSocket != null) {
       result = webSocket.send(str);
     }
@@ -147,7 +166,32 @@ public class WebSocketConnection extends WebSocketListener {
   @Override
   public void onMessage(WebSocket webSocket, String text) {
     super.onMessage(webSocket, text);
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime = System.currentTimeMillis();
+
+    log.debug("[On Message]:{}", text);
+    try {
+      JsonWrapper jsonWrapper = JsonWrapper.parseFromString(text);
+
+      if (jsonWrapper.containKey("action")) {
+        String action = jsonWrapper.getString("action");
+        if ("ping".equals(action)) {
+          processPingOnV2TradingLine(jsonWrapper, webSocket);
+        } else if ("push".equals(action)) {
+          onReceive(jsonWrapper);
+        } if ("req".equals(action)) {
+          String ch = jsonWrapper.getStringOrDefault("ch",null);
+          if ("auth".equals(ch)) {
+            this.request.authHandler.handle(this);
+          }
+
+        }
+
+      }
+
+    } catch (Exception e) {
+      log.error("[On Message][{}]: catch exception:", connectionId, e);
+      closeOnError();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -162,7 +206,7 @@ public class WebSocketConnection extends WebSocketListener {
         return;
       }
 
-      lastReceivedTime = TimeService.getCurrentTimeStamp();
+      lastReceivedTime = System.currentTimeMillis();
 
       String data;
       try {
@@ -173,6 +217,7 @@ public class WebSocketConnection extends WebSocketListener {
         closeOnError();
         return;
       }
+      log.debug("[On Message][{}] {}", connectionId, data);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
       if (jsonWrapper.containKey("status") && !"ok".equals(jsonWrapper.getString("status"))) {
         String errorCode = jsonWrapper.getStringOrDefault("err-code", "");
@@ -191,16 +236,17 @@ public class WebSocketConnection extends WebSocketListener {
           if (request.authHandler != null) {
             request.authHandler.handle(this);
           }
+        } else if (op.equals("req")) {
+          onReceiveAndClose(jsonWrapper);
         }
-      } else if (jsonWrapper.containKey("ch")) {
-        onReceive(jsonWrapper);
+      } else if (jsonWrapper.containKey("ch") || jsonWrapper.containKey("rep")) {
+        onReceiveAndClose(jsonWrapper);
       } else if (jsonWrapper.containKey("ping")) {
         processPingOnMarketLine(jsonWrapper, webSocket);
       } else if (jsonWrapper.containKey("subbed")) {
       }
     } catch (Exception e) {
-      log.error("[Sub][" + this.connectionId
-          + "] Unexpected error: " + e.getMessage());
+      log.error("[Sub][" + this.connectionId + "] Unexpected error: " + e.getMessage());
       closeOnError();
     }
   }
@@ -212,6 +258,13 @@ public class WebSocketConnection extends WebSocketListener {
       request.errorHandler.onError(exception);
     }
     log.error("[Sub][" + this.connectionId + "] " + errorMessage);
+  }
+
+  private void onReceiveAndClose(JsonWrapper jsonWrapper) {
+    onReceive(jsonWrapper);
+    if (autoClose) {
+      close();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -238,6 +291,14 @@ public class WebSocketConnection extends WebSocketListener {
   private void processPingOnMarketLine(JsonWrapper jsonWrapper, WebSocket webSocket) {
     long ts = jsonWrapper.getLong("ping");
     webSocket.send(String.format("{\"pong\":%d}", ts));
+  }
+
+  private void processPingOnV2TradingLine(JsonWrapper jsonWrapper, WebSocket webSocket) {
+
+    long ts = jsonWrapper.getJsonObject("data").getLong("ts");
+
+    String pong = String.format("{\"action\": \"pong\",\"params\": {\"ts\": %d}}", ts);
+    webSocket.send(pong);
   }
 
   public ConnectionState getState() {
@@ -270,23 +331,61 @@ public class WebSocketConnection extends WebSocketListener {
       request.connectionHandler.handle(this);
     }
     state = ConnectionState.CONNECTED;
-    lastReceivedTime = TimeService.getCurrentTimeStamp();
+    lastReceivedTime = System.currentTimeMillis();
     if (request.authHandler != null) {
-      ApiSignature as = new ApiSignature();
-      UrlParamsBuilder builder = UrlParamsBuilder.build();
-      try {
-        URI uri = new URI(subscriptionTradingUrl);
-        as.createSignature(apiKey, secretKey, "GET", tradingHost, uri.getPath(), builder);
-      } catch (Exception e) {
-        onError("Unexpected error when create the signature: " + e.getMessage(), e);
+
+      if (ApiSignature.signatureVersionValue.equals(request.signatureVersion)) {
+        // 老版本验签
+        sendAuthV2();
+      } else if (ApiSignatureV2.SIGNATURE_VERSION_VALUE.equals(request.signatureVersion)) {
+        // 新版本2.1验签
+        sendAuthV2_1();
+      } else {
+        onError("Unsupport signature version: " + request.signatureVersion, null);
         close();
         return;
       }
-      builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
-          .putToUrl("cid", TimeService.getCurrentTimeStamp());
-      send(builder.buildUrlToJsonString());
+
       InternalUtils.await(100);
     }
+  }
+
+  private void sendAuthV2_1() {
+    ApiSignatureV2 as = new ApiSignatureV2();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    try {
+      URI uri = new URI(subscriptionTradingUrl);
+      as.createSignature(apiKey, secretKey, "GET", tradingHost, uri.getPath(), builder);
+    } catch (Exception e) {
+      onError("Unexpected error when create the signature v2: " + e.getMessage(), e);
+      close();
+      return;
+    }
+
+    JSONObject signObj = JSON.parseObject(builder.buildUrlToJsonString());
+    signObj.put("authType", "api");
+
+    JSONObject json = new JSONObject();
+    json.put("action", "req");
+    json.put("ch", "auth");
+    json.put("params", signObj);
+    send(json.toJSONString());
+  }
+
+  private void sendAuthV2() {
+    ApiSignature as = new ApiSignature();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    try {
+      URI uri = new URI(subscriptionTradingUrl);
+      as.createSignature(apiKey, secretKey, "GET", tradingHost, uri.getPath(), builder);
+    } catch (Exception e) {
+      onError("Unexpected error when create the signature: " + e.getMessage(), e);
+      close();
+      return;
+    }
+    builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
+        .putToUrl("cid", System.currentTimeMillis());
+    send(builder.buildUrlToJsonString());
   }
 
   @Override

@@ -19,6 +19,13 @@ public class Loan {
   private BigDecimal interestRate;
   private BigDecimal interestAmount;
   private BigDecimal interestBalance;
+  private BigDecimal paidPoint;
+  private BigDecimal paidCoin;
+  private String deductCurrency;
+  private BigDecimal deductAmount;
+  private BigDecimal deductRate;
+  private BigDecimal hourInterestRate;
+  private BigDecimal dayInterestRate;
   private LoanOrderStates state;
   private long createdTimestamp;
   private long accruedTimestamp;
@@ -190,5 +197,61 @@ public class Loan {
 
   public void setAccruedTimestamp(long accruedTimestamp) {
     this.accruedTimestamp = accruedTimestamp;
+  }
+
+  public BigDecimal getPaidPoint() {
+    return paidPoint;
+  }
+
+  public void setPaidPoint(BigDecimal paidPoint) {
+    this.paidPoint = paidPoint;
+  }
+
+  public BigDecimal getPaidCoin() {
+    return paidCoin;
+  }
+
+  public void setPaidCoin(BigDecimal paidCoin) {
+    this.paidCoin = paidCoin;
+  }
+
+  public String getDeductCurrency() {
+    return deductCurrency;
+  }
+
+  public void setDeductCurrency(String deductCurrency) {
+    this.deductCurrency = deductCurrency;
+  }
+
+  public BigDecimal getDeductAmount() {
+    return deductAmount;
+  }
+
+  public void setDeductAmount(BigDecimal deductAmount) {
+    this.deductAmount = deductAmount;
+  }
+
+  public BigDecimal getDeductRate() {
+    return deductRate;
+  }
+
+  public void setDeductRate(BigDecimal deductRate) {
+    this.deductRate = deductRate;
+  }
+
+  public BigDecimal getHourInterestRate() {
+    return hourInterestRate;
+  }
+
+  public void setHourInterestRate(BigDecimal hourInterestRate) {
+    this.hourInterestRate = hourInterestRate;
+  }
+
+  public BigDecimal getDayInterestRate() {
+    return dayInterestRate;
+  }
+
+  public void setDayInterestRate(BigDecimal dayInterestRate) {
+    this.dayInterestRate = dayInterestRate;
   }
 }

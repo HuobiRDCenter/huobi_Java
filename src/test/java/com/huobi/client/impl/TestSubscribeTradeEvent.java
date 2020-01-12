@@ -1,19 +1,20 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.enums.TradeDirection;
-import com.huobi.client.model.event.TradeEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.enums.TradeDirection;
+import com.huobi.client.model.event.TradeEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestSubscribeTradeEvent {
 
@@ -83,16 +84,14 @@ public class TestSubscribeTradeEvent {
     TradeEvent event = request.jsonParser.parseJson(JsonWrapper.parseFromString(data));
     assertEquals("btcusdt", event.getSymbol());
     assertEquals(2, event.getTradeList().size());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550558574702L), event.getTimestamp());
+    assertEquals(1550558574702L, event.getTimestamp());
     assertEquals(new BigDecimal("0.001"), event.getTradeList().get(0).getAmount());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550558574684L),
-        event.getTradeList().get(0).getTimestamp());
+    assertEquals(1550558574684L, event.getTradeList().get(0).getTimestamp());
     assertEquals("10033544262424890651900", event.getTradeList().get(0).getTradeId());
     assertEquals(new BigDecimal("3892.36"), event.getTradeList().get(0).getPrice());
     assertEquals(TradeDirection.SELL, event.getTradeList().get(0).getDirection());
     assertEquals(new BigDecimal("0.0512"), event.getTradeList().get(1).getAmount());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550558574684L),
-        event.getTradeList().get(1).getTimestamp());
+    assertEquals(1550558574684L, event.getTradeList().get(1).getTimestamp());
     assertEquals("10033544262424890651183", event.getTradeList().get(1).getTradeId());
     assertEquals(new BigDecimal("3892.35"), event.getTradeList().get(1).getPrice());
     assertEquals(TradeDirection.BUY, event.getTradeList().get(1).getDirection());

@@ -3,6 +3,7 @@ package com.huobi.client.model;
 import com.huobi.client.model.enums.WithdrawState;
 import java.math.BigDecimal;
 
+
 /**
  * The latest status for withdraws.
  */
@@ -10,6 +11,7 @@ public class Withdraw {
 
   private long id;
   private String currency;
+  private String chain;
   private String txHash;
   private BigDecimal amount;
   private String address;
@@ -107,6 +109,15 @@ public class Withdraw {
    */
   public WithdrawState getWithdrawState() {
     return withdrawState;
+  }
+
+
+  public String getChain() {
+    return chain;
+  }
+
+  public void setChain(String chain) {
+    this.chain = chain;
   }
 
   public void setId(long id) {

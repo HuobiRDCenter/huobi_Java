@@ -1,16 +1,10 @@
 package com.huobi.client.impl;
 
-import com.huobi.client.AsyncResult;
-import com.huobi.client.ResponseCallback;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.EtfResult;
-import com.huobi.client.impl.utils.FailedAsyncResult;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.SucceededAsyncResult;
-import com.huobi.client.model.enums.EtfStatus;
 import java.io.IOException;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -21,6 +15,14 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.huobi.client.AsyncResult;
+import com.huobi.client.ResponseCallback;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.EtfResult;
+import com.huobi.client.impl.utils.FailedAsyncResult;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.SucceededAsyncResult;
 
 abstract class RestApiInvoker {
 
@@ -52,6 +54,13 @@ abstract class RestApiInvoker {
                 "[Executing] " + err_code + ": " + err_msg);
           }
         }
+      } else if (json.containKey("code")) {
+
+        int code = json.getInteger("code");
+        if (code != 200) {
+          String message = json.getString("message");
+          throw new HuobiApiException(HuobiApiException.EXEC_ERROR, "[Executing] " + code + ": " + message);
+        }
       } else {
         throw new HuobiApiException(
             HuobiApiException.RUNTIME_ERROR, "[Invoking] Status cannot be found in response.");
@@ -67,7 +76,12 @@ abstract class RestApiInvoker {
   static <T> T callSync(RestApiRequest<T> request) {
     try {
       String str;
+      log.debug("Request URL " + request.request.url());
       Response response = client.newCall(request.request).execute();
+      if (response.code() != 200) {
+        throw new HuobiApiException(
+            HuobiApiException.EXEC_ERROR, "[Invoking] Response Status Error : "+response.code()+" message:"+response.message());
+      }
       if (response != null && response.body() != null) {
         str = response.body().string();
         response.close();
@@ -75,6 +89,7 @@ abstract class RestApiInvoker {
         throw new HuobiApiException(
             HuobiApiException.ENV_ERROR, "[Invoking] Cannot get the response from server");
       }
+      log.debug("Response =====> " + str);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(str);
       checkResponse(jsonWrapper);
       return request.jsonParser.parseJson(jsonWrapper);

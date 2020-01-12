@@ -61,6 +61,13 @@ public class JsonWrapper {
     return getString(name);
   }
 
+  public Boolean getBooleanOrDefault(String name,Boolean defaultValue) {
+    if (!containKey(name)) {
+      return defaultValue;
+    }
+    return getBoolean(name);
+  }
+
   public boolean getBoolean(String name) {
     checkMandatoryField(name);
     try {
@@ -74,6 +81,18 @@ public class JsonWrapper {
   public int getInteger(String name) {
     checkMandatoryField(name);
     try {
+      return json.getInteger(name);
+    } catch (Exception e) {
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+          "[Json] Get integer error: " + name + " " + e.getMessage());
+    }
+  }
+
+  public Integer getIntegerOrDefault(String name, Integer defValue) {
+    try {
+      if (!containKey(name)) {
+        return defValue;
+      }
       return json.getInteger(name);
     } catch (Exception e) {
       throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
@@ -113,6 +132,18 @@ public class JsonWrapper {
     }
   }
 
+  public BigDecimal getBigDecimalOrDefault(String name, BigDecimal defValue) {
+    if (!containKey(name)) {
+      return defValue;
+    }
+    try {
+      return new BigDecimal(json.getBigDecimal(name).stripTrailingZeros().toPlainString());
+    } catch (Exception e) {
+      throw new HuobiApiException(HuobiApiException.RUNTIME_ERROR,
+          "[Json] Get decimal error: " + name + " " + e.getMessage());
+    }
+  }
+
   public JsonWrapper getJsonObject(String name) {
     checkMandatoryField(name);
     return new JsonWrapper(json.getJSONObject(name));
@@ -137,6 +168,10 @@ public class JsonWrapper {
           "[Json] Array: " + name + " does not exist");
     }
     return new JsonWrapperArray(array);
+  }
+
+  public JSONObject getJson(){
+    return json;
   }
 
 }

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
  */
 public class Candlestick {
 
+  private Long id;
   private long timestamp;
   private BigDecimal amount;
   private long count;
@@ -87,6 +88,14 @@ public class Candlestick {
    */
   public BigDecimal getVolume() {
     return volume;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public void setTimestamp(long timestamp) {

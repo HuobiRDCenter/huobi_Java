@@ -1,18 +1,19 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.event.PriceDepthEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.event.PriceDepthEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestSubscribePriceDepthEvent {
 
@@ -74,7 +75,7 @@ public class TestSubscribePriceDepthEvent {
         }, null);
     PriceDepthEvent event = request.jsonParser.parseJson(JsonWrapper.parseFromString(data));
     assertEquals("btcusdt", event.getSymbol());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550558788054L), event.getTimestamp());
+    assertEquals(1550558788054L, event.getTimestamp());
     assertEquals(3, event.getData().getBids().size());
     assertEquals(2, event.getData().getAsks().size());
     assertEquals(new BigDecimal("3891.94"), event.getData().getBids().get(0).getPrice());

@@ -22,6 +22,7 @@ public class Account {
 
 
   private List<Balance> balances;
+  private String subtype;
 
   /**
    * Get The balance list of the account.
@@ -59,6 +60,12 @@ public class Account {
     return state;
   }
 
+
+  public String getSubtype() {
+    return subtype;
+  }
+
+
   /**
    * Get The balance list of the specified currency.
    *
@@ -89,5 +96,9 @@ public class Account {
 
   public void setState(AccountState state) {
     this.state = state;
+  }
+
+  public void setSubtype(String subtype) {
+    this.subtype = subtype;
   }
 }

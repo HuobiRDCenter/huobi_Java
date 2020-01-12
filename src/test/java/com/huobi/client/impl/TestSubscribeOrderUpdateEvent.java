@@ -1,20 +1,9 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.User;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderSource;
-import com.huobi.client.model.enums.OrderType;
-import com.huobi.client.model.event.OrderUpdateEvent;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +11,18 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.User;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderSource;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.event.OrderUpdateEvent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -101,10 +102,9 @@ public class TestSubscribeOrderUpdateEvent {
     assertEquals(new BigDecimal("5001"), event.getData().getAmount());
     assertEquals(new BigDecimal("5000"), event.getData().getFilledAmount());
     assertEquals("btcusdt", event.getData().getSymbol());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1522856623232L), event.getTimestamp());
+    assertEquals(1522856623232L, event.getTimestamp());
     assertEquals(AccountType.SPOT, event.getData().getAccountType());
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1522858623622L),
-        event.getData().getCreatedTimestamp());
+    assertEquals(1522858623622L, event.getData().getCreatedTimestamp());
     assertEquals(2039498445L, event.getData().getOrderId());
     assertEquals(OrderType.BUY_LIMIT, event.getData().getType());
     assertEquals(OrderSource.API, event.getData().getSource());

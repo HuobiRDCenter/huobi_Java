@@ -1,26 +1,26 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
-import com.huobi.client.model.MatchResult;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderType;
-import com.huobi.client.model.request.MatchResultRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.MatchResult;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.request.MatchResultRequest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestGetMatchResults {
 
@@ -146,8 +146,7 @@ public class TestGetMatchResults {
         impl.getMatchResults(matchResultRequest);
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
     List<MatchResult> matchResults = restApiRequest.jsonParser.parseJson(jsonWrapper);
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1550632074577L),
-        matchResults.get(1).getCreatedTimestamp());
+    assertEquals(1550632074577L, matchResults.get(1).getCreatedTimestamp());
     assertEquals(4191225853L, matchResults.get(1).getId());
     assertEquals(100047251154L, matchResults.get(1).getMatchId());
     assertEquals(24966984923L, matchResults.get(1).getOrderId());

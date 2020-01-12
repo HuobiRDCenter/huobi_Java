@@ -9,6 +9,7 @@ import com.huobi.client.impl.utils.SucceededAsyncResult;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
@@ -16,13 +17,20 @@ import com.huobi.client.model.Deposit;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
+import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.Symbol;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.BatchCancelRequest;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -108,6 +116,11 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   }
 
   @Override
+  public void getTrade(String symbol, ResponseCallback<AsyncResult<List<Trade>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getTrade(symbol), callback);
+  }
+
+  @Override
   public void get24HTradeStatistics(String symbol,
                                     ResponseCallback<AsyncResult<TradeStatistics>> callback) {
     RestApiInvoker.callASync(requestImpl.get24HTradeStatistics(symbol), callback);
@@ -129,6 +142,16 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   }
 
   @Override
+  public void getCurrencies(ResponseCallback<AsyncResult<List<String>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getCurrencies(), callback);
+  }
+
+  @Override
+  public void getSymbols(ResponseCallback<AsyncResult<List<Symbol>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getSymbols(), callback);
+  }
+
+  @Override
   public void getBestQuote(String symbol, ResponseCallback<AsyncResult<BestQuote>> callback) {
     RestApiInvoker.callASync(requestImpl.getBestQuote(symbol), callback);
   }
@@ -136,19 +159,35 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   @Override
   public void getWithdrawHistory(String currency, long fromId, int size,
                                  ResponseCallback<AsyncResult<List<Withdraw>>> callback) {
-    RestApiInvoker.callASync(requestImpl.getWithdrawHistory(currency, fromId, size), callback);
+    RestApiInvoker.callASync(requestImpl.getWithdrawHistory(currency, fromId, size,null), callback);
+  }
+
+  @Override
+  public void getWithdrawHistory(String currency, long fromId, int size, QueryDirection direction,
+      ResponseCallback<AsyncResult<List<Withdraw>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getWithdrawHistory(currency, fromId, size,direction), callback);
   }
 
   @Override
   public void getDepositHistory(String currency, long fromId, int size,
                                 ResponseCallback<AsyncResult<List<Deposit>>> callback) {
-    RestApiInvoker.callASync(requestImpl.getDepositHistory(currency, fromId, size), callback);
+    RestApiInvoker.callASync(requestImpl.getDepositHistory(currency, fromId, size,null), callback);
+  }
+
+  @Override
+  public void getDepositHistory(String currency, long fromId, int size,QueryDirection direction,
+      ResponseCallback<AsyncResult<List<Deposit>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getDepositHistory(currency, fromId, size,direction), callback);
   }
 
   @Override
   public void transfer(TransferRequest transferRequest,
                        ResponseCallback<AsyncResult<Long>> callback) {
     RestApiInvoker.callASync(requestImpl.transfer(transferRequest), callback);
+  }
+
+  public void transferFutures(TransferFuturesRequest request, ResponseCallback<AsyncResult<Long>> callback) {
+    RestApiInvoker.callASync(requestImpl.transferFutures(request), callback);
   }
 
   @Override
@@ -251,10 +290,17 @@ public class AsyncRequestImpl implements AsyncRequestClient {
     RestApiInvoker.callASync(requestImpl.cancelOrder(symbol, orderId), callback);
   }
 
+  public void cancelOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Void>> callback) {
+    RestApiInvoker.callASync(requestImpl.cancelOrderByClientOrderId(symbol, clientOrderId), callback);
+  }
+
   @Override
   public void cancelOrders(String symbol, List<Long> orderIds,
-                           ResponseCallback<AsyncResult<Void>> callback) {
-    RestApiInvoker.callASync(requestImpl.cancelOrders(symbol, orderIds), callback);
+                           ResponseCallback<AsyncResult<BatchCancelResultV1>> callback) {
+    BatchCancelRequest request = new BatchCancelRequest();
+    request.setSymbol(symbol);
+    request.setOrderIds(orderIds);
+    RestApiInvoker.callASync(requestImpl.cancelOrders(request), callback);
   }
 
   @Override
@@ -266,6 +312,10 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   @Override
   public void getOrder(String symbol, long orderId, ResponseCallback<AsyncResult<Order>> callback) {
     RestApiInvoker.callASync(requestImpl.getOrder(symbol, orderId), callback);
+  }
+
+  public void getOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Order>> callback){
+    RestApiInvoker.callASync(requestImpl.getOrderByClientOrderId(symbol, clientOrderId), callback);
   }
 
   @Override
@@ -296,6 +346,18 @@ public class AsyncRequestImpl implements AsyncRequestClient {
   public void getHistoricalOrders(HistoricalOrdersRequest req,
                                   ResponseCallback<AsyncResult<List<Order>>> callback) {
     RestApiInvoker.callASync(requestImpl.getHistoricalOrders(req), callback);
+  }
+
+  public void getOrders(OrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getOrders(req), callback);
+  }
+
+  public void getOrderHistory(OrdersHistoryRequest req, ResponseCallback<AsyncResult<List<Order>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getOrderHistory(req), callback);
+  }
+
+  public void getFeeRate(String symbol, ResponseCallback<AsyncResult<List<FeeRate>>> callback) {
+    RestApiInvoker.callASync(requestImpl.getFeeRate(symbol), callback);
   }
 
   @Override

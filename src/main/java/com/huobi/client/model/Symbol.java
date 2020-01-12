@@ -1,5 +1,8 @@
 package com.huobi.client.model;
 
+import java.math.BigDecimal;
+
+
 /**
  * The Huobi supported symbols.
  */
@@ -11,6 +14,13 @@ public class Symbol {
   private int amountPrecision;
   private String symbolPartition;
   private String symbol;
+
+  private Integer valuePrecision;
+  private BigDecimal minOrderAmt;
+  private BigDecimal maxOrderAmt;
+  private BigDecimal minOrderValue;
+  private Integer leverageRatio;
+
 
   /**
    * Get the base currency in a trading symbol.
@@ -66,6 +76,46 @@ public class Symbol {
     return symbol;
   }
 
+  /**
+   * Get the trading amount precision .
+   * @return
+   */
+  public Integer getValuePrecision() {
+    return valuePrecision;
+  }
+
+  /**
+   * Get the min order size .
+   * @return
+   */
+  public BigDecimal getMinOrderAmt() {
+    return minOrderAmt;
+  }
+
+  /**
+   * Get the max order size .
+   * @return
+   */
+  public BigDecimal getMaxOrderAmt() {
+    return maxOrderAmt;
+  }
+
+  /**
+   * Get the min order amount .
+   * @return
+   */
+  public BigDecimal getMinOrderValue() {
+    return minOrderValue;
+  }
+
+  /**
+   * Get the maximum leverage
+   * @return
+   */
+  public Integer getLeverageRatio() {
+    return leverageRatio;
+  }
+
   public void setBaseCurrency(String baseCurrency) {
     this.baseCurrency = baseCurrency;
   }
@@ -88,5 +138,25 @@ public class Symbol {
 
   public void setSymbol(String symbol) {
     this.symbol = symbol;
+  }
+
+  public void setValuePrecision(Integer valuePrecision) {
+    this.valuePrecision = valuePrecision;
+  }
+
+  public void setMinOrderAmt(BigDecimal minOrderAmt) {
+    this.minOrderAmt = minOrderAmt;
+  }
+
+  public void setMaxOrderAmt(BigDecimal maxOrderAmt) {
+    this.maxOrderAmt = maxOrderAmt;
+  }
+
+  public void setMinOrderValue(BigDecimal minOrderValue) {
+    this.minOrderValue = minOrderValue;
+  }
+
+  public void setLeverageRatio(Integer leverageRatio) {
+    this.leverageRatio = leverageRatio;
   }
 }

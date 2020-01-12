@@ -4,6 +4,7 @@ import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
+import com.huobi.client.model.BatchCancelResultV1;
 import com.huobi.client.model.BestQuote;
 import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
@@ -11,13 +12,19 @@ import com.huobi.client.model.Deposit;
 import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
+import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.Symbol;
 import com.huobi.client.model.enums.EtfSwapType;
+import com.huobi.client.model.enums.QueryDirection;
+import com.huobi.client.model.request.OrdersHistoryRequest;
+import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
@@ -39,9 +46,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Asynchronous request interface, invoking Huobi RestAPI via asynchronous method. All methods in
- * this interface will return immediately, do not wait the server's response. So you must implement
- * the ResponseCallback interface yourself. As long as the server response received, the onResponse
+ * Asynchronous request interface, invoking Huobi RestAPI via asynchronous method. All methods in this interface will return immediately, do not wait
+ * the server's response. So you must implement the ResponseCallback interface yourself. As long as the server response received, the onResponse
  * callback method will be called..
  */
 public interface AsyncRequestClient {
@@ -70,8 +76,8 @@ public interface AsyncRequestClient {
       CandlestickRequest request, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
 
   /**
-   * Get the timestamp from Huobi server. The timestamp is the Unix timestamp in millisecond.<br>
-   * The count shows how many milliseconds passed from Jan 1st 1970, 00:00:00.000 at UTC.<br>
+   * Get the timestamp from Huobi server. The timestamp is the Unix timestamp in millisecond.<br> The count shows how many milliseconds passed from
+   * Jan 1st 1970, 00:00:00.000 at UTC.<br>
    * <br> e.g. 1546300800000 is Thu, 1st Jan 2019 00:00:00.000 UTC.
    *
    * @param callback The callback you should implemented.
@@ -113,6 +119,8 @@ public interface AsyncRequestClient {
   void getHistoricalTrade(String symbol, int size,
       ResponseCallback<AsyncResult<List<Trade>>> callback);
 
+  void getTrade(String symbol, ResponseCallback<AsyncResult<List<Trade>>> callback);
+
   /**
    * Get trade statistics in 24 hours.
    *
@@ -123,12 +131,27 @@ public interface AsyncRequestClient {
       ResponseCallback<AsyncResult<TradeStatistics>> callback);
 
   /**
-   * Get all the trading assets and currencies supported in huobi. The information of trading
-   * instrument, including base currency, quote precision, etc.
+   * Get all the trading assets and currencies supported in huobi. The information of trading instrument, including base currency, quote precision,
+   * etc.
    *
    * @param callback The callback you should implemented.
    */
   void getExchangeInfo(ResponseCallback<AsyncResult<ExchangeInfo>> callback);
+
+
+  /**
+   * Get all the trading currencies supported in Huobi.
+   *
+   * @return The name of trading currencies .
+   */
+  void getCurrencies(ResponseCallback<AsyncResult<List<String>>> callback);
+
+  /**
+   * Get all the trading symbol supported in Huobi.
+   *
+   * @return The information of trading symbol .
+   */
+  void getSymbols(ResponseCallback<AsyncResult<List<Symbol>>> callback);
 
   /**
    * Get the best bid and ask.
@@ -151,17 +174,43 @@ public interface AsyncRequestClient {
       ResponseCallback<AsyncResult<List<Withdraw>>> callback);
 
   /**
+   *
+   * @param currency The currency, like "btc". (mandatory)
+   * @param fromId The beginning withdraw record id. (mandatory)
+   *  @param size The size of record. (mandatory)
+   * @param queryDirection The direction of query ,pre or next
+   * @param callback  The callback you should implemented.
+   */
+  void getWithdrawHistory(String currency, long fromId, int size, QueryDirection queryDirection,
+      ResponseCallback<AsyncResult<List<Withdraw>>> callback);
+
+  /**
    * Get the deposit records of an account
    *
    * @param currency The currency, like "btc". (mandatory)
    * @param fromId The beginning deposit record id. (mandatory)
-   * @param size The size of record. (mandatory)
+   * @param size The beginning deposit record id. (mandatory)
    * @param callback The callback you should implemented.
    */
   void getDepositHistory(
       String currency,
       long fromId,
       int size,
+      ResponseCallback<AsyncResult<List<Deposit>>> callback);
+
+  /**
+   *
+   * @param currency The currency, like "btc". (mandatory)
+   * @param fromId The beginning deposit record id. (mandatory)
+   * @param size  The beginning deposit record id. (mandatory)
+   * @param direction  The direction of query ,pre or next
+   * @param callback    The callback you should implemented.
+   */
+  void getDepositHistory(
+      String currency,
+      long fromId,
+      int size,
+      QueryDirection direction,
       ResponseCallback<AsyncResult<List<Deposit>>> callback);
 
   /**
@@ -172,6 +221,12 @@ public interface AsyncRequestClient {
    */
   void transfer(TransferRequest transferRequest, ResponseCallback<AsyncResult<Long>> callback);
 
+  /**
+   *
+   * @param request The request of transfer between futures and pro
+   * @param callback The callback you should implemented.
+   */
+  void transferFutures(TransferFuturesRequest request, ResponseCallback<AsyncResult<Long>> callback);
   /**
    * Submit a request to borrow with margin account
    *
@@ -196,8 +251,7 @@ public interface AsyncRequestClient {
   /**
    * Get the margin loan records
    *
-   * @param loanOrderRequest The information of order request, including symbol, start-date,
-   * end-date etc, see {@link LoanOrderRequest}
+   * @param loanOrderRequest The information of order request, including symbol, start-date, end-date etc, see {@link LoanOrderRequest}
    * @param callback The callback you should implemented.
    */
   void getLoanHistory(
@@ -236,9 +290,8 @@ public interface AsyncRequestClient {
   void createOrder(NewOrderRequest newOrderRequest, ResponseCallback<AsyncResult<Long>> callback);
 
   /**
-   * Provide open orders of a symbol for an account<br> When neither account-id nor symbol defined
-   * in the request, the system will return all open orders (max 500) for all symbols and all
-   * accounts of the user, sorted by order ID in descending.
+   * Provide open orders of a symbol for an account<br> When neither account-id nor symbol defined in the request, the system will return all open
+   * orders (max 500) for all symbols and all accounts of the user, sorted by order ID in descending.
    *
    * @param openOrderRequest open order request
    * @param callback The callback you should implemented.
@@ -256,6 +309,13 @@ public interface AsyncRequestClient {
   void cancelOrder(String symbol, long orderId, ResponseCallback<AsyncResult<Void>> callback);
 
   /**
+   *
+   * @param symbol The symbol, like "btcusdt"
+   * @param clientOrderId The client order id defined by client
+   * @param callback  The callback you should implemented.
+   */
+  void cancelOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Void>> callback);
+  /**
    * Submit cancel request for cancelling an order
    *
    * @param symbol The symbol, like "btcusdt"
@@ -263,7 +323,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void cancelOrders(String symbol, List<Long> orderIds,
-      ResponseCallback<AsyncResult<Void>> callback);
+      ResponseCallback<AsyncResult<BatchCancelResultV1>> callback);
 
   /**
    * request to cancel open orders.
@@ -282,6 +342,14 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getOrder(String symbol, long orderId, ResponseCallback<AsyncResult<Order>> callback);
+
+  /**
+   *
+   * @param symbol  The symbol, like "btcusdt"
+   * @param clientOrderId  The client order id defined by client
+   * @param callback  The callback you should implemented.
+   */
+  void getOrderByClientOrderId(String symbol, String clientOrderId, ResponseCallback<AsyncResult<Order>> callback);
 
   /**
    * Get detail match results of an order
@@ -331,6 +399,26 @@ public interface AsyncRequestClient {
       HistoricalOrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
 
   /**
+   *
+   * @param req The order request
+   * @param callback  The callback you should implemented.
+   */
+  void getOrders(OrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
+
+  /**
+   *
+   * @param req  The request of historical orders
+   * @param callback  The callback you should implemented.
+   */
+  void getOrderHistory(OrdersHistoryRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
+
+  /**
+   *
+   * @param symbol  The currency, like "btcusdt"
+   * @param callback The callback you should implemented.
+   */
+  void getFeeRate(String symbol, ResponseCallback<AsyncResult<List<FeeRate>>> callback);
+  /**
    * Transfer Asset between Parent and Sub Account
    *
    * @param req The request for transferring in master.
@@ -358,9 +446,8 @@ public interface AsyncRequestClient {
       ResponseCallback<AsyncResult<List<CompleteSubAccountInfo>>> callback);
 
   /**
-   * Get the basic information of ETF creation and redemption, as well as ETF constituents,
-   * including max amount of creation, min amount of creation, max amount of redemption, min amount
-   * of redemption, creation fee rate, redemption fee rate, eft create/redeem status.
+   * Get the basic information of ETF creation and redemption, as well as ETF constituents, including max amount of creation, min amount of creation,
+   * max amount of redemption, min amount of redemption, creation fee rate, redemption fee rate, eft create/redeem status.
    *
    * @param etfSymbol The symbol, currently only support hb10. (mandatory)
    * @param callback The callback you should implemented.
@@ -372,8 +459,7 @@ public interface AsyncRequestClient {
    *
    * @param etfSymbol The symbol, currently only support hb10. (mandatory)
    * @param amount The amount to create or redemption. (mandatory)
-   * @param swapType The swap type to indicate creation or redemption, see {@link EtfSwapType}
-   * (mandatory)
+   * @param swapType The swap type to indicate creation or redemption, see {@link EtfSwapType} (mandatory)
    * @param callback The callback you should implemented.
    */
   void etfSwap(String etfSymbol, int amount, EtfSwapType swapType,
@@ -407,8 +493,8 @@ public interface AsyncRequestClient {
    * @param symbol The symbol, like "btcusdt". (mandatory)
    * @param callback The callback you should implemented.
    */
-   void getMarginBalanceDetail(
-       String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
+  void getMarginBalanceDetail(
+      String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
 
   /**
    * Get Latest Tickers for All Pairs.
@@ -418,8 +504,7 @@ public interface AsyncRequestClient {
   void getTickers(ResponseCallback<AsyncResult<Map<String, TradeStatistics>>> callback);
 
   /**
-   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented
-   * by asynchronous mode.
+   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented by asynchronous mode.
    *
    * @return The instance of asynchronous client.
    */
@@ -428,8 +513,7 @@ public interface AsyncRequestClient {
   }
 
   /**
-   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented
-   * by asynchronous mode.
+   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented by asynchronous mode.
    *
    * @param apiKey The public key applied from Huobi.
    * @param secretKey The private key applied from Huobi.
@@ -441,8 +525,7 @@ public interface AsyncRequestClient {
   }
 
   /**
-   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented
-   * by asynchronous mode.
+   * Create the asynchronous client. All interfaces defined in asynchronous client are implemented by asynchronous mode.
    *
    * @param apiKey The public key applied from Huobi.
    * @param secretKey The private key applied from Huobi.

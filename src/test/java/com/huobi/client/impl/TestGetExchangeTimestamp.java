@@ -1,17 +1,17 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.TimeService;
 import okhttp3.Request;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestGetExchangeTimestamp {
 
@@ -40,7 +40,7 @@ public class TestGetExchangeTimestamp {
     assertEquals("GET", request.method());
     assertTrue(request.url().toString().contains("/v1/common/timestamp"));
     Long result = restApiRequest.jsonParser.parseJson(JsonWrapper.parseFromString(data));
-    assertEquals(TimeService.convertCSTInMillisecondToUTC(1494900087029L), result.longValue());
+    assertEquals(1494900087029L, result.longValue());
   }
 
   @Test
