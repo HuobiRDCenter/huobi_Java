@@ -50,4 +50,13 @@ public class OrderUpdateNewEvent {
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
   }
+
+  @Override
+  public String toString() {
+    return "OrderUpdateNewEvent{" +
+            "symbol='" + symbol + '\'' +
+            ", timestamp=" + timestamp +
+            ", data=" + data +
+            '}';
+  }
 }

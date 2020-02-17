@@ -3,6 +3,7 @@ package com.huobi.client.impl;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -28,6 +29,7 @@ public class WebSocketConnection extends WebSocketListener implements Closeable 
 
   private static int connectionCounter = 0;
   private long lastConnectCalled = 0;
+  private final AtomicBoolean disposed = new AtomicBoolean();
 
   public enum ConnectionState {
     IDLE,
@@ -261,8 +263,10 @@ public class WebSocketConnection extends WebSocketListener implements Closeable 
       } else if (jsonWrapper.containKey("subbed")) {
       }
     } catch (Exception e) {
-      log.error("[Sub][" + this.connectionId + "] Unexpected error: " + e.getMessage());
-      closeOnError();
+      if (!disposed.get()) {
+        log.error("[Sub][" + this.connectionId + "] Unexpected error: " + e.getMessage());
+        closeOnError();
+      }
     }
   }
 
@@ -322,9 +326,11 @@ public class WebSocketConnection extends WebSocketListener implements Closeable 
 
   @Override
   public void close() {
-    log.info("[Sub][{}] Closing normally", this.connectionId);
-    disposeWebSocket();
-    watchDog.onClosedNormally(this);
+    if (disposed.compareAndSet(false, true)) {
+      watchDog.onClosedNormally(this);
+      log.info("[Sub][{}] Closing normally", this.connectionId);
+      disposeWebSocket();
+    }
   }
 
   @Override
@@ -410,10 +416,8 @@ public class WebSocketConnection extends WebSocketListener implements Closeable 
   }
 
   private void closeOnError() {
-    if (webSocket != null) {
-      this.webSocket.cancel();
-      state = ConnectionState.CLOSED_ON_ERROR;
-      log.error("[Sub][" + this.connectionId + "] Connection is closing due to error");
-    }
+    disposeWebSocket();
+    state = ConnectionState.CLOSED_ON_ERROR;
+    log.error("[Sub][" + this.connectionId + "] Connection is closing due to error");
   }
 }

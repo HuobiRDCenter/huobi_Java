@@ -240,4 +240,26 @@ public class Order {
   public void setOperator(StopOrderOperator operator) {
     this.operator = operator;
   }
+
+  @Override
+  public String toString() {
+    return "Order{" +
+            "accountType=" + accountType +
+            ", amount=" + amount +
+            ", price=" + price +
+            ", createdTimestamp=" + createdTimestamp +
+            ", canceledTimestamp=" + canceledTimestamp +
+            ", finishedTimestamp=" + finishedTimestamp +
+            ", orderId=" + orderId +
+            ", symbol='" + symbol + '\'' +
+            ", stopPrice=" + stopPrice +
+            ", type=" + type +
+            ", filledAmount=" + filledAmount +
+            ", filledCashAmount=" + filledCashAmount +
+            ", filledFees=" + filledFees +
+            ", source=" + source +
+            ", state=" + state +
+            ", operator=" + operator +
+            '}';
+  }
 }

@@ -31,4 +31,13 @@ public class FeeRate {
   public void setTakerFee(BigDecimal takerFee) {
     this.takerFee = takerFee;
   }
+
+  @Override
+  public String toString() {
+    return "FeeRate{" +
+            "symbol='" + symbol + '\'' +
+            ", makerFee=" + makerFee +
+            ", takerFee=" + takerFee +
+            '}';
+  }
 }

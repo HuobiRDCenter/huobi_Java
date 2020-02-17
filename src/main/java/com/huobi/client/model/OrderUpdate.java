@@ -118,4 +118,21 @@ public class OrderUpdate {
   public void setClientOrderId(String clientOrderId) {
     this.clientOrderId = clientOrderId;
   }
+
+  @Override
+  public String toString() {
+    return "OrderUpdate{" +
+            "matchId=" + matchId +
+            ", orderId=" + orderId +
+            ", symbol='" + symbol + '\'' +
+            ", state=" + state +
+            ", type=" + type +
+            ", role=" + role +
+            ", price=" + price +
+            ", filledAmount=" + filledAmount +
+            ", filledCashAmount=" + filledCashAmount +
+            ", unfilledAmount=" + unfilledAmount +
+            ", clientOrderId='" + clientOrderId + '\'' +
+            '}';
+  }
 }
