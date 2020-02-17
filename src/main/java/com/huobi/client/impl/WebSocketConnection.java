@@ -411,8 +411,10 @@ public class WebSocketConnection extends WebSocketListener implements Closeable 
 
   @Override
   public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-    onError("Unexpected error: " + t.getMessage(), t);
-    closeOnError();
+    if (!disposed.get()) {
+      onError("Unexpected error: " + t.getMessage(), t);
+      closeOnError();
+    }
   }
 
   private void closeOnError() {
