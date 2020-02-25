@@ -809,7 +809,6 @@ class WebsocketRequestImpl {
       requestTopic.put("topic", "orders.detail");
       requestTopic.put("order-id", orderId.toString());
 
-      System.out.println("[send]" + requestTopic.toJSONString());
       connection.send(requestTopic.toJSONString());
     };
     request.jsonParser = (jsonWrapper) -> {

@@ -75,6 +75,21 @@ public class OrdersRequest {
     this.direct = direct;
   }
 
+  public OrdersRequest(String symbol, List<OrderState> stateList,
+      List<OrderType> typeList, Long startTime, Long endTime, Date startDate, Date endDate, Long startId, Integer size, QueryDirection direct) {
+
+    this.symbol = symbol;
+    this.states = stateList;
+    this.types = typeList;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.startId = startId;
+    this.size = size;
+    this.direct = direct;
+  }
+
   public OrdersRequest(HistoricalOrdersRequest request) {
     List<OrderState> stateList = new ArrayList<OrderState>();
     if (request.getState() != null) {
@@ -93,11 +108,15 @@ public class OrdersRequest {
     this.endDate = request.getEndDate();
     this.startId = request.getStartId();
     this.size = request.getSize();
+    this.startTime = request.getStartTime();
+    this.endTime = request.getEndTime();
   }
 
   private final String symbol;
   private List<OrderState> states;
   private List<OrderType> types = null;
+  private Long startTime = null;
+  private Long endTime = null;
   private Date startDate = null;
   private Date endDate = null;
   private Long startId = null;
@@ -105,7 +124,7 @@ public class OrdersRequest {
   private QueryDirection direct;
 
 
-  public String getTypesString(){
+  public String getTypesString() {
     String typeString = null;
     if (this.getTypes() != null && this.getTypes().size() > 0) {
       StringBuffer typeBuffer = new StringBuffer();
@@ -118,7 +137,7 @@ public class OrdersRequest {
     return typeString;
   }
 
-  public String getStatesString(){
+  public String getStatesString() {
     String stateString = null;
     if (this.getStates() != null && this.getStates().size() > 0) {
       StringBuffer statesBuffer = new StringBuffer();
@@ -189,5 +208,13 @@ public class OrdersRequest {
 
   public void setDirect(QueryDirection direct) {
     this.direct = direct;
+  }
+
+  public Long getStartTime() {
+    return startTime;
+  }
+
+  public Long getEndTime() {
+    return endTime;
   }
 }
