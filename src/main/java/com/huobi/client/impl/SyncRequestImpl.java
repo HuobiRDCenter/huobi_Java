@@ -211,8 +211,8 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
-  public List<MarginLoanInfo> getLoanInfo() {
-    return RestApiInvoker.callSync(requestImpl.getLoanInfo());
+  public List<MarginLoanInfo> getLoanInfo(String symbols) {
+    return RestApiInvoker.callSync(requestImpl.getLoanInfo(symbols));
   }
 
   @Override

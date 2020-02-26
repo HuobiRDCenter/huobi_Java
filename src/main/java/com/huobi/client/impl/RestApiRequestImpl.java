@@ -715,10 +715,10 @@ class RestApiRequestImpl {
   }
 
 
-  RestApiRequest<List<MarginLoanInfo>> getLoanInfo() {
+  RestApiRequest<List<MarginLoanInfo>> getLoanInfo(String symbols) {
     RestApiRequest<List<MarginLoanInfo>> request = new RestApiRequest<>();
-
-    request.request = createRequestByGetWithSignature("/v1/margin/loan-info", UrlParamsBuilder.build());
+    UrlParamsBuilder builder = UrlParamsBuilder.build().putToUrl("symbols",symbols);
+    request.request = createRequestByGetWithSignature("/v1/margin/loan-info", builder);
     request.jsonParser = (jsonWrapper -> {
       List<MarginLoanInfo> infoList = new LinkedList<>();
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");

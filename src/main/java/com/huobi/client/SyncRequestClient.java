@@ -254,7 +254,7 @@ public interface SyncRequestClient {
    */
   List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest);
 
-  List<MarginLoanInfo> getLoanInfo();
+  List<MarginLoanInfo> getLoanInfo(String symbols);
 
   /**
    * This endpoint transfer specific asset `from spot trading account to cross margin account` or `from cross margin account to spot trading account`.

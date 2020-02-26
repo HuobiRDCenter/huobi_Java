@@ -123,7 +123,7 @@ public class TestGetHistoryOrders {
   @Before
   public void Initialize() {
     impl = new RestApiRequestImpl("12345", "67890", new RequestOptions());
-    historicalOrdersRequest = new HistoricalOrdersRequest("htbtc", OrderState.CANCELED, null, null,
+    historicalOrdersRequest = new HistoricalOrdersRequest("htbtc", OrderState.CANCELED, null,null,null, null,
         null, null, null);
     testAccount.setType(AccountType.SPOT);
     testAccount.setId(123L);

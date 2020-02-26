@@ -13,7 +13,7 @@ public class MarginExamples {
   public static void main(String[] args) {
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
-    List<MarginLoanInfo> infoList = syncRequestClient.getLoanInfo();
+    List<MarginLoanInfo> infoList = syncRequestClient.getLoanInfo(null);
     infoList.forEach(marginLoanInfo -> {
       System.out.println("----------------------");
       System.out.println("symbol : "+marginLoanInfo.getSymbol());
