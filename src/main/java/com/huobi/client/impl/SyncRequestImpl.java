@@ -12,6 +12,7 @@ import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
 import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
@@ -23,6 +24,7 @@ import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
+import com.huobi.client.model.MarginLoanInfo;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -30,6 +32,7 @@ import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
@@ -208,6 +211,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public List<MarginLoanInfo> getLoanInfo(String symbols) {
+    return RestApiInvoker.callSync(requestImpl.getLoanInfo(symbols));
+  }
+
+  @Override
   public long transferCrossMargin(CrossMarginTransferRequest request) {
     return RestApiInvoker.callSync(requestImpl.transferCrossMargin(request));
   }
@@ -226,6 +234,10 @@ public class SyncRequestImpl implements SyncRequestClient {
 
   public CrossMarginAccount getCrossMarginAccount() {
     return RestApiInvoker.callSync(requestImpl.getCrossMarginAccount());
+  }
+
+  public List<CrossMarginLoanInfo> getCrossMarginLoanInfo() {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginLoanInfo());
   }
 
 
@@ -388,6 +400,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<FeeRate> getFeeRate(String symbol) {
     return RestApiInvoker.callSync(requestImpl.getFeeRate(symbol));
+  }
+
+  @Override
+  public List<TransactFeeRate> getTransactFeeRate(String symbols) {
+    return RestApiInvoker.callSync(requestImpl.getTransactFeeRate(symbols));
   }
 
   @Override

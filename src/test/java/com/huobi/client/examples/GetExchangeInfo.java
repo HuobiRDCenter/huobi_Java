@@ -27,12 +27,12 @@ public class GetExchangeInfo {
     System.out.println();
     List<Symbol> symbolList = syncRequestClient.getSymbols();
     symbolList.forEach(symbol -> {
-      System.out.println(symbol.toString());
+      System.out.println(JSON.toJSONString(symbol));
     });
 
     List<String> currencyList = syncRequestClient.getCurrencies();
     currencyList.forEach(currency ->{
-      System.out.println(currency);
+      System.out.println(JSON.toJSONString(currency));
     });
 
     List<Currency> currencyInfoList = syncRequestClient.getCurrencyInfo(null,null);

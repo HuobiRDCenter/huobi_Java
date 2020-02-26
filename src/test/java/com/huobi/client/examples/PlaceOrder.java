@@ -14,6 +14,7 @@ import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.OrderState;
 import com.huobi.client.model.enums.OrderType;
@@ -145,6 +146,7 @@ public class PlaceOrder {
     // Get the order detail use order id
     Order orderInfo = syncRequestClient.getOrder(symbol, o1);
     System.out.println("GetById Id: " + orderInfo.getOrderId());
+    System.out.println("GetById ClientOrderId: " + orderInfo.getClientOrderId());
     System.out.println("GetById Type: " + orderInfo.getType());
     System.out.println("GetById Status: " + orderInfo.getState());
     System.out.println("GetById Amount: " + orderInfo.getAmount());
@@ -153,6 +155,7 @@ public class PlaceOrder {
     // Get the order detail use client order id
     Order orderInfo1 = syncRequestClient.getOrderByClientOrderId(symbol, clientOrderId);
     System.out.println("GetByClientOrderId Id: " + orderInfo1.getOrderId());
+    System.out.println("GetByClientOrderId ClientOrderId: " + orderInfo.getClientOrderId());
     System.out.println("GetByClientOrderId Type: " + orderInfo1.getType());
     System.out.println("GetByClientOrderId Status: " + orderInfo1.getState());
     System.out.println("GetByClientOrderId Amount: " + orderInfo1.getAmount());
@@ -223,6 +226,11 @@ public class PlaceOrder {
     List<FeeRate> feeRateList = syncRequestClient.getFeeRate("htusdt,ethusdt");
     feeRateList.forEach(feeRate -> {
       System.out.println("FeeRate : " + JSON.toJSONString(feeRate));
+    });
+
+    List<TransactFeeRate> transactFeeRateList = syncRequestClient.getTransactFeeRate("btcusdt,adausdt");
+    transactFeeRateList.forEach(rate -> {
+      System.out.println("transact fee rate:" + JSON.toJSONString(rate));
     });
   }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.huobi.client.SubscriptionClient;
@@ -23,14 +24,17 @@ public class SubscribeOrderUpdate {
      * subscribe order updateEvent ,old interface
      */
     client.subscribeOrderUpdateEvent(symbol,(event ->{
-      System.out.println(event.getData().toString());
+      System.out.println(JSON.toJSONString(event));
     }));
 
     /**
      * subscribe order updateEvent ,new interface (recommend)
+     *
+     * Wild card (*) is supported
+     * examples : symbol = "*"
      */
     client.subscribeOrderUpdateNewEvent(symbol,(event ->{
-      System.out.println(event.getData().toString());
+      System.out.println(JSON.toJSONString(event));
     }));
 
     /**
@@ -56,7 +60,7 @@ public class SubscribeOrderUpdate {
     client.requestOrderListEvent(ordersRequest, orderListEvent -> {
       System.out.println("=================Request Order List======================");
       orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Orders:" + order.toString());
+        System.out.println("Request Orders:" + JSON.toJSONString(order));
       });
     });
 
@@ -68,7 +72,7 @@ public class SubscribeOrderUpdate {
     client.requestOrderDetailEvent(startOrderId,orderListEvent -> {
       System.out.println("=================Request Order Detail======================");
       orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Order:" + order.toString());
+        System.out.println("Request Order:" + JSON.toJSONString(order));
       });
     });
 

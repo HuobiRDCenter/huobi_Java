@@ -26,6 +26,7 @@ import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
 import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
@@ -36,6 +37,8 @@ import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
+import com.huobi.client.model.MarginLoanCurrencyInfo;
+import com.huobi.client.model.MarginLoanInfo;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -43,6 +46,7 @@ import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.UnitPrice;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
@@ -711,6 +715,39 @@ class RestApiRequestImpl {
   }
 
 
+  RestApiRequest<List<MarginLoanInfo>> getLoanInfo(String symbols) {
+    RestApiRequest<List<MarginLoanInfo>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build().putToUrl("symbols",symbols);
+    request.request = createRequestByGetWithSignature("/v1/margin/loan-info", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<MarginLoanInfo> infoList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        JsonWrapperArray currencies = item.getJsonArray("currencies");
+        List<MarginLoanCurrencyInfo> curList = new ArrayList<>();
+        currencies.forEach(curr -> {
+          MarginLoanCurrencyInfo currencyInfo = new MarginLoanCurrencyInfo();
+
+          currencyInfo.setCurrency(curr.getStringOrDefault("currency", null));
+          currencyInfo.setInterestRate(curr.getBigDecimalOrDefault("interest-rate", null));
+          currencyInfo.setMinLoanAmt(curr.getBigDecimalOrDefault("min-loan-amt", null));
+          currencyInfo.setMaxLoanAmt(curr.getBigDecimalOrDefault("max-loan-amt", null));
+          currencyInfo.setLoanableAmt(curr.getBigDecimalOrDefault("loanable-amt", null));
+          currencyInfo.setActualRate(curr.getBigDecimalOrDefault("actual-rate", null));
+          curList.add(currencyInfo);
+        });
+
+        MarginLoanInfo info = new MarginLoanInfo();
+        info.setSymbol(item.getStringOrDefault("symbol", null));
+        info.setCurrencies(curList);
+        infoList.add(info);
+      });
+      return infoList;
+    });
+    return request;
+
+  }
+
   RestApiRequest<Long> transferCrossMargin(CrossMarginTransferRequest transferRequest) {
     InputChecker.checker()
         .shouldNotNull(transferRequest.getType(), "type")
@@ -849,6 +886,32 @@ class RestApiRequestImpl {
   }
 
 
+  RestApiRequest<List<CrossMarginLoanInfo>> getCrossMarginLoanInfo() {
+    RestApiRequest<List<CrossMarginLoanInfo>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    request.request = createRequestByGetWithSignature("/v1/cross-margin/loan-info", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<CrossMarginLoanInfo> infoList = new LinkedList<>();
+
+      JsonWrapperArray array = jsonWrapper.getJsonArray("data");
+
+      array.forEach(item -> {
+        CrossMarginLoanInfo info = new CrossMarginLoanInfo();
+
+        info.setCurrency(item.getStringOrDefault("currency", null));
+        info.setInterestRate(item.getBigDecimalOrDefault("interest-rate", null));
+        info.setMinLoanAmt(item.getBigDecimalOrDefault("min-loan-amt", null));
+        info.setMaxLoanAmt(item.getBigDecimalOrDefault("max-loan-amt", null));
+        info.setLoanableAmt(item.getBigDecimalOrDefault("loanable-amt", null));
+        info.setActualRate(item.getBigDecimalOrDefault("actual-rate", null));
+        infoList.add(info);
+      });
+
+      return infoList;
+    });
+    return request;
+  }
+
   RestApiRequest<Long> createOrder(NewOrderRequest newOrderRequest) {
     InputChecker.checker().checkSymbol(newOrderRequest.getSymbol())
         .shouldNotNull(newOrderRequest.getAccountType(), "AccountType")
@@ -985,6 +1048,7 @@ class RestApiRequestImpl {
       dataArray.forEach((item) -> {
         Order order = new Order();
         order.setOrderId(item.getLong("id"));
+        order.setClientOrderId(item.getStringOrDefault("client-order-id", null));
         order.setSymbol(item.getString("symbol"));
         order.setPrice(item.getBigDecimal("price"));
         order.setAmount(item.getBigDecimal("amount"));
@@ -1242,6 +1306,8 @@ class RestApiRequestImpl {
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("symbol", req.getSymbol())
         .putToUrl("types", req.getTypesString())
+        .putToUrl("start-time", req.getStartTime())
+        .putToUrl("end-time", req.getEndTime())
         .putToUrl("start-date", req.getStartDate(), "yyyy-MM-dd")
         .putToUrl("end-date", req.getEndDate(), "yyyy-MM-dd")
         .putToUrl("from", req.getStartId())
@@ -1254,6 +1320,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
         Order order = new Order();
+        order.setClientOrderId(item.getStringOrDefault("client-order-id", null));
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         order.setAmount(item.getBigDecimal("amount"));
@@ -1293,6 +1360,7 @@ class RestApiRequestImpl {
       JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
       dataArray.forEach((item) -> {
         Order order = new Order();
+        order.setClientOrderId(item.getStringOrDefault("client-order-id", null));
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         order.setAmount(item.getBigDecimal("amount"));
@@ -1331,6 +1399,25 @@ class RestApiRequestImpl {
         rate.setSymbol(item.getString("symbol"));
         rate.setMakerFee(item.getBigDecimalOrDefault("maker-fee", null));
         rate.setTakerFee(item.getBigDecimalOrDefault("taker-fee", null));
+        rateList.add(rate);
+      });
+      return rateList;
+    });
+    return request;
+  }
+
+  RestApiRequest<List<TransactFeeRate>> getTransactFeeRate(String symbols) {
+    RestApiRequest<List<TransactFeeRate>> request = new RestApiRequest<>();
+    InputChecker.checker().shouldNotNull(symbols, "symbols");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("symbols", symbols);
+    request.request = createRequestByGetWithSignature("/v2/reference/transact-fee-rate", builder);
+    request.jsonParser = (jsonWrapper -> {
+      List<TransactFeeRate> rateList = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        TransactFeeRate rate = item.getJson().toJavaObject(TransactFeeRate.class);
         rateList.add(rate);
       });
       return rateList;
@@ -1598,6 +1685,7 @@ class RestApiRequestImpl {
       Order order = new Order();
       order.setSymbol(data.getString("symbol"));
       order.setOrderId(data.getLong("id"));
+      order.setClientOrderId(data.getStringOrDefault("client-order-id", null));
       order
           .setAccountType(AccountsInfoMap.getAccount(apiKey, data.getLong("account-id")).getType());
       order.setAmount(data.getBigDecimal("amount"));

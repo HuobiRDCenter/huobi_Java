@@ -1,5 +1,6 @@
 package com.huobi.client.impl;
 
+import com.huobi.client.constants.ApiConstants;
 import com.huobi.client.exception.HuobiApiException;
 
 import java.util.List;
@@ -48,6 +49,11 @@ class InputChecker {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR,
           "[Input] Symbol is mandatory");
     }
+
+    if (ApiConstants.COMMON_SYMBOL_SIGN.equals(symbol)) {
+      return checkerInst;
+    }
+
     if (isSpecialChar(symbol)) {
       throw new HuobiApiException(HuobiApiException.INPUT_ERROR,
           "[Input] " + symbol + " is invalid symbol");

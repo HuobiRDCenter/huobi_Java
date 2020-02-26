@@ -15,6 +15,7 @@ import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
 import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
@@ -26,6 +27,7 @@ import com.huobi.client.model.FeeRate;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
+import com.huobi.client.model.MarginLoanInfo;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
@@ -33,6 +35,7 @@ import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
@@ -251,6 +254,7 @@ public interface SyncRequestClient {
    */
   List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest);
 
+  List<MarginLoanInfo> getLoanInfo(String symbols);
 
   /**
    * This endpoint transfer specific asset `from spot trading account to cross margin account` or `from cross margin account to spot trading account`.
@@ -285,6 +289,7 @@ public interface SyncRequestClient {
    */
   CrossMarginAccount getCrossMarginAccount();
 
+  List<CrossMarginLoanInfo> getCrossMarginLoanInfo();
 
   /**
    * Get last trade, best bid and best ask of a symbol.
@@ -463,6 +468,9 @@ public interface SyncRequestClient {
    * @return  The feeRate list, see {@link FeeRate}
    */
   List<FeeRate> getFeeRate(String symbol);
+
+  List<TransactFeeRate> getTransactFeeRate(String symbol);
+
   /**
    * Transfer Asset between Parent and Sub Account.
    *
