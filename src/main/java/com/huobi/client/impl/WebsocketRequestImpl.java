@@ -544,7 +544,7 @@ class WebsocketRequestImpl {
       changeV2.setAccountType(data.getStringOrDefault("accountType", null));
       changeV2.setBalance(data.getBigDecimalOrDefault("balance", null));
       changeV2.setChangeType(data.getStringOrDefault("changeType", null));
-      changeV2.setChangeTime(data.getLongOrDefault("changeTime", -1));
+      changeV2.setChangeTime(data.getLong("changeTime"));
       accountEvent.setAccountChange(changeV2);
       return accountEvent;
     };

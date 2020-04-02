@@ -2,6 +2,7 @@ package com.huobi.client.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.huobi.client.RequestOptions;
@@ -65,7 +66,7 @@ public class TestCancleOpenOrders {
     assertNotNull(restApiRequest.request.url().queryParameter("Signature"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("htbtc", querier.jsonWrapper.getString("symbol"));
-    assertEquals(12345L, querier.jsonWrapper.getLong("account-id"));
+    assertSame(12345L, querier.jsonWrapper.getLong("account-id"));
 
   }
 

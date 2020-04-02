@@ -2,6 +2,7 @@ package com.huobi.client.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.huobi.client.RequestOptions;
@@ -74,7 +75,7 @@ public class TestCreateOrder {
     assertNotNull(restApiRequest.request.url().queryParameter("Signature"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("htbtc", querier.jsonWrapper.getString("symbol"));
-    assertEquals(12345L, querier.jsonWrapper.getLong("account-id"));
+    assertSame(12345,querier.jsonWrapper.getLong("account-id"));
     assertEquals(new BigDecimal("1"), querier.jsonWrapper.getBigDecimal("amount"));
     assertEquals(new BigDecimal("1"), querier.jsonWrapper.getBigDecimal("price"));
     assertEquals(OrderType.SELL_LIMIT.toString(), querier.jsonWrapper.getString("type"));
