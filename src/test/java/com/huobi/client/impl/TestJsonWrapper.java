@@ -2,6 +2,7 @@ package com.huobi.client.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
 
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.JsonWrapper;
@@ -84,8 +85,8 @@ public class TestJsonWrapper {
   @Test
   public void testGetValues() {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(sampleJson1);
-    assertEquals(123, jsonWrapper.getInteger("int"));
-    assertEquals(1234567890123456789L, jsonWrapper.getLong("long"));
+    assertSame(123, jsonWrapper.getInteger("int"));
+    assertSame(1234567890123456789L, jsonWrapper.getLong("long"));
     assertEquals("test string", jsonWrapper.getString("string"));
     assertEquals(new BigDecimal("1.1234567890123456789"), jsonWrapper.getBigDecimal("float"));
   }
@@ -143,10 +144,10 @@ public class TestJsonWrapper {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(sampleJson2);
     JsonWrapper anotherObject = jsonWrapper.getJsonObject("anotherObject");
     assertNotEquals(anotherObject, null);
-    assertEquals(456, anotherObject.getInteger("int"));
-    assertEquals(123, jsonWrapper.getInteger("int"));
+    assertSame(456, anotherObject.getInteger("int"));
+    assertSame(123, jsonWrapper.getInteger("int"));
     jsonWrapper.getJsonObject("anotherObject", (item) -> {
-      assertEquals(456, item.getInteger("int"));
+      assertSame(456, item.getInteger("int"));
       assertEquals("test string2", item.getString("string"));
     });
   }
@@ -155,7 +156,7 @@ public class TestJsonWrapper {
   public void testGetObjectAndGetNonExistString() {
     JsonWrapper jsonWrapper = JsonWrapper.parseFromString(sampleJson2);
     jsonWrapper.getJsonObject("anotherObject", (item) -> {
-      assertEquals(456, item.getInteger("int"));
+      assertSame(456, item.getInteger("int"));
       assertEquals("test string2", item.getString("string"));
       thrown.expect(HuobiApiException.class);
       thrown.expectMessage("Get json item field");

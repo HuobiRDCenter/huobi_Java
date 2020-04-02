@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class TestTransferMaster {
@@ -58,7 +59,7 @@ public class TestTransferMaster {
 
     RestApiRequest<Long> restApiRequest = impl.transferBetweenParentAndSub(request);
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
-    assertEquals(1234L, querier.jsonWrapper.getLong("sub-uid"));
+    assertSame(1234L, querier.jsonWrapper.getLong("sub-uid"));
     assertEquals("btc", querier.jsonWrapper.getString("currency"));
     assertEquals(TransferMasterType.MASTER_POINT_TRANSFER_IN.toString(), querier.jsonWrapper.getString("type"));
     assertEquals(new BigDecimal("0.01"), querier.jsonWrapper.getBigDecimal("amount"));
