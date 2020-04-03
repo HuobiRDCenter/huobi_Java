@@ -1,45 +1,46 @@
 # Huobi Java SDK Change Log
 
-
-
 This is Huobi Java SDK, This is a lightweight java library, you can import to your java project and use this SDK to query all market data, trading and manage your account.
-
-
 
 The SDK supports both synchronous RESTful API invoking, and subscribe the market data from the Websocket connection.
 
-
-
-
-
-
-
 ## Table of Contents
 
-- [Huobi Global API Java SDK version 1.0.10](#Huobi-Global-API-Java-SDK-version-1.0.10)
+- [Huobi Global API Java SDK version 1.0.11](#Huobi-Global-API-Java-SDK-version-1011)
 
-- [Huobi Global API Java SDK version 1.0.9](#Huobi-Global-API-Java-SDK-version-1.0.9)
+- [Huobi Global API Java SDK version 1.0.10](#Huobi-Global-API-Java-SDK-version-1010)
 
-- [Huobi Global API Java SDK version 1.0.8](#Huobi-Global-API-Java-SDK-version-1.0.8)
+- [Huobi Global API Java SDK version 1.0.9](#Huobi-Global-API-Java-SDK-version-109)
 
-- [Huobi Global API Java SDK version 1.0.7](#Huobi-Global-API-Java-SDK-version-1.0.7)
+- [Huobi Global API Java SDK version 1.0.8](#Huobi-Global-API-Java-SDK-version-108)
 
-- [Huobi Global API Java SDK version 1.0.6](#Huobi-Global-API-Java-SDK-version-1.0.6)
+- [Huobi Global API Java SDK version 1.0.7](#Huobi-Global-API-Java-SDK-version-107)
 
-- [Huobi Global API Java SDK version 1.0.5](#Huobi-Global-API-Java-SDK-version-1.0.5)
+- [Huobi Global API Java SDK version 1.0.6](#Huobi-Global-API-Java-SDK-version-106)
 
-- [Huobi Global API Java SDK version 1.0.4](#Huobi-Global-API-Java-SDK-version-1.0.4)
+- [Huobi Global API Java SDK version 1.0.5](#Huobi-Global-API-Java-SDK-version-105)
 
-- [Huobi Global API Java SDK version 1.0.3](#Huobi-Global-API-Java-SDK-version-1.0.3)
+- [Huobi Global API Java SDK version 1.0.4](#Huobi-Global-API-Java-SDK-version-104)
 
-- [Huobi Global API Java SDK version 1.0.2](#Huobi-Global-API-Java-SDK-version-1.0.2)
+- [Huobi Global API Java SDK version 1.0.3](#Huobi-Global-API-Java-SDK-version-103)
 
-- [Huobi Global API Java SDK version 1.0.1](#Huobi-Global-API-Java-SDK-version-1.0.1)
+- [Huobi Global API Java SDK version 1.0.2](#Huobi-Global-API-Java-SDK-version-102)
 
+- [Huobi Global API Java SDK version 1.0.1](#Huobi-Global-API-Java-SDK-version-101)
+
+# Huobi Global API JAVA SDK version 1.0.11
+
+***2020-04-02***
+
+
+- modify subscribe for account update with currency balance information
+
+  ```
+   subscribe : account update
+  ```
 
 # Huobi Global API JAVA SDK version 1.0.10
 
-## 1.RELEASE NOTE - Huobi Global API SDK  1.0.10
 ***2020-02-26***
 
 
@@ -62,10 +63,9 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 
 # Huobi Global API JAVA SDK version 1.0.9
 
-## 1.RELEASE NOTE - Huobi Global API SDK  1.0.9
 ***2020-01-07***
 
-   
+
 - add new api
     ```
      1. POST /v1/order/batch-orders
@@ -76,11 +76,10 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
      1. POST /v1/order/orders/batchcancel
         param add client-order-ids 
         return success and failed detail info
-    ```    
+    ```
 
 # Huobi Global API JAVA SDK version 1.0.8
 
-## 1.RELEASE NOTE - Huobi Global API SDK  1.0.8
 ***2019-12-11***
 
 
@@ -92,10 +91,7 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 
 # Huobi Global API JAVA SDK version 1.0.7
 
-## 1.RELEASE NOTE - Huobi Global API SDK  1.0.7
 ***2019-11-27***
-
-
 
 
 - align response timestamp to UTC time
