@@ -1,13 +1,16 @@
-package com.huobi.client;
+package com.huobi.client.examples;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+import com.huobi.client.SubscriptionClient;
+import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.enums.MBPLevelEnums;
 
-public class SimpleTest {
+public class SubscribeFullMarketMBPEventTest {
 	
 	@Test
 	public void testSubscribeFullMarketMBPEvent() {

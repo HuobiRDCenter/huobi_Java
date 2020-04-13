@@ -31,7 +31,7 @@ public class WalletExamples {
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
     AccountLedgerRequest accountLedgerRequest = new AccountLedgerRequest();
-    accountLedgerRequest.setAccountId(12477272L);
+    accountLedgerRequest.setAccountId(123456L);
     List<AccountLedger> accountLedgerList = syncRequestClient.getAccountLedgers(accountLedgerRequest);
     System.out.println(accountLedgerList.size());
 

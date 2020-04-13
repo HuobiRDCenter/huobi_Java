@@ -1,5 +1,19 @@
 package com.huobi.client.impl;
 
+import static com.huobi.client.model.enums.OrderType.BUY_LIMIT;
+import static com.huobi.client.model.enums.OrderType.BUY_LIMIT_FOK;
+import static com.huobi.client.model.enums.OrderType.BUY_LIMIT_MAKER;
+import static com.huobi.client.model.enums.OrderType.BUY_MARKET;
+import static com.huobi.client.model.enums.OrderType.BUY_STOP_LIMIT;
+import static com.huobi.client.model.enums.OrderType.BUY_STOP_LIMIT_FOK;
+import static com.huobi.client.model.enums.OrderType.SELL_LIMIT;
+import static com.huobi.client.model.enums.OrderType.SELL_LIMIT_FOK;
+import static com.huobi.client.model.enums.OrderType.SELL_LIMIT_MAKER;
+import static com.huobi.client.model.enums.OrderType.SELL_MARKET;
+import static com.huobi.client.model.enums.OrderType.SELL_STOP_LIMIT;
+import static com.huobi.client.model.enums.OrderType.SELL_STOP_LIMIT_FOK;
+import com.huobi.client.model.enums.OrderType;
+
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,7 +77,6 @@ import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.LoanOrderStates;
 import com.huobi.client.model.enums.OrderSource;
 import com.huobi.client.model.enums.OrderState;
-import static com.huobi.client.model.enums.OrderType.*;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.enums.QuerySort;
 import com.huobi.client.model.enums.StopOrderOperator;
@@ -914,26 +927,28 @@ class RestApiRequestImpl {
     Optional.ofNullable(crequest).map(x -> x.getSubUid()).ifPresent(u -> builder.putToUrl("sub-uid", u));
     request.request = createRequestByGetWithSignature("/v1/cross-margin/accounts/balance", builder);
     request.jsonParser = (jsonWrapper -> {
-//      List<CrossMarginAccount> accountList = new LinkedList<>();
       JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
-
+      
       CrossMarginAccount account = new CrossMarginAccount();
-      account.setId(itemInData.getLong("id"));
-      account.setType(itemInData.getStringOrDefault("type", null));
-      account.setState(itemInData.getStringOrDefault("state", null));
-      account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate", null));
-      account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum", null));
-      account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum", null));
-      JsonWrapperArray array = itemInData.getJsonArray("list");
-      List<Balance> balanceList = new ArrayList<>();
-      array.forEach(balanceItem -> {
-        Balance balance = new Balance();
-        balance.setCurrency(balanceItem.getStringOrDefault("currency", null));
-        balance.setType(BalanceType.lookup(balanceItem.getString("type")));
-        balance.setBalance(balanceItem.getBigDecimalOrDefault("balance", null));
-        balanceList.add(balance);
-      });
-      account.setList(balanceList);
+      
+      if (itemInData != null) {
+    	  account.setId(itemInData.getLong("id"));
+          account.setType(itemInData.getStringOrDefault("type", null));
+          account.setState(itemInData.getStringOrDefault("state", null));
+          account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate", null));
+          account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum", null));
+          account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum", null));
+          JsonWrapperArray array = itemInData.getJsonArray("list");
+          List<Balance> balanceList = new ArrayList<>();
+          array.forEach(balanceItem -> {
+            Balance balance = new Balance();
+            balance.setCurrency(balanceItem.getStringOrDefault("currency", null));
+            balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+            balance.setBalance(balanceItem.getBigDecimalOrDefault("balance", null));
+            balanceList.add(balance);
+          });
+          account.setList(balanceList);
+      }      
 
       return account;
     });
@@ -1122,7 +1137,7 @@ class RestApiRequestImpl {
         order.setAccountType(
             AccountsInfoMap.getAccount(apiKey, item.getLong("account-id")).getType());
         order.setCreatedTimestamp(item.getLong("created-at"));
-        order.setType(lookup(item.getString("type")));
+        order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("filled-amount"));
         order.setFilledCashAmount(item.getBigDecimal("filled-cash-amount"));
         order.setFilledFees(item.getBigDecimal("filled-fees"));
@@ -1397,7 +1412,7 @@ class RestApiRequestImpl {
         order.setSymbol(item.getString("symbol"));
         order.setPrice(item.getBigDecimal("price"));
         order.setCreatedTimestamp(item.getLong("created-at"));
-        order.setType(lookup(item.getString("type")));
+        order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("field-amount"));
         order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
         order.setFilledFees(item.getBigDecimal("field-fees"));
@@ -1437,7 +1452,7 @@ class RestApiRequestImpl {
         order.setSymbol(item.getString("symbol"));
         order.setPrice(item.getBigDecimal("price"));
         order.setCreatedTimestamp(item.getLong("created-at"));
-        order.setType(lookup(item.getString("type")));
+        order.setType(OrderType.lookup(item.getString("type")));
         order.setFilledAmount(item.getBigDecimal("field-amount"));
         order.setFilledCashAmount(item.getBigDecimal("field-cash-amount"));
         order.setFilledFees(item.getBigDecimal("field-fees"));
@@ -1771,7 +1786,7 @@ class RestApiRequestImpl {
       order.setPrice(data.getBigDecimal("price"));
       order.setSource(OrderSource.lookup(data.getString("source")));
       order.setState(OrderState.lookup(data.getString("state")));
-      order.setType(lookup(data.getString("type")));
+      order.setType(OrderType.lookup(data.getString("type")));
       order.setStopPrice(data.getBigDecimalOrDefault("stop-price", null));
       order.setOperator(StopOrderOperator.find(data.getStringOrDefault("operator", null)));
       return order;
@@ -1793,7 +1808,7 @@ class RestApiRequestImpl {
         matchResult.setPrice(item.getBigDecimal("price"));
         matchResult.setSource(OrderSource.lookup(item.getString("source")));
         matchResult.setSymbol(item.getString("symbol"));
-        matchResult.setType(lookup(item.getString("type")));
+        matchResult.setType(OrderType.lookup(item.getString("type")));
         matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
         matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
         matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
