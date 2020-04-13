@@ -46,6 +46,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.FullMarketDepthMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -544,7 +545,7 @@ class WebsocketRequestImpl {
       changeV2.setAccountType(data.getStringOrDefault("accountType", null));
       changeV2.setBalance(data.getBigDecimalOrDefault("balance", null));
       changeV2.setChangeType(data.getStringOrDefault("changeType", null));
-      changeV2.setChangeTime(data.getLongOrDefault("changeTime", -1));
+      changeV2.setChangeTime(data.getLongOrDefault("changeTime",-1));
       accountEvent.setAccountChange(changeV2);
       return accountEvent;
     };
@@ -845,6 +846,43 @@ class WebsocketRequestImpl {
     };
     return request;
   }
+  
+	WebsocketRequest<FullMarketDepthMBPEvent> subscribeFullMarketDepthMBPEvent(String symbol, MBPLevelEnums level,
+			SubscriptionListener<FullMarketDepthMBPEvent> subscriptionListener, SubscriptionErrorHandler errorHandler) {
+		WebsocketRequest<FullMarketDepthMBPEvent> request = new WebsocketRequest<FullMarketDepthMBPEvent>(
+				subscriptionListener, errorHandler);
+		request.connectionHandler = (connection) -> {
+			connection.send(Channels.fullMarketDepthMBPChannel(symbol, level));
+		};
+
+		request.jsonParser = (jsonWrapper) -> {
+			JsonWrapper data = jsonWrapper.getJsonObject("tick");
+
+			FullMarketDepthMBPEvent event = new FullMarketDepthMBPEvent();
+			event.setSeqNum(data.getLong("seqNum"));
+
+			List<DepthEntry> bidList = new LinkedList<>();
+			JsonWrapperArray bids = data.getJsonArray("bids");
+			bids.forEachAsArray((item) -> {
+				DepthEntry depthEntry = new DepthEntry();
+				depthEntry.setPrice(item.getBigDecimalAt(0));
+				depthEntry.setAmount(item.getBigDecimalAt(1));
+				bidList.add(depthEntry);
+			});
+			List<DepthEntry> askList = new LinkedList<>();
+			JsonWrapperArray asks = data.getJsonArray("asks");
+			asks.forEachAsArray((item) -> {
+				DepthEntry depthEntry = new DepthEntry();
+				depthEntry.setPrice(item.getBigDecimalAt(0));
+				depthEntry.setAmount(item.getBigDecimalAt(1));
+				askList.add(depthEntry);
+			});
+			event.setAsks(askList);
+			event.setBids(bidList);
+			return event;
+		};
+		return request;
+	}
 
 
   WebsocketRequest<MarketDepthMBPEvent> subscribeMarketDepthMBPEvent(String symbol, MBPLevelEnums level,

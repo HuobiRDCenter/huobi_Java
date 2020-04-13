@@ -7,6 +7,7 @@ import java.util.Map;
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.AccountLedger;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BatchCancelResultV1;
@@ -43,9 +44,11 @@ import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.AccountLedgerRequest;
 import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
+import com.huobi.client.model.request.CrossMarginAccountRequest;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
@@ -287,7 +290,7 @@ public interface SyncRequestClient {
    * This endpoint returns the balance of the margin loan account.
    * @return
    */
-  CrossMarginAccount getCrossMarginAccount();
+  CrossMarginAccount getCrossMarginAccount(CrossMarginAccountRequest request);
 
   List<CrossMarginLoanInfo> getCrossMarginLoanInfo();
 
@@ -323,6 +326,15 @@ public interface SyncRequestClient {
    * @return
    */
   List<AccountHistory> getAccountHistory(AccountHistoryRequest request);
+  
+  /**
+   * Get account ledger
+   * @param request
+   * @return
+   */
+  List<AccountLedger> getAccountLedgers(AccountLedgerRequest request);
+  
+  String getSystemStatus();
 
 
   SubuserManagementResult subuserManagement(SubuserManagementRequest request);

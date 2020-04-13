@@ -1,5 +1,10 @@
 package com.huobi.client.impl;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
 import com.huobi.client.SubscriptionClient;
 import com.huobi.client.SubscriptionErrorHandler;
 import com.huobi.client.SubscriptionListener;
@@ -14,6 +19,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.FullMarketDepthMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -24,11 +30,6 @@ import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
 import com.huobi.client.model.request.OrdersRequest;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
 public class WebSocketStreamClientImpl implements SubscriptionClient {
 
@@ -391,4 +392,10 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
       SubscriptionErrorHandler errorHandler) {
     createConnection(requestImpl.requestMarketDepthMBPEvent(symbol, level, callback, errorHandler), true);
   }
+
+	@Override
+	public void subscribeFullMarketDepthMBP(String symbol, MBPLevelEnums level,
+			SubscriptionListener<FullMarketDepthMBPEvent> callback) {
+		createConnection(requestImpl.subscribeFullMarketDepthMBPEvent(symbol, level, callback, null));
+	}
 }

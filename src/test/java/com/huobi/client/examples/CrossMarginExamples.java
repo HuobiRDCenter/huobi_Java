@@ -26,7 +26,7 @@ public class CrossMarginExamples {
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
-    CrossMarginAccount crossMarginAccount = syncRequestClient.getCrossMarginAccount();
+    CrossMarginAccount crossMarginAccount = syncRequestClient.getCrossMarginAccount(null);
 
     System.out.println("Cross Margin Account:"+JSON.toJSONString(crossMarginAccount));
     crossMarginAccount.getList().forEach(balance -> {
