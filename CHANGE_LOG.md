@@ -6,6 +6,8 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 
 ## Table of Contents
 
+- [Huobi Global API Java SDK version 1.0.12](#Huobi-Global-API-Java-SDK-version-1012)
+
 - [Huobi Global API Java SDK version 1.0.11](#Huobi-Global-API-Java-SDK-version-1011)
 
 - [Huobi Global API Java SDK version 1.0.10](#Huobi-Global-API-Java-SDK-version-1010)
@@ -27,6 +29,28 @@ The SDK supports both synchronous RESTful API invoking, and subscribe the market
 - [Huobi Global API Java SDK version 1.0.2](#Huobi-Global-API-Java-SDK-version-102)
 
 - [Huobi Global API Java SDK version 1.0.1](#Huobi-Global-API-Java-SDK-version-101)
+
+# Huobi Global API JAVA SDK version 1.0.12
+
+***2020-04-13***
+
+- Modify API request and response field
+
+  ```
+  GET /v1/cross-margin/loan-orders				Add sub-id as optional parameters
+  GET /v1/cross-margin/accounts/balance		Add sub-id as optional parameters
+  GET /market/tickers											Add best bid offer response field
+  POST /v1/order/orders/place							Add FOK order types
+  POST /v1/order/batch-orders							Add FOK order types
+  ```
+
+- Add new API
+
+  ```
+  GET https://status.huobigroup.com/api/v2/summary.json
+  WebSocket topic market.$symbol.mbp.refresh.$levels
+  GET /v2/account/ledger
+  ```
 
 # Huobi Global API JAVA SDK version 1.0.11
 
