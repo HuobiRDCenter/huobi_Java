@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
-
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.AccountLedger;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
 import com.huobi.client.model.SubuserManagementResult;
@@ -16,6 +16,7 @@ import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.AccountLedgerRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 
@@ -29,6 +30,10 @@ public class WalletExamples {
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
+    AccountLedgerRequest accountLedgerRequest = new AccountLedgerRequest();
+    accountLedgerRequest.setAccountId(12477272L);
+    List<AccountLedger> accountLedgerList = syncRequestClient.getAccountLedgers(accountLedgerRequest);
+    System.out.println(accountLedgerList.size());
 
     // Lock sub user
     SubuserManagementResult lockResult = syncRequestClient.subuserManagement(SubuserManagementRequest.lock(subUid));

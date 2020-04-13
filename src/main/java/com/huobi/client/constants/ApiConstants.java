@@ -1,4 +1,3 @@
-
 package com.huobi.client.constants;
 
 public class ApiConstants {

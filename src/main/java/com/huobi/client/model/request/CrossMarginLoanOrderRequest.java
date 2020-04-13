@@ -42,6 +42,11 @@ public class CrossMarginLoanOrderRequest {
    * The number of orders to return
    */
   private Integer size;
+  
+  /**
+	* sub-uid
+    */
+  private Long subUid;
 
   public Date getStartDate() {
     return startDate;
@@ -98,4 +103,12 @@ public class CrossMarginLoanOrderRequest {
   public void setSize(Integer size) {
     this.size = size;
   }
+
+	public Long getSubUid() {
+		return subUid;
+	}
+	
+	public void setSubUid(Long subUid) {
+		this.subUid = subUid;
+	}
 }

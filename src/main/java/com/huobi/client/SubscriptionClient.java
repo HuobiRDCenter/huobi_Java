@@ -11,6 +11,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
+import com.huobi.client.model.event.FullMarketDepthMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -465,6 +466,8 @@ public interface SubscriptionClient {
    */
   void requestAccountListEvent(boolean autoClose, SubscriptionListener<AccountListEvent> callback,
       SubscriptionErrorHandler errorHandler);
+  
+  void subscribeFullMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<FullMarketDepthMBPEvent> callback);
 
   void subscribeMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback);
 

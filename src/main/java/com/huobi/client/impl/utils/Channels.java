@@ -125,6 +125,14 @@ public abstract class Channels {
   public static String marketDepthMBPChannel(String symbol, MBPLevelEnums level) {
     return marketDepthMBPChannel(OP_SUB, symbol, level);
   }
+  
+  public static String fullMarketDepthMBPChannel(String symbol, MBPLevelEnums level) {
+		JSONObject json = new JSONObject();
+		String topic = "market." + symbol + ".mbp.refresh." + level.getLevels();
+		json.put(OP_SUB, topic);
+		json.put("id", System.currentTimeMillis() + "");
+		return json.toJSONString();
+  }
 
   public static String requestMarketDepthMBPChannel(String symbol, MBPLevelEnums level) {
     return marketDepthMBPChannel(OP_REQ, symbol, level);
