@@ -19,7 +19,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
-import com.huobi.client.model.event.FullMarketDepthMBPEvent;
+import com.huobi.client.model.event.MarketDepthFullMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -29,6 +29,7 @@ import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.event.OrdersUpdateEvent;
 import com.huobi.client.model.request.OrdersRequest;
 
 public class WebSocketStreamClientImpl implements SubscriptionClient {
@@ -394,8 +395,16 @@ public class WebSocketStreamClientImpl implements SubscriptionClient {
   }
 
 	@Override
-	public void subscribeFullMarketDepthMBP(String symbol, MBPLevelEnums level,
-			SubscriptionListener<FullMarketDepthMBPEvent> callback) {
-		createConnection(requestImpl.subscribeFullMarketDepthMBPEvent(symbol, level, callback, null));
+	public void subscribeMarketDepthFullMBP(String symbol, MBPLevelEnums level,
+                                            SubscriptionListener<MarketDepthFullMBPEvent> callback) {
+		createConnection(requestImpl.subscribeMarketDepthFullMBPEvent(symbol, level, callback, null));
 	}
+
+	@Override
+	public void subscribeOrderChangeEvent(String symbol, SubscriptionListener<OrdersUpdateEvent> listener,
+			SubscriptionErrorHandler errorHandler) {
+		createConnection(requestImpl.subscribeOrderChangeEvent(symbol, listener, errorHandler));
+	}
+	
+	
 }

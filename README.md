@@ -5,39 +5,15 @@ This is Huobi Java SDK, This is a lightweight Java library, you can import to yo
 The SDK supports both synchronous and asynchronous RESTful API invoking, and subscribe the market data from the Websocket connection.
 
 
+## Huobi Java SDK Releases
 
-## Huobi Java SDK (change log)
-[Java SDK Change Log](https://github.com/HuobiRDCenter/huobi_Java/blob/master/CHANGE_LOG.md)
-
-
-## Huobi Java SDK Download
-
-- [Huobi Global API Java SDK version 1.0.11](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.11)
-
-- [Huobi Global API Java SDK version 1.0.10](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.10)
-
-- [Huobi Global API Java SDK version 1.0.9](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.9)
-
-- [Huobi Global API Java SDK version 1.0.8](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.8)
-
-- [Huobi Global API Java SDK version 1.0.7](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.7)
-
-- [Huobi Global API Java SDK version 1.0.6](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.6)
-
-- [Huobi Global API Java SDK version 1.0.5](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.5)
-
-- [Huobi Global API Java SDK version 1.0.4](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.4)
-
-- [Huobi Global API Java SDK version 1.0.3](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.3)
-
-- [Huobi Global API Java SDK version 1.0.2](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.2)
-
-- [Huobi Global API Java SDK version 1.0.1](https://github.com/HuobiRDCenter/huobi_Java/releases/tag/1.0.1)
+Go to [Releases](https://github.com/HuobiRDCenter/huobi_Java/releases) page to view and download each release.
 
 
 ## Table of Contents
 
 - [Beginning](#Beginning)
+  
   - [Installation](#Installation)
   - [Quick Start](#Quick-Start)
   - [Request vs. Subscription](#request-vs.-subscription)
@@ -800,11 +776,8 @@ subscriptionClient.subscribeOrderUpdateEvent("btcusdt", (orderEvent) -> {
 
 ```java
 // Subscribe account change.
-subscriptionClient.subscribeAccountEvent(BalanceMode.AVAILABLE, (accountEvent) -> {
-    for (AccountChange change : accountEvent.getData()) {
-        System.out.println(change.getAccountType());
-        System.out.println("Balance: " + change.getBalance());
-    }
+subscriptionClient.subscribeAccountChangeV2Event(AccountChangeModeEnum.TOTAL, (event) -> {
+    System.out.println("===>"+ JSON.toJSONString(event));
 });
 ```
 

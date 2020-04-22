@@ -18,7 +18,7 @@ public class SubscribeOrderUpdate {
 
   public static void main(String[] args) {
 
-    String symbol = "htusdt";
+    String symbol = "hthusd";
     SubscriptionClient client = SubscriptionClient.create(Constants.API_KEY, Constants.SECRET_KEY);
     /**
      * subscribe order updateEvent ,old interface
@@ -37,6 +37,7 @@ public class SubscribeOrderUpdate {
       System.out.println(JSON.toJSONString(event));
     }));
 
+
     /**
      * request order list event
      */
@@ -53,9 +54,9 @@ public class SubscribeOrderUpdate {
     Date today = new Date();
     Date startDate = DateUtils.addDays(today, -2);
 
-    long startOrderId = 48909764277L;
+    long startOrderId = 81964355440L;
 
-    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, startOrderId, 20, QueryDirection.PREV);
+    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, 0L, 20, QueryDirection.PREV);
 
     client.requestOrderListEvent(ordersRequest, orderListEvent -> {
       System.out.println("=================Request Order List======================");
@@ -63,8 +64,6 @@ public class SubscribeOrderUpdate {
         System.out.println("Request Orders:" + JSON.toJSONString(order));
       });
     });
-
-    System.out.println("------------------------------------------");
 
     /**
      * request order detail event
@@ -76,6 +75,12 @@ public class SubscribeOrderUpdate {
       });
     });
 
+    /**
+     * subscribe order update v2
+     */
+    client.subscribeOrderChangeEvent(symbol, (event) -> {
+      System.out.println(JSON.toJSONString(event));
+    }, null);
   }
 
 }

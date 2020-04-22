@@ -11,7 +11,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
-import com.huobi.client.model.event.FullMarketDepthMBPEvent;
+import com.huobi.client.model.event.MarketDepthFullMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -21,6 +21,7 @@ import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.event.OrdersUpdateEvent;
 import com.huobi.client.model.request.OrdersRequest;
 
 /***
@@ -467,7 +468,16 @@ public interface SubscriptionClient {
   void requestAccountListEvent(boolean autoClose, SubscriptionListener<AccountListEvent> callback,
       SubscriptionErrorHandler errorHandler);
   
-  void subscribeFullMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<FullMarketDepthMBPEvent> callback);
+  /**
+   * when the order status is changed, the order change event will be triggered
+   * @param symbol
+   * @param listener
+   * @param errorHandler
+   */
+  void subscribeOrderChangeEvent(String symbol, SubscriptionListener<OrdersUpdateEvent> listener,
+	      SubscriptionErrorHandler errorHandler);
+  
+  void subscribeMarketDepthFullMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthFullMBPEvent> callback);
 
   void subscribeMarketDepthMBP(String symbol, MBPLevelEnums level, SubscriptionListener<MarketDepthMBPEvent> callback);
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.huobi.client.model.DepthEntry;
 
-public class FullMarketDepthMBPEvent {
+public class MarketDepthFullMBPEvent {
 
   private Long seqNum;
 

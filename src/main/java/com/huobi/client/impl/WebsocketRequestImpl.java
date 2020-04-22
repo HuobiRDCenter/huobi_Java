@@ -3,8 +3,12 @@ package com.huobi.client.impl;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.huobi.client.SubscriptionErrorHandler;
@@ -46,7 +50,7 @@ import com.huobi.client.model.event.AccountEvent;
 import com.huobi.client.model.event.AccountListEvent;
 import com.huobi.client.model.event.CandlestickEvent;
 import com.huobi.client.model.event.CandlestickReqEvent;
-import com.huobi.client.model.event.FullMarketDepthMBPEvent;
+import com.huobi.client.model.event.MarketDepthFullMBPEvent;
 import com.huobi.client.model.event.MarketBBOEvent;
 import com.huobi.client.model.event.MarketDepthMBPEvent;
 import com.huobi.client.model.event.OrderListEvent;
@@ -56,6 +60,10 @@ import com.huobi.client.model.event.PriceDepthEvent;
 import com.huobi.client.model.event.TradeClearingEvent;
 import com.huobi.client.model.event.TradeEvent;
 import com.huobi.client.model.event.TradeStatisticsEvent;
+import com.huobi.client.model.event.OrdersUpdateEvent;
+import com.huobi.client.model.event.OrdersCancellationEvent;
+import com.huobi.client.model.event.OrdersCreationEvent;
+import com.huobi.client.model.event.OrdersTradeEvent;
 import com.huobi.client.model.request.OrdersRequest;
 
 import static com.huobi.client.impl.utils.InternalUtils.await;
@@ -847,18 +855,18 @@ class WebsocketRequestImpl {
     return request;
   }
   
-	WebsocketRequest<FullMarketDepthMBPEvent> subscribeFullMarketDepthMBPEvent(String symbol, MBPLevelEnums level,
-			SubscriptionListener<FullMarketDepthMBPEvent> subscriptionListener, SubscriptionErrorHandler errorHandler) {
-		WebsocketRequest<FullMarketDepthMBPEvent> request = new WebsocketRequest<FullMarketDepthMBPEvent>(
+	WebsocketRequest<MarketDepthFullMBPEvent> subscribeMarketDepthFullMBPEvent(String symbol, MBPLevelEnums level,
+                                                                               SubscriptionListener<MarketDepthFullMBPEvent> subscriptionListener, SubscriptionErrorHandler errorHandler) {
+		WebsocketRequest<MarketDepthFullMBPEvent> request = new WebsocketRequest<MarketDepthFullMBPEvent>(
 				subscriptionListener, errorHandler);
 		request.connectionHandler = (connection) -> {
-			connection.send(Channels.fullMarketDepthMBPChannel(symbol, level));
+			connection.send(Channels.marketDepthFullMBPChannel(symbol, level));
 		};
 
 		request.jsonParser = (jsonWrapper) -> {
 			JsonWrapper data = jsonWrapper.getJsonObject("tick");
 
-			FullMarketDepthMBPEvent event = new FullMarketDepthMBPEvent();
+			MarketDepthFullMBPEvent event = new MarketDepthFullMBPEvent();
 			event.setSeqNum(data.getLong("seqNum"));
 
 			List<DepthEntry> bidList = new LinkedList<>();
@@ -964,6 +972,43 @@ class WebsocketRequestImpl {
     };
 
     return request;
+  }
+  
+  WebsocketRequest<OrdersUpdateEvent> subscribeOrderChangeEvent(String symbol, SubscriptionListener<OrdersUpdateEvent> listener,
+                                                                SubscriptionErrorHandler errorHandler) {
+	  WebsocketRequest<OrdersUpdateEvent> request = new WebsocketRequest<>(listener, errorHandler);
+
+	  request.name = "Order Change Event";
+	  // 新版本需设置版本号
+	  request.signatureVersion = ApiSignatureV2.SIGNATURE_VERSION_VALUE;
+	  request.authHandler = (connection) -> {
+        connection.send(Channels.orderChangeChannel(symbol));
+      };
+	  request.jsonParser = (jsonWrapper) -> {
+		  JsonWrapper data = jsonWrapper.getJsonObject("data");
+		  return Optional.ofNullable(data).map(a -> {
+			  String eventType = data.getString("eventType");
+			  OrdersUpdateEvent result = null;
+			  switch (eventType) {
+				case "creation":
+					result = JSON.parseObject(data.getJson().toString(), new TypeReference<OrdersCreationEvent>(){});
+					break;
+				case "trade":
+					result = JSON.parseObject(data.getJson().toString(), new TypeReference<OrdersTradeEvent>(){});
+					break;
+				case "cancellation":
+					result = JSON.parseObject(data.getJson().toString(), new TypeReference<OrdersCancellationEvent>(){});
+					break;
+	
+				default:
+					break;
+				}
+			  
+			  return result;
+		  }).orElse(null);
+	  };
+	  
+	  return request;
   }
 
 }
