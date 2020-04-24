@@ -1,7 +1,9 @@
 package com.huobi.client.impl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -21,11 +23,13 @@ import com.huobi.client.impl.utils.UrlParamsBuilder;
 
 import static com.huobi.client.impl.utils.InternalUtils.decode;
 
-public class WebSocketConnection extends WebSocketListener {
+public class WebSocketConnection extends WebSocketListener implements Closeable {
 
   private static final Logger log = LoggerFactory.getLogger(WebSocketConnection.class);
 
   private static int connectionCounter = 0;
+  private long lastConnectCalled = 0;
+  private final AtomicBoolean disposed = new AtomicBoolean();
 
   public enum ConnectionState {
     IDLE,
@@ -110,8 +114,8 @@ public class WebSocketConnection extends WebSocketListener {
         : new Request.Builder().url(subscriptionTradingUrl).build();
     this.watchDog = watchDog;
     log.info("[Sub] Connection [id: "
-        + this.connectionId
-        + "] created for " + request.name);
+            + this.connectionId
+            + "] created for " + request.name);
   }
 
   int getConnectionId() {
@@ -123,17 +127,30 @@ public class WebSocketConnection extends WebSocketListener {
       log.info("[Sub][" + this.connectionId + "] Already connected");
       return;
     }
+    if (System.currentTimeMillis() - lastConnectCalled < 10_000) return;
+    lastConnectCalled = System.currentTimeMillis();
+    disposeWebSocket();
     log.info("[Sub][" + this.connectionId + "] Connecting...");
     webSocket = RestApiInvoker.createWebSocket(okhttpRequest, this);
   }
 
+  private void disposeWebSocket() {
+    WebSocket webSocket = this.webSocket;
+    this.webSocket = null;
+    if (webSocket == null) return;
+    try {
+      log.info("[Sub][{}] Closing existing connection...", this.connectionId);
+      webSocket.cancel();
+      webSocket.close(4999, "Close session");
+    } catch (Exception e) {
+      onError(e.getMessage(), e);
+    }
+  }
+
   void reConnect(int delayInSecond) {
     log.warn("[Sub][" + this.connectionId + "] Reconnecting after "
-        + delayInSecond + " seconds later");
-    if (webSocket != null) {
-      webSocket.cancel();
-      webSocket = null;
-    }
+            + delayInSecond + " seconds later");
+    disposeWebSocket();
     this.delayInSecond = delayInSecond;
     state = ConnectionState.DELAY_CONNECT;
   }
@@ -246,8 +263,10 @@ public class WebSocketConnection extends WebSocketListener {
       } else if (jsonWrapper.containKey("subbed")) {
       }
     } catch (Exception e) {
-      log.error("[Sub][" + this.connectionId + "] Unexpected error: " + e.getMessage());
-      closeOnError();
+      if (!disposed.get()) {
+        log.error("[Sub][" + this.connectionId + "] Unexpected error: " + e.getMessage());
+        closeOnError();
+      }
     }
   }
 
@@ -305,11 +324,13 @@ public class WebSocketConnection extends WebSocketListener {
     return state;
   }
 
+  @Override
   public void close() {
-    log.error("[Sub][" + this.connectionId + "] Closing normally");
-    webSocket.cancel();
-    webSocket = null;
-    watchDog.onClosedNormally(this);
+    if (disposed.compareAndSet(false, true)) {
+      watchDog.onClosedNormally(this);
+      log.info("[Sub][{}] Closing normally", this.connectionId);
+      disposeWebSocket();
+    }
   }
 
   @Override
@@ -390,15 +411,15 @@ public class WebSocketConnection extends WebSocketListener {
 
   @Override
   public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-    onError("Unexpected error: " + t.getMessage(), t);
-    closeOnError();
+    if (!disposed.get()) {
+      onError("Unexpected error: " + t.getMessage(), t);
+      closeOnError();
+    }
   }
 
   private void closeOnError() {
-    if (webSocket != null) {
-      this.webSocket.cancel();
-      state = ConnectionState.CLOSED_ON_ERROR;
-      log.error("[Sub][" + this.connectionId + "] Connection is closing due to error");
-    }
+    disposeWebSocket();
+    state = ConnectionState.CLOSED_ON_ERROR;
+    log.error("[Sub][" + this.connectionId + "] Connection is closing due to error");
   }
 }
