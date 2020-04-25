@@ -1,10 +1,12 @@
 package com.huobi.client.impl;
 
-import java.io.IOException;
-import java.net.URI;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.huobi.client.SubscriptionOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.InternalUtils;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.impl.utils.UrlParamsBuilder;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -13,11 +15,9 @@ import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.huobi.client.SubscriptionOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.InternalUtils;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.impl.utils.UrlParamsBuilder;
+import java.io.IOException;
+import java.net.Proxy;
+import java.net.URI;
 
 import static com.huobi.client.impl.utils.InternalUtils.decode;
 
@@ -68,28 +68,30 @@ public class WebSocketConnection extends WebSocketListener {
   private String subscriptionMarketUrl = "wss://api.huobi.pro/ws";
   private String subscriptionTradingUrl = "wss://api.huobi.pro/ws/v1";
   private String tradingHost;
+  private Proxy proxy;
 
   WebSocketConnection(
-      String apiKey,
-      String secretKey,
-      SubscriptionOptions options,
-      WebsocketRequest request,
-      WebSocketWatchDog watchDog) {
+          String apiKey,
+          String secretKey,
+          SubscriptionOptions options,
+          WebsocketRequest request,
+          WebSocketWatchDog watchDog) {
     this(apiKey, secretKey, options, request, watchDog, false);
   }
 
   WebSocketConnection(
-      String apiKey,
-      String secretKey,
-      SubscriptionOptions options,
-      WebsocketRequest request,
-      WebSocketWatchDog watchDog,
-      boolean autoClose) {
+          String apiKey,
+          String secretKey,
+          SubscriptionOptions options,
+          WebsocketRequest request,
+          WebSocketWatchDog watchDog,
+          boolean autoClose) {
     this.connectionId = WebSocketConnection.connectionCounter++;
     this.apiKey = apiKey;
     this.secretKey = secretKey;
     this.request = request;
     this.autoClose = autoClose;
+    this.proxy=options.getProxy();
     try {
       String host = new URI(options.getUri()).getHost();
       this.tradingHost = host;
@@ -106,12 +108,12 @@ public class WebSocketConnection extends WebSocketListener {
     }
 
     this.okhttpRequest = request.authHandler == null
-        ? new Request.Builder().url(subscriptionMarketUrl).build()
-        : new Request.Builder().url(subscriptionTradingUrl).build();
+            ? new Request.Builder().url(subscriptionMarketUrl).build()
+            : new Request.Builder().url(subscriptionTradingUrl).build();
     this.watchDog = watchDog;
     log.info("[Sub] Connection [id: "
-        + this.connectionId
-        + "] created for " + request.name);
+                     + this.connectionId
+                     + "] created for " + request.name);
   }
 
   int getConnectionId() {
@@ -124,12 +126,12 @@ public class WebSocketConnection extends WebSocketListener {
       return;
     }
     log.info("[Sub][" + this.connectionId + "] Connecting...");
-    webSocket = RestApiInvoker.createWebSocket(okhttpRequest, this);
+    webSocket = RestApiInvoker.createWebSocket(okhttpRequest, this,this.proxy);
   }
 
   void reConnect(int delayInSecond) {
     log.warn("[Sub][" + this.connectionId + "] Reconnecting after "
-        + delayInSecond + " seconds later");
+                     + delayInSecond + " seconds later");
     if (webSocket != null) {
       webSocket.cancel();
       webSocket = null;
@@ -158,7 +160,7 @@ public class WebSocketConnection extends WebSocketListener {
     }
     if (!result) {
       log.error("[Sub][" + this.connectionId
-          + "] Failed to send message");
+                        + "] Failed to send message");
       closeOnError();
     }
   }
@@ -201,7 +203,7 @@ public class WebSocketConnection extends WebSocketListener {
     try {
       if (request == null) {
         log.error("[Sub][" + this.connectionId
-            + "] request is null");
+                          + "] request is null");
         closeOnError();
         return;
       }
@@ -213,19 +215,19 @@ public class WebSocketConnection extends WebSocketListener {
         data = new String(decode(bytes.toByteArray()));
       } catch (IOException e) {
         log.error("[Sub][" + this.connectionId
-            + "] Receive message error: " + e.getMessage());
+                          + "] Receive message error: " + e.getMessage());
         closeOnError();
         return;
       }
       log.debug("[On Message][{}] {}", connectionId, data);
       JsonWrapper jsonWrapper = JsonWrapper.parseFromString(data);
       if ((jsonWrapper.containKey("status") && !"ok".equals(jsonWrapper.getString("status"))) ||
-          (jsonWrapper.containKey("err-code") && jsonWrapper.getIntegerOrDefault("err-code",999999) > 0)) {
+              (jsonWrapper.containKey("err-code") && jsonWrapper.getIntegerOrDefault("err-code",999999) > 0)) {
         String errorCode = jsonWrapper.getStringOrDefault("err-code", "");
         String errorMsg = jsonWrapper.getStringOrDefault("err-msg", "");
         onError(errorCode + ": " + errorMsg, null);
         log.error("[Sub][" + this.connectionId
-            + "] Got error from server: " + errorCode + "; " + errorMsg);
+                          + "] Got error from server: " + errorCode + "; " + errorMsg);
         close();
       } else if (jsonWrapper.containKey("op")) {
         String op = jsonWrapper.getString("op");
@@ -255,7 +257,7 @@ public class WebSocketConnection extends WebSocketListener {
   private void onError(String errorMessage, Throwable e) {
     if (request.errorHandler != null) {
       HuobiApiException exception = new HuobiApiException(
-          HuobiApiException.SUBSCRIPTION_ERROR, errorMessage, e);
+              HuobiApiException.SUBSCRIPTION_ERROR, errorMessage, e);
       request.errorHandler.onError(exception);
     }
     log.error("[Sub][" + this.connectionId + "] " + errorMessage);
@@ -280,7 +282,7 @@ public class WebSocketConnection extends WebSocketListener {
       request.updateCallback.onReceive(obj);
     } catch (Exception e) {
       onError("Process error: " + e.getMessage()
-          + " You should capture the exception in your error handler", e);
+                      + " You should capture the exception in your error handler", e);
     }
   }
 
@@ -385,7 +387,7 @@ public class WebSocketConnection extends WebSocketListener {
       return;
     }
     builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
-        .putToUrl("cid", System.currentTimeMillis());
+           .putToUrl("cid", System.currentTimeMillis());
     send(builder.buildUrlToJsonString());
   }
 

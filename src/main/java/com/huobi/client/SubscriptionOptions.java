@@ -1,6 +1,8 @@
 package com.huobi.client;
 
 import com.huobi.client.exception.HuobiApiException;
+
+import java.net.Proxy;
 import java.net.URI;
 
 /**
@@ -12,16 +14,25 @@ public class SubscriptionOptions {
   private boolean isAutoReconnect = true;
   private int receiveLimitMs = 60_000;
   private int connectionDelayOnFailure = 15;
+  private Proxy proxy;
 
 
   public SubscriptionOptions(
-      SubscriptionOptions options) {
+          SubscriptionOptions options) {
     this.uri = options.uri;
     this.isAutoReconnect = options.isAutoReconnect;
     this.receiveLimitMs = options.receiveLimitMs;
     this.connectionDelayOnFailure = options.connectionDelayOnFailure;
+    this.proxy=options.proxy;
   }
-
+  public void setProxy(Proxy proxy)
+  {
+    this.proxy=proxy;
+  }
+  public Proxy getProxy()
+  {
+    return this.proxy;
+  }
   public SubscriptionOptions() {
   }
 
@@ -36,7 +47,7 @@ public class SubscriptionOptions {
     } catch (Exception e)
     {
       throw new HuobiApiException(
-          HuobiApiException.INPUT_ERROR, "The URI is incorrect: " + e.getMessage());
+              HuobiApiException.INPUT_ERROR, "The URI is incorrect: " + e.getMessage());
     }
     this.uri = uri;
   }

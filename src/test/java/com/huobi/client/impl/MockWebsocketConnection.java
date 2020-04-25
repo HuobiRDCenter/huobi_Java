@@ -25,6 +25,7 @@ public class MockWebsocketConnection extends WebSocketConnection {
     this.request = request;
   }
 
+  @Override
   void connect() {
     try {
       mockWebsocket = new MockOkHttpWebsocket();
