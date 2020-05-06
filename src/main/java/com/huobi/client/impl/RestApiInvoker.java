@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.sun.istack.internal.NotNull;
+import javax.annotation.Nonnull;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Interceptor;
@@ -40,9 +40,9 @@ public abstract class RestApiInvoker {
       .pingInterval(20, TimeUnit.SECONDS)
       .readTimeout(10, TimeUnit.SECONDS)
       .addInterceptor(new Interceptor() {
-        @NotNull
+        @Nonnull
         @Override
-        public Response intercept(@NotNull Chain chain) throws IOException {
+        public Response intercept(@Nonnull Chain chain) throws IOException {
           Request request = chain.request();
 
           Long startTime = System.currentTimeMillis();
