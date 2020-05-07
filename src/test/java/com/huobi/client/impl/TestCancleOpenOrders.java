@@ -66,7 +66,7 @@ public class TestCancleOpenOrders {
     assertNotNull(restApiRequest.request.url().queryParameter("Signature"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("htbtc", querier.jsonWrapper.getString("symbol"));
-    assertSame(12345L, querier.jsonWrapper.getLong("account-id"));
+    assertTrue(12345L == querier.jsonWrapper.getLong("account-id"));
 
   }
 

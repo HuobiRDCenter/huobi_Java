@@ -42,6 +42,6 @@ public class TestEtfSwap {
     assertTrue(restApiRequest.request.url().toString().contains("/etf/swap/out"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("hb10", querier.jsonWrapper.getString("etf_name"));
-    assertSame(345, querier.jsonWrapper.getInteger("amount"));
+    assertTrue(345 == querier.jsonWrapper.getInteger("amount"));
   }
 }

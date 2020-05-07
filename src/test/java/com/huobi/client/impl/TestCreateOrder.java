@@ -1,21 +1,9 @@
 package com.huobi.client.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import com.huobi.client.RequestOptions;
-import com.huobi.client.exception.HuobiApiException;
-import com.huobi.client.impl.utils.JsonWrapper;
-import com.huobi.client.model.Account;
-import com.huobi.client.model.User;
-import com.huobi.client.model.enums.AccountType;
-import com.huobi.client.model.enums.OrderType;
-import com.huobi.client.model.request.NewOrderRequest;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +13,19 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.huobi.client.RequestOptions;
+import com.huobi.client.exception.HuobiApiException;
+import com.huobi.client.impl.utils.JsonWrapper;
+import com.huobi.client.model.Account;
+import com.huobi.client.model.User;
+import com.huobi.client.model.enums.AccountType;
+import com.huobi.client.model.enums.OrderType;
+import com.huobi.client.model.request.NewOrderRequest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AccountsInfoMap.class})
@@ -75,7 +76,7 @@ public class TestCreateOrder {
     assertNotNull(restApiRequest.request.url().queryParameter("Signature"));
     MockPostQuerier querier = new MockPostQuerier(restApiRequest.request);
     assertEquals("htbtc", querier.jsonWrapper.getString("symbol"));
-    assertSame(12345,querier.jsonWrapper.getLong("account-id"));
+    assertTrue(12345L == querier.jsonWrapper.getLong("account-id"));
     assertEquals(new BigDecimal("1"), querier.jsonWrapper.getBigDecimal("amount"));
     assertEquals(new BigDecimal("1"), querier.jsonWrapper.getBigDecimal("price"));
     assertEquals(OrderType.SELL_LIMIT.toString(), querier.jsonWrapper.getString("type"));
