@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
+
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.Account;
@@ -17,6 +18,7 @@ import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.AccountLedgerRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 
@@ -67,6 +69,12 @@ public class WalletExamples {
       System.out.println("Deposit Address:" + JSON.toJSONString(address));
     });
 
+    List<DepositAddress> subAddressList = syncRequestClient.getSubUserDepositAddress(subUid, currency);
+    subAddressList.forEach(address -> {
+      System.out.println("SubUser Deposit Address:" + JSON.toJSONString(address));
+    });
+
+
 
     WithdrawQuota withdrawQuota = syncRequestClient.getWithdrawQuota(currency);
     System.out.println("==============" + withdrawQuota.getCurrency() + "===============");
@@ -98,6 +106,18 @@ public class WalletExamples {
     List<Deposit> depositList = syncRequestClient.getDepositHistory(currency,0,10);
     depositList.forEach(deposit -> {
       System.out.println("Deposit History:" + JSON.toJSONString(deposit));
+    });
+
+    SubUserDepositHistoryRequest subUserDepositHistoryRequest = new SubUserDepositHistoryRequest(subUid);
+//    subUserDepositHistoryRequest.setCurrency("usdt");
+//    subUserDepositHistoryRequest.setStartTime(1588905385236L);
+//    subUserDepositHistoryRequest.setEndTime(1588905385230L);
+//    subUserDepositHistoryRequest.setSort(QuerySort.DESC);
+//    subUserDepositHistoryRequest.setFromId(34801816L);
+//    subUserDepositHistoryRequest.setLimit(1);
+    List<Deposit> subUserDepositList = syncRequestClient.getSubUserDepositHistory(subUserDepositHistoryRequest);
+    subUserDepositList.forEach(deposit -> {
+      System.out.println("SubUser Deposit History:" + deposit.getId() + " ==>" + JSON.toJSONString(deposit));
     });
   }
 

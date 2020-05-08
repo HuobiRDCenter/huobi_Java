@@ -60,6 +60,7 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
@@ -213,6 +214,9 @@ public interface SyncRequestClient {
    * @return
    */
   List<Deposit> getDepositHistory(String currency, long fromId, int size, QueryDirection queryDirection);
+
+  List<Deposit> getSubUserDepositHistory(SubUserDepositHistoryRequest request);
+
   /**
    * Transfer asset from specified account to another account.
    *
@@ -427,6 +431,8 @@ public interface SyncRequestClient {
    * @return
    */
   List<DepositAddress> getDepositAddress(String currency);
+
+  List<DepositAddress> getSubUserDepositAddress(Long subUid, String currency);
 
   /**
    * Get the withdraw quota information.

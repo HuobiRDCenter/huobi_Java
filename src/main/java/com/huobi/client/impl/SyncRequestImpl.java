@@ -57,6 +57,7 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
@@ -187,6 +188,10 @@ public class SyncRequestImpl implements SyncRequestClient {
 
   public List<Deposit> getDepositHistory(String currency, long fromId, int size, QueryDirection direction) {
     return RestApiInvoker.callSync(requestImpl.getDepositHistory(currency, fromId, size, direction));
+  }
+
+  public List<Deposit> getSubUserDepositHistory(SubUserDepositHistoryRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserDepositHistory(request));
   }
 
   @Override
@@ -368,6 +373,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<DepositAddress> getDepositAddress(String currency) {
     return RestApiInvoker.callSync(requestImpl.getDepositAddress(currency));
+  }
+
+  @Override
+  public List<DepositAddress> getSubUserDepositAddress(Long subUid, String currency) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserDepositAddress(subUid, currency));
   }
 
   @Override

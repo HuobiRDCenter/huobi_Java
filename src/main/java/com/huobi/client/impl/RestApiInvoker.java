@@ -109,7 +109,7 @@ public abstract class RestApiInvoker {
   static <T> T callSync(RestApiRequest<T> request, boolean ifCheck) {
 	    try {
 	      String str;
-	      log.debug("Request URL " + request.request.url());
+	      log.info("Request URL " + request.request.url());
 	      Response response = client.newCall(request.request).execute();
 	      if (response.code() != 200) {
 	        throw new HuobiApiException(
@@ -122,7 +122,7 @@ public abstract class RestApiInvoker {
 	        throw new HuobiApiException(
 	            HuobiApiException.ENV_ERROR, "[Invoking] Cannot get the response from server");
 	      }
-	      log.debug("Response =====> " + str);
+	      log.info("Response =====> " + str);
 	      JsonWrapper jsonWrapper = JsonWrapper.parseFromString(str);
 	      
 	      if (ifCheck) {

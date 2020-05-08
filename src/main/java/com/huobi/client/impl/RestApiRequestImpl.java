@@ -98,6 +98,7 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
@@ -282,53 +283,53 @@ class RestApiRequestImpl {
     });
     return restApiRequest;
   }
-  
+
   RestApiRequest<String> getSystemStatusRequest() {
-	  RestApiRequest<String> request = new RestApiRequest<>();
-	  request.request = createRequest("https://status.huobigroup.com/api/v2/summary.json", "", UrlParamsBuilder.build());
-	  request.jsonParser = (JsonWrapper -> {
-		  return JSON.toJSONString(JsonWrapper.getJson());
-	  });
-	  return request;
+    RestApiRequest<String> request = new RestApiRequest<>();
+    request.request = createRequest("https://status.huobigroup.com/api/v2/summary.json", "", UrlParamsBuilder.build());
+    request.jsonParser = (JsonWrapper -> {
+      return JSON.toJSONString(JsonWrapper.getJson());
+    });
+    return request;
   }
-  
+
   RestApiRequest<List<AccountLedger>> getAccountLedgeRequest(AccountLedgerRequest request) {
 
-	    InputChecker.checker()
-	        .shouldNotNull(request.getAccountId(), "accountId");
+    InputChecker.checker()
+        .shouldNotNull(request.getAccountId(), "accountId");
 
-	    RestApiRequest<List<AccountLedger>> restApiRequest = new RestApiRequest<>();
-	    UrlParamsBuilder builder = UrlParamsBuilder.build()
-	        .putToUrl("accountId", request.getAccountId())
-	        .putToUrl("currency", request.getCurrency())
-	        .putToUrl("transactTypes", request.getTypeString())
-	        .putToUrl("startTime", request.getStartTime())
-	        .putToUrl("endTime", request.getEndTime())
-	        .putToUrl("sort", Optional.ofNullable(request).map(AccountLedgerRequest :: getSort).map(QuerySort :: getCode).orElse(null))
-	        .putToUrl("limit", request.getLimit())
-	        .putToUrl("fromId", request.getFromId());
-	    	
-	    restApiRequest.request = createRequestByGetWithSignature("/v2/account/ledger", builder);
-	    restApiRequest.jsonParser = (jsonWrapper -> {
-	      List<AccountLedger> res = new LinkedList<>();
-	      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-	      
-	      dataArray.forEach((item) -> {
-	    	  AccountLedger ledger = new AccountLedger();
-	        ledger.setAccountId(item.getLongOrDefault("accountId", 0L));
-	        ledger.setCurrency(item.getStringOrDefault("currency", null));
-	        ledger.setTransactAmt(item.getBigDecimalOrDefault("transactAmt", null));
-	        ledger.setTransactType(item.getStringOrDefault("transactType", null));
-	        ledger.setTransactId(item.getLongOrDefault("transactId", 0L));
-	        ledger.setTransferer(item.getLongOrDefault("transferer", 0L));
-	        ledger.setTransferee(item.getLongOrDefault("transferee", 0L));
-	        ledger.setTransactTime(item.getLongOrDefault("transactTime", 0L));
-	        res.add(ledger);
-	      });
-	      return res;
-	    });
-	    return restApiRequest;
-	  }
+    RestApiRequest<List<AccountLedger>> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("accountId", request.getAccountId())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("transactTypes", request.getTypeString())
+        .putToUrl("startTime", request.getStartTime())
+        .putToUrl("endTime", request.getEndTime())
+        .putToUrl("sort", Optional.ofNullable(request).map(AccountLedgerRequest::getSort).map(QuerySort::getCode).orElse(null))
+        .putToUrl("limit", request.getLimit())
+        .putToUrl("fromId", request.getFromId());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/account/ledger", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      List<AccountLedger> res = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+
+      dataArray.forEach((item) -> {
+        AccountLedger ledger = new AccountLedger();
+        ledger.setAccountId(item.getLongOrDefault("accountId", 0L));
+        ledger.setCurrency(item.getStringOrDefault("currency", null));
+        ledger.setTransactAmt(item.getBigDecimalOrDefault("transactAmt", null));
+        ledger.setTransactType(item.getStringOrDefault("transactType", null));
+        ledger.setTransactId(item.getLongOrDefault("transactId", 0L));
+        ledger.setTransferer(item.getLongOrDefault("transferer", 0L));
+        ledger.setTransferee(item.getLongOrDefault("transferee", 0L));
+        ledger.setTransactTime(item.getLongOrDefault("transactTime", 0L));
+        res.add(ledger);
+      });
+      return res;
+    });
+    return restApiRequest;
+  }
 
 
   RestApiRequest<SubuserManagementResult> subuserManagement(SubuserManagementRequest request) {
@@ -630,6 +631,42 @@ class RestApiRequestImpl {
     return request;
   }
 
+  RestApiRequest<List<Deposit>> getSubUserDepositHistory(SubUserDepositHistoryRequest request) {
+    InputChecker.checker()
+        .shouldNotNull(request.getSubUid(), "subUid");
+    RestApiRequest<List<Deposit>> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("subUid", request.getSubUid())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("startTime", request.getStartTime())
+        .putToUrl("endTime", request.getEndTime())
+        .putToUrl("sort", request.getSort() == null ? null : request.getSort().getCode())
+        .putToUrl("limit", request.getLimit())
+        .putToUrl("fromId", request.getFromId());
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/query-deposit", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+
+      List<Deposit> deposits = new LinkedList<>();
+      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+      dataArray.forEach((item) -> {
+        Deposit deposit = new Deposit();
+        deposit.setId(item.getLong("id"));
+        deposit.setCurrency(item.getString("currency"));
+        deposit.setChain(item.getStringOrDefault("chain", null));
+        deposit.setTxHash(item.getString("txHash"));
+        deposit.setAmount(item.getBigDecimal("amount"));
+        deposit.setAddress(item.getString("address"));
+        deposit.setAddressTag(item.getString("addressTag"));
+        deposit.setDepositState(DepositState.lookup(item.getString("state")));
+        deposit.setCreatedTimestamp(item.getLong("createTime"));
+        deposit.setUpdatedTimestamp(item.getLong("updateTime"));
+        deposits.add(deposit);
+      });
+      return deposits;
+    });
+    return restApiRequest;
+  }
+
   RestApiRequest<List<Balance>> getBalance(Account account) {
     RestApiRequest<List<Balance>> request = new RestApiRequest<>();
     UrlParamsBuilder builder = UrlParamsBuilder.build();
@@ -783,7 +820,7 @@ class RestApiRequestImpl {
 
   RestApiRequest<List<MarginLoanInfo>> getLoanInfo(String symbols) {
     RestApiRequest<List<MarginLoanInfo>> request = new RestApiRequest<>();
-    UrlParamsBuilder builder = UrlParamsBuilder.build().putToUrl("symbols",symbols);
+    UrlParamsBuilder builder = UrlParamsBuilder.build().putToUrl("symbols", symbols);
     request.request = createRequestByGetWithSignature("/v1/margin/loan-info", builder);
     request.jsonParser = (jsonWrapper -> {
       List<MarginLoanInfo> infoList = new LinkedList<>();
@@ -928,27 +965,27 @@ class RestApiRequestImpl {
     request.request = createRequestByGetWithSignature("/v1/cross-margin/accounts/balance", builder);
     request.jsonParser = (jsonWrapper -> {
       JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
-      
+
       CrossMarginAccount account = new CrossMarginAccount();
-      
+
       if (itemInData != null) {
-    	  account.setId(itemInData.getLong("id"));
-          account.setType(itemInData.getStringOrDefault("type", null));
-          account.setState(itemInData.getStringOrDefault("state", null));
-          account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate", null));
-          account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum", null));
-          account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum", null));
-          JsonWrapperArray array = itemInData.getJsonArray("list");
-          List<Balance> balanceList = new ArrayList<>();
-          array.forEach(balanceItem -> {
-            Balance balance = new Balance();
-            balance.setCurrency(balanceItem.getStringOrDefault("currency", null));
-            balance.setType(BalanceType.lookup(balanceItem.getString("type")));
-            balance.setBalance(balanceItem.getBigDecimalOrDefault("balance", null));
-            balanceList.add(balance);
-          });
-          account.setList(balanceList);
-      }      
+        account.setId(itemInData.getLong("id"));
+        account.setType(itemInData.getStringOrDefault("type", null));
+        account.setState(itemInData.getStringOrDefault("state", null));
+        account.setRiskRate(itemInData.getBigDecimalOrDefault("risk-rate", null));
+        account.setAcctBalanceSum(itemInData.getBigDecimalOrDefault("acct-balance-sum", null));
+        account.setDebtBalanceSum(itemInData.getBigDecimalOrDefault("debt-balance-sum", null));
+        JsonWrapperArray array = itemInData.getJsonArray("list");
+        List<Balance> balanceList = new ArrayList<>();
+        array.forEach(balanceItem -> {
+          Balance balance = new Balance();
+          balance.setCurrency(balanceItem.getStringOrDefault("currency", null));
+          balance.setType(BalanceType.lookup(balanceItem.getString("type")));
+          balance.setBalance(balanceItem.getBigDecimalOrDefault("balance", null));
+          balanceList.add(balance);
+        });
+        account.setList(balanceList);
+      }
 
       return account;
     });
@@ -993,7 +1030,7 @@ class RestApiRequestImpl {
         || newOrderRequest.getType() == BUY_LIMIT_MAKER
         || newOrderRequest.getType() == SELL_LIMIT_MAKER
         || newOrderRequest.getType() == BUY_LIMIT_FOK
-        || newOrderRequest.getType() == SELL_LIMIT_FOK 
+        || newOrderRequest.getType() == SELL_LIMIT_FOK
         || newOrderRequest.getType() == SELL_STOP_LIMIT_FOK
         || newOrderRequest.getType() == BUY_STOP_LIMIT_FOK
         || newOrderRequest.getType() == SELL_STOP_LIMIT
@@ -1056,9 +1093,9 @@ class RestApiRequestImpl {
       if (newOrderRequest.getType() == SELL_LIMIT
           || newOrderRequest.getType() == BUY_LIMIT
           || newOrderRequest.getType() == BUY_LIMIT_MAKER
-          || newOrderRequest.getType() == SELL_LIMIT_MAKER 
+          || newOrderRequest.getType() == SELL_LIMIT_MAKER
           || newOrderRequest.getType() == BUY_LIMIT_FOK
-          || newOrderRequest.getType() == SELL_LIMIT_FOK 
+          || newOrderRequest.getType() == SELL_LIMIT_FOK
           || newOrderRequest.getType() == SELL_STOP_LIMIT_FOK
           || newOrderRequest.getType() == BUY_STOP_LIMIT_FOK
           || newOrderRequest.getType() == SELL_STOP_LIMIT
@@ -1066,12 +1103,12 @@ class RestApiRequestImpl {
         InputChecker.checker()
             .shouldNotNull(newOrderRequest.getPrice(), "Price");
       }
-      
+
       if (newOrderRequest.getType() == SELL_MARKET
-    	        || newOrderRequest.getType() == BUY_MARKET) {
-	      InputChecker.checker()
-	          .shouldNull(newOrderRequest.getPrice(), "Price");
-	    }
+          || newOrderRequest.getType() == BUY_MARKET) {
+        InputChecker.checker()
+            .shouldNull(newOrderRequest.getPrice(), "Price");
+      }
 
       Map<String, Object> param = new HashMap<>();
       String stopOp = newOrderRequest.getOperator() != null ? newOrderRequest.getOperator().getOperator() : null;
@@ -1320,16 +1357,35 @@ class RestApiRequestImpl {
 
     request.request = createRequestByGetWithSignature("/v2/account/deposit/address", builder);
     request.jsonParser = (jsonWrapper -> {
-
-      JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
-      List<DepositAddress> addressList = new ArrayList<>();
-      dataArray.forEach(item -> {
-        DepositAddress address = item.getJson().toJavaObject(DepositAddress.class);
-        addressList.add(address);
-      });
-      return addressList;
+      return parseDepositAddress(jsonWrapper);
     });
     return request;
+  }
+
+  RestApiRequest<List<DepositAddress>> getSubUserDepositAddress(Long subUid, String currency) {
+    InputChecker.checker()
+        .shouldNotNull(subUid, "subUid")
+        .checkCurrency(currency);
+    RestApiRequest<List<DepositAddress>> request = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("subUid", subUid)
+        .putToUrl("currency", currency);
+
+    request.request = createRequestByGetWithSignature("/v2/sub-user/deposit-address", builder);
+    request.jsonParser = (jsonWrapper -> {
+      return parseDepositAddress(jsonWrapper);
+    });
+    return request;
+  }
+
+  private List<DepositAddress> parseDepositAddress(JsonWrapper jsonWrapper) {
+    JsonWrapperArray dataArray = jsonWrapper.getJsonArray("data");
+    List<DepositAddress> addressList = new ArrayList<>();
+    dataArray.forEach(item -> {
+      DepositAddress address = item.getJson().toJavaObject(DepositAddress.class);
+      addressList.add(address);
+    });
+    return addressList;
   }
 
 
@@ -1753,12 +1809,12 @@ class RestApiRequestImpl {
         statistics.setLow(item.getBigDecimal("low"));
         statistics.setCount(item.getLong("count"));
         statistics.setVolume(item.getBigDecimal("vol"));
-        
+
         statistics.setBid(item.getBigDecimal("bid"));
         statistics.setBidSize(item.getBigDecimal("bidSize"));
         statistics.setAsk(item.getBigDecimal("ask"));
         statistics.setAskSize(item.getBigDecimal("askSize"));
-        
+
         map.put(item.getString("symbol"), statistics);
       });
       return map;
