@@ -112,6 +112,7 @@ public abstract class RestApiInvoker {
 	      log.info("Request URL " + request.request.url());
 	      Response response = client.newCall(request.request).execute();
 	      if (response.code() != 200) {
+	          response.close();
 	        throw new HuobiApiException(
 	            HuobiApiException.EXEC_ERROR, "[Invoking] Response Status Error : "+response.code()+" message:"+response.message());
 	      }
@@ -119,6 +120,7 @@ public abstract class RestApiInvoker {
 	        str = response.body().string();
 	        response.close();
 	      } else {
+	          response.close();
 	        throw new HuobiApiException(
 	            HuobiApiException.ENV_ERROR, "[Invoking] Cannot get the response from server");
 	      }
@@ -159,9 +161,11 @@ public abstract class RestApiInvoker {
           String str = "";
           JsonWrapper jsonWrapper;
           try {
-            if (response != null && response.body() != null) {
-              str = response.body().string();
-              response.close();
+            if (response != null) {
+                if (response.body() != null) {
+                    str = response.body().string();
+                }
+                response.close();
             }
             jsonWrapper = JsonWrapper.parseFromString(str);
             checkResponse(jsonWrapper);
@@ -171,6 +175,7 @@ public abstract class RestApiInvoker {
             callback.onResponse(result);
             return;
           } catch (Exception e) {
+              response.close();
             FailedAsyncResult<T> result = new FailedAsyncResult<>(
                 new HuobiApiException(
                     HuobiApiException.RUNTIME_ERROR, "[Invoking] Rest api call failed"));
