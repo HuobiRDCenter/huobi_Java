@@ -1,4 +1,4 @@
-//package com.huobi.client.model;
+package com.huobi.client.model;//package com.huobi.client.model;
 //
 //import com.huobi.client.model.enums.TradeOrFrozen;
 //

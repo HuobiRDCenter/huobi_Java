@@ -61,10 +61,10 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getLatestCandlestick(
-      String symbol,
-      CandlestickInterval interval,
-      int size,
-      ResponseCallback<AsyncResult<List<Candlestick>>> callback);
+    String symbol,
+    CandlestickInterval interval,
+    int size,
+    ResponseCallback<AsyncResult<List<Candlestick>>> callback);
 
   /**
    * Get the candlestick/kline for the specified symbol. The data number is 150 as default.
@@ -73,7 +73,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getCandlestick(
-      CandlestickRequest request, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
+    CandlestickRequest request, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
 
   /**
    * Get the timestamp from Huobi server. The timestamp is the Unix timestamp in millisecond.<br> The count shows how many milliseconds passed from
@@ -117,7 +117,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getHistoricalTrade(String symbol, int size,
-      ResponseCallback<AsyncResult<List<Trade>>> callback);
+    ResponseCallback<AsyncResult<List<Trade>>> callback);
 
   void getTrade(String symbol, ResponseCallback<AsyncResult<List<Trade>>> callback);
 
@@ -128,7 +128,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void get24HTradeStatistics(String symbol,
-      ResponseCallback<AsyncResult<TradeStatistics>> callback);
+    ResponseCallback<AsyncResult<TradeStatistics>> callback);
 
   /**
    * Get all the trading assets and currencies supported in huobi. The information of trading instrument, including base currency, quote precision,
@@ -170,8 +170,8 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getWithdrawHistory(
-      String currency, long fromId, int size,
-      ResponseCallback<AsyncResult<List<Withdraw>>> callback);
+    String currency, long fromId, int size,
+    ResponseCallback<AsyncResult<List<Withdraw>>> callback);
 
   /**
    *
@@ -182,7 +182,7 @@ public interface AsyncRequestClient {
    * @param callback  The callback you should implemented.
    */
   void getWithdrawHistory(String currency, long fromId, int size, QueryDirection queryDirection,
-      ResponseCallback<AsyncResult<List<Withdraw>>> callback);
+    ResponseCallback<AsyncResult<List<Withdraw>>> callback);
 
   /**
    * Get the deposit records of an account
@@ -193,10 +193,10 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getDepositHistory(
-      String currency,
-      long fromId,
-      int size,
-      ResponseCallback<AsyncResult<List<Deposit>>> callback);
+    String currency,
+    long fromId,
+    int size,
+    ResponseCallback<AsyncResult<List<Deposit>>> callback);
 
   /**
    *
@@ -207,11 +207,11 @@ public interface AsyncRequestClient {
    * @param callback    The callback you should implemented.
    */
   void getDepositHistory(
-      String currency,
-      long fromId,
-      int size,
-      QueryDirection direction,
-      ResponseCallback<AsyncResult<List<Deposit>>> callback);
+    String currency,
+    long fromId,
+    int size,
+    QueryDirection direction,
+    ResponseCallback<AsyncResult<List<Deposit>>> callback);
 
   /**
    * Transfer asset from specified account to another account.
@@ -236,8 +236,8 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void applyLoan(
-      String symbol, String currency, BigDecimal amount,
-      ResponseCallback<AsyncResult<Long>> callback);
+    String symbol, String currency, BigDecimal amount,
+    ResponseCallback<AsyncResult<Long>> callback);
 
   /**
    * Repay margin loan with you asset in your margin account.
@@ -255,7 +255,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getLoanHistory(
-      LoanOrderRequest loanOrderRequest, ResponseCallback<AsyncResult<List<Loan>>> callback);
+    LoanOrderRequest loanOrderRequest, ResponseCallback<AsyncResult<List<Loan>>> callback);
 
   /**
    * Get last trade, best bid and best ask of a symbol.
@@ -264,7 +264,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getLastTradeAndBestQuote(
-      String symbol, ResponseCallback<AsyncResult<LastTradeAndBestQuote>> callback);
+    String symbol, ResponseCallback<AsyncResult<LastTradeAndBestQuote>> callback);
 
   /**
    * Get the balance of a margin account.
@@ -297,7 +297,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getOpenOrders(
-      OpenOrderRequest openOrderRequest, ResponseCallback<AsyncResult<List<Order>>> callback);
+    OpenOrderRequest openOrderRequest, ResponseCallback<AsyncResult<List<Order>>> callback);
 
   /**
    * Submit cancel request for cancelling an order
@@ -323,7 +323,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void cancelOrders(String symbol, List<Long> orderIds,
-      ResponseCallback<AsyncResult<BatchCancelResultV1>> callback);
+    ResponseCallback<AsyncResult<BatchCancelResultV1>> callback);
 
   /**
    * request to cancel open orders.
@@ -332,7 +332,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void cancelOpenOrders(
-      CancelOpenOrderRequest request, ResponseCallback<AsyncResult<BatchCancelResult>> callback);
+    CancelOpenOrderRequest request, ResponseCallback<AsyncResult<BatchCancelResult>> callback);
 
   /**
    * Get the details of an order
@@ -359,7 +359,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getMatchResults(
-      String symbol, long orderId, ResponseCallback<AsyncResult<List<MatchResult>>> callback);
+    String symbol, long orderId, ResponseCallback<AsyncResult<List<MatchResult>>> callback);
 
   /**
    * Search for the trade records of an account
@@ -368,8 +368,8 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getMatchResults(
-      MatchResultRequest matchResultRequest,
-      ResponseCallback<AsyncResult<List<MatchResult>>> callback);
+    MatchResultRequest matchResultRequest,
+    ResponseCallback<AsyncResult<List<MatchResult>>> callback);
 
   /**
    * Submit a request to withdraw some asset from an account
@@ -387,7 +387,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void cancelWithdraw(String currency, long withdrawId,
-      ResponseCallback<AsyncResult<Void>> callback);
+    ResponseCallback<AsyncResult<Void>> callback);
 
   /**
    * Get historical orders.
@@ -396,7 +396,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getHistoricalOrders(
-      HistoricalOrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
+    HistoricalOrdersRequest req, ResponseCallback<AsyncResult<List<Order>>> callback);
 
   /**
    *
@@ -426,7 +426,7 @@ public interface AsyncRequestClient {
    */
 
   void transferBetweenParentAndSub(
-      TransferMasterRequest req, ResponseCallback<AsyncResult<Long>> callback);
+    TransferMasterRequest req, ResponseCallback<AsyncResult<Long>> callback);
 
   /**
    * Get the Aggregated Balance of all Sub-accounts of the Current User
@@ -434,7 +434,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getCurrentUserAggregatedBalance(
-      ResponseCallback<AsyncResult<List<Balance>>> callback);
+    ResponseCallback<AsyncResult<List<Balance>>> callback);
 
   /**
    * Get Account Balance of a Sub-Account
@@ -443,7 +443,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getSpecifyAccountBalance(long subId,
-      ResponseCallback<AsyncResult<List<CompleteSubAccountInfo>>> callback);
+    ResponseCallback<AsyncResult<List<CompleteSubAccountInfo>>> callback);
 
   /**
    * Get the basic information of ETF creation and redemption, as well as ETF constituents, including max amount of creation, min amount of creation,
@@ -463,7 +463,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void etfSwap(String etfSymbol, int amount, EtfSwapType swapType,
-      ResponseCallback<AsyncResult<Void>> callback);
+    ResponseCallback<AsyncResult<Void>> callback);
 
   /**
    * Get past creation and redemption.(up to 100 records)
@@ -474,7 +474,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getEtfSwapHistory(String etfSymbol, int offset, int size,
-      ResponseCallback<AsyncResult<List<EtfSwapHistory>>> callback);
+    ResponseCallback<AsyncResult<List<EtfSwapHistory>>> callback);
 
   /**
    * Get the latest candlestick/kline for the etf.
@@ -485,7 +485,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getEtfCandlestick(String etfSymbol, CandlestickInterval interval,
-      Integer limit, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
+    Integer limit, ResponseCallback<AsyncResult<List<Candlestick>>> callback);
 
   /**
    * Get the Balance of the Margin Loan Account
@@ -494,7 +494,7 @@ public interface AsyncRequestClient {
    * @param callback The callback you should implemented.
    */
   void getMarginBalanceDetail(
-      String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
+    String symbol, ResponseCallback<AsyncResult<List<MarginBalanceDetail>>> callback);
 
   /**
    * Get Latest Tickers for All Pairs.

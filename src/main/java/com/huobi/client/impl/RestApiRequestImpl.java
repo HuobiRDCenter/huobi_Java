@@ -12,6 +12,24 @@ import static com.huobi.client.model.enums.OrderType.SELL_LIMIT_MAKER;
 import static com.huobi.client.model.enums.OrderType.SELL_MARKET;
 import static com.huobi.client.model.enums.OrderType.SELL_STOP_LIMIT;
 import static com.huobi.client.model.enums.OrderType.SELL_STOP_LIMIT_FOK;
+
+import com.huobi.client.model.AccountTransferResult;
+import com.huobi.client.model.ApiKeyInfo;
+import com.huobi.client.model.GetApiKeyListResult;
+import com.huobi.client.model.GetSubUserAccountListResult;
+import com.huobi.client.model.GetSubUserListRequest;
+import com.huobi.client.model.GetSubUserListResult;
+import com.huobi.client.model.GetWithdrawAddressResult;
+import com.huobi.client.model.SubUserApiKeyGenerationResult;
+import com.huobi.client.model.SubUserApiKeyModificationResult;
+import com.huobi.client.model.SubUserCreationInfo;
+import com.huobi.client.model.SubUserCreationResult;
+import com.huobi.client.model.SubUserState;
+import com.huobi.client.model.SubUserTradableMarketResult;
+import com.huobi.client.model.SubUserTradableMarketState;
+import com.huobi.client.model.SubUserTransferabilityResult;
+import com.huobi.client.model.SubUserTransferabilityState;
+import com.huobi.client.model.WithdrawAddress;
 import com.huobi.client.model.enums.OrderType;
 
 import java.math.BigDecimal;
@@ -24,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.alibaba.fastjson.JSON;
+
 import com.huobi.client.RequestOptions;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.impl.utils.JsonWrapper;
@@ -84,6 +103,7 @@ import com.huobi.client.model.enums.TradeDirection;
 import com.huobi.client.model.enums.WithdrawState;
 import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.AccountLedgerRequest;
+import com.huobi.client.model.request.AccountTransferRequest;
 import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CrossMarginAccountRequest;
@@ -91,6 +111,9 @@ import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
 import com.huobi.client.model.request.CrossMarginTransferRequest;
+import com.huobi.client.model.request.GetApiKeyListRequest;
+import com.huobi.client.model.request.GetSubUserAccountListRequest;
+import com.huobi.client.model.request.GetWithdrawAddressRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -98,13 +121,21 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserApiKeyDeletionRequest;
+import com.huobi.client.model.request.SubUserApiKeyGenerationRequest;
+import com.huobi.client.model.request.SubUserApiKeyModificationRequest;
+import com.huobi.client.model.request.SubUserCreationRequest;
 import com.huobi.client.model.request.SubUserDepositHistoryRequest;
+import com.huobi.client.model.request.SubUserTradableMarketRequest;
+import com.huobi.client.model.request.SubUserTransferabilityRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
 import com.huobi.client.model.request.TransferRequest;
 import com.huobi.client.model.request.WithdrawRequest;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.Request;
 
 class RestApiRequestImpl {
@@ -332,6 +363,72 @@ class RestApiRequestImpl {
   }
 
 
+  RestApiRequest<GetWithdrawAddressResult> getAccountWithdrawAddressList(GetWithdrawAddressRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getCurrency(), "currency");
+
+    RestApiRequest<GetWithdrawAddressResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("chain", request.getChain())
+        .putToUrl("note", request.getNote())
+        .putToUrl("limit", request.getLimit())
+        .putToUrl("fromId", request.getFromId());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/account/withdraw/address", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+
+      Long nextId = jsonWrapper.getLongOrDefault("nextId", -1L);
+      JSONArray data = jsonWrapper.getJson().getJSONArray("data");
+      List<WithdrawAddress> addresses = new ArrayList<>();
+      if (data != null) {
+        addresses = data.toJavaList(WithdrawAddress.class);
+      }
+      return new GetWithdrawAddressResult(addresses, nextId);
+    });
+    return restApiRequest;
+  }
+
+
+  RestApiRequest<AccountTransferResult> accountTransfer(AccountTransferRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getFromUser(), "from-user")
+        .shouldNotNull(request.getFromAccountType(), "from-account-type")
+        .shouldNotNull(request.getFromAccount(), "from-account")
+        .shouldNotNull(request.getToUser(), "to-user")
+        .shouldNotNull(request.getToAccountType(), "to-account-type")
+        .shouldNotNull(request.getToAccount(), "to-account")
+        .shouldNotNull(request.getCurrency(), "currency")
+        .shouldNotNull(request.getAmount(), "amount")
+    ;
+
+    RestApiRequest<AccountTransferResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("from-user", request.getFromUser())
+        .putToPost("from-account-type", request.getFromAccountType())
+        .putToPost("from-account", request.getFromAccount())
+        .putToPost("to-user", request.getToUser())
+        .putToPost("to-account-type", request.getToAccountType())
+        .putToPost("to-account", request.getToAccount())
+        .putToPost("currency", request.getCurrency())
+        .putToPost("amount", request.getAmount());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v1/account/transfer", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+
+      JsonWrapper data = jsonWrapper.getJsonObject("data");
+
+      AccountTransferResult res = new AccountTransferResult();
+      res.setTransactId(data.getLong("transact-id"));
+      res.setTransactTime(data.getLong("transact-time"));
+      return res;
+    });
+    return restApiRequest;
+  }
+
+
   RestApiRequest<SubuserManagementResult> subuserManagement(SubuserManagementRequest request) {
 
     InputChecker.checker()
@@ -349,6 +446,246 @@ class RestApiRequestImpl {
       result.setSubUid(data.getLongOrDefault("subUid", -1));
       result.setUserState(data.getStringOrDefault("userState", null));
       return result;
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<SubUserCreationResult> subuserCreation(SubUserCreationRequest request) {
+
+    InputChecker checker = InputChecker.checker()
+        .shouldNotNull(request, "request")
+        .checkList(request.getUserList(), 1, 50, "userList");
+
+    request.getUserList().forEach(param -> {
+      checker.shouldNotNull(param.getUserName(), "userName");
+    });
+
+    RestApiRequest<SubUserCreationResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("userList", request.getUserList());
+
+    restApiRequest.request = createRequestByPostWithSignature("/v2/sub-user/creation", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONArray data = jsonWrapper.getJson().getJSONArray("data");
+      if (data == null || data.size() <= 0) {
+        return new SubUserCreationResult();
+      }
+      List<SubUserCreationInfo> list = data.toJavaList(SubUserCreationInfo.class);
+      return new SubUserCreationResult(list);
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<GetSubUserListResult> getSubUserList(GetSubUserListRequest request) {
+
+    RestApiRequest<GetSubUserListResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("fromId", request.getFromId());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/user-list", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONArray data = jsonWrapper.getJson().getJSONArray("data");
+      if (data == null || data.size() <= 0) {
+        return new GetSubUserListResult();
+      }
+      List<SubUserState> list = data.toJavaList(SubUserState.class);
+      Long nextId = jsonWrapper.getLongOrDefault("nextId", -1L);
+      return new GetSubUserListResult(list, nextId);
+    });
+    return restApiRequest;
+  }
+
+
+  RestApiRequest<SubUserState> getSubUserState(Long subUid) {
+
+    InputChecker.checker().shouldNotNull(subUid, "subUid");
+
+    RestApiRequest<SubUserState> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("subUid", subUid);
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/user-state", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONObject data = jsonWrapper.getJsonObject("data").getJson();
+      if (data == null) {
+        return null;
+      }
+
+      SubUserState state = data.toJavaObject(SubUserState.class);
+      return state;
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<GetSubUserAccountListResult> getSubuserAccountList(GetSubUserAccountListRequest request) {
+
+    InputChecker.checker().shouldNotNull(request.getSubUid(), "subUid");
+
+    RestApiRequest<GetSubUserAccountListResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("subUid", request.getSubUid());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/account-list", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONObject data = jsonWrapper.getJsonObject("data").getJson();
+      if (data == null) {
+        return null;
+      }
+
+      GetSubUserAccountListResult state = data.toJavaObject(GetSubUserAccountListResult.class);
+      return state;
+    });
+    return restApiRequest;
+  }
+
+
+  RestApiRequest<SubUserTransferabilityResult> subuserTransferability(SubUserTransferabilityRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getSubUids(), "subUids")
+        .shouldNotNull(request.getTransferrable(), "transferrable");
+
+    RestApiRequest<SubUserTransferabilityResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("subUids", request.getSubUids())
+        .putToPost("accountType", request.getAccountType())
+        .putToPost("transferrable", request.getTransferrable());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/transferability", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONArray data = jsonWrapper.getJson().getJSONArray("data");
+      if (data == null) {
+        return null;
+      }
+
+      List<SubUserTransferabilityState> list = data.toJavaList(SubUserTransferabilityState.class);
+      return new SubUserTransferabilityResult(list);
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<SubUserTradableMarketResult> subuserTradableMarket(SubUserTradableMarketRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getSubUids(), "subUids")
+        .shouldNotNull(request.getAccountType(), "accountType")
+        .shouldNotNull(request.getActivation(), "activation");
+
+    RestApiRequest<SubUserTradableMarketResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("subUids", request.getSubUids())
+        .putToPost("accountType", request.getAccountType())
+        .putToPost("activation", request.getActivation());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/tradable-market", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONArray data = jsonWrapper.getJson().getJSONArray("data");
+      if (data == null) {
+        return null;
+      }
+
+      List<SubUserTradableMarketState> list = data.toJavaList(SubUserTradableMarketState.class);
+      return new SubUserTradableMarketResult(list);
+    });
+    return restApiRequest;
+  }
+
+
+  RestApiRequest<SubUserApiKeyGenerationResult> subuserApiKeyGeneration(SubUserApiKeyGenerationRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getOtpToken(), "otpToken")
+        .shouldNotNull(request.getSubUid(), "subUid")
+        .shouldNotNull(request.getNote(), "note")
+        .shouldNotNull(request.getPermission(), "permission");
+
+    RestApiRequest<SubUserApiKeyGenerationResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("otpToken", request.getOtpToken())
+        .putToPost("subUid", request.getSubUid())
+        .putToPost("note", request.getNote())
+        .putToPost("permission", request.getPermission())
+        .putToPost("ipAddresses", request.getIpAddresses());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/api-key-generation", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONObject data = jsonWrapper.getJson().getJSONObject("data");
+      if (data == null) {
+        return null;
+      }
+
+      SubUserApiKeyGenerationResult result = data.toJavaObject(SubUserApiKeyGenerationResult.class);
+      return result;
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<SubUserApiKeyModificationResult> subuserApiKeyModification(SubUserApiKeyModificationRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getAccessKey(), "accessKey")
+        .shouldNotNull(request.getSubUid(), "subUid");
+
+    RestApiRequest<SubUserApiKeyModificationResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("accessKey", request.getAccessKey())
+        .putToPost("subUid", request.getSubUid())
+        .putToPost("note", request.getNote())
+        .putToPost("permission", request.getPermission())
+        .putToPost("ipAddresses", request.getIpAddresses());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/api-key-modification", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+      JSONObject data = jsonWrapper.getJson().getJSONObject("data");
+      if (data == null) {
+        return null;
+      }
+
+      SubUserApiKeyModificationResult result = data.toJavaObject(SubUserApiKeyModificationResult.class);
+      return result;
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<Void> subuserApiKeyDeletion(SubUserApiKeyDeletionRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getAccessKey(), "accessKey")
+        .shouldNotNull(request.getSubUid(), "subUid");
+
+    RestApiRequest<Void> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToPost("accessKey", request.getAccessKey())
+        .putToPost("subUid", request.getSubUid());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/sub-user/api-key-deletion", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+
+      return null;
+    });
+    return restApiRequest;
+  }
+
+  RestApiRequest<GetApiKeyListResult> getApiKeyList(GetApiKeyListRequest request) {
+
+    InputChecker.checker().shouldNotNull(request.getUid(), "uid");
+
+    RestApiRequest<GetApiKeyListResult> restApiRequest = new RestApiRequest<>();
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("uid", request.getUid())
+        .putToUrl("accessKey", request.getAccessKey());
+
+    restApiRequest.request = createRequestByGetWithSignature("/v2/user/api-key", builder);
+    restApiRequest.jsonParser = (jsonWrapper -> {
+
+      JSONObject originObj = jsonWrapper.getJson();
+      JSONArray data = originObj.getJSONArray("data");
+      if (data == null) {
+        return null;
+      }
+
+      List<ApiKeyInfo> list = data.toJavaList(ApiKeyInfo.class);
+      return new GetApiKeyListResult(list);
     });
     return restApiRequest;
   }
@@ -585,6 +922,8 @@ class RestApiRequestImpl {
         withdraw.setWithdrawState(WithdrawState.lookup(item.getString("state")));
         withdraw.setCreatedTimestamp(item.getLong("created-at"));
         withdraw.setUpdatedTimestamp(item.getLong("updated-at"));
+        withdraw.setErrorCode(item.getStringOrDefault("error-code", null));
+        withdraw.setErrorMsg(item.getStringOrDefault("error-msg", null));
         withdraws.add(withdraw);
       });
       return withdraws;
@@ -964,8 +1303,13 @@ class RestApiRequestImpl {
     Optional.ofNullable(crequest).map(x -> x.getSubUid()).ifPresent(u -> builder.putToUrl("sub-uid", u));
     request.request = createRequestByGetWithSignature("/v1/cross-margin/accounts/balance", builder);
     request.jsonParser = (jsonWrapper -> {
-      JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
 
+      JSONObject originObject = jsonWrapper.getJson();
+      if (originObject == null || originObject.get("data") == null || originObject.get("data") instanceof JSONArray) {
+        return null;
+      }
+
+      JsonWrapper itemInData = jsonWrapper.getJsonObject("data");
       CrossMarginAccount account = new CrossMarginAccount();
 
       if (itemInData != null) {
@@ -1868,6 +2212,7 @@ class RestApiRequestImpl {
         matchResult.setFilledPoints(item.getBigDecimalOrDefault("filled-points", null));
         matchResult.setFeeDeductCurrency(item.getStringOrDefault("fee-deduct-currency", null));
         matchResult.setRole(DealRole.find(item.getStringOrDefault("role", null)));
+        matchResult.setFeeCurrency(item.getStringOrDefault("fee-currency", null));
         matchResultList.add(matchResult);
       });
       return matchResultList;

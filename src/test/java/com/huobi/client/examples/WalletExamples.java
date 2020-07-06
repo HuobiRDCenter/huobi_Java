@@ -12,12 +12,15 @@ import com.huobi.client.model.AccountHistory;
 import com.huobi.client.model.AccountLedger;
 import com.huobi.client.model.Deposit;
 import com.huobi.client.model.DepositAddress;
+import com.huobi.client.model.GetWithdrawAddressResult;
 import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Withdraw;
+import com.huobi.client.model.WithdrawAddress;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.request.AccountHistoryRequest;
 import com.huobi.client.model.request.AccountLedgerRequest;
+import com.huobi.client.model.request.GetWithdrawAddressRequest;
 import com.huobi.client.model.request.SubUserDepositHistoryRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.WithdrawRequest;
@@ -119,6 +122,14 @@ public class WalletExamples {
     subUserDepositList.forEach(deposit -> {
       System.out.println("SubUser Deposit History:" + deposit.getId() + " ==>" + JSON.toJSONString(deposit));
     });
+
+
+    GetWithdrawAddressResult getWithdrawAddressResult = syncRequestClient.getAccountWithdrawAddressList(new GetWithdrawAddressRequest("usdt"));
+    if (getWithdrawAddressResult != null) {
+      for (WithdrawAddress address : getWithdrawAddressResult.getList()) {
+        System.out.println("wihtdraw address: " + JSON.toJSONString(address));
+      }
+    }
   }
 
 }
