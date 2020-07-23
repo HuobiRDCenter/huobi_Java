@@ -7,10 +7,15 @@ import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
 import com.huobi.model.generic.CurrencyChain;
+import com.huobi.model.generic.MarketStatus;
 import com.huobi.model.generic.Symbol;
 import com.huobi.service.huobi.HuobiGenericService;
 
 public interface GenericClient {
+
+  String getSystemStatus();
+
+  MarketStatus getMarketStatus();
 
   List<Symbol> getSymbols();
 

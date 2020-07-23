@@ -10,23 +10,30 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.AccountClient;
 import com.huobi.client.req.account.AccountBalanceRequest;
-import com.huobi.client.req.account.SubAccountChangeRequest;
-import com.huobi.client.req.account.TransferSubuserRequest;
+import com.huobi.client.req.account.AccountFuturesTransferRequest;
+import com.huobi.client.req.account.AccountHistoryRequest;
+import com.huobi.client.req.account.AccountLedgerRequest;
+import com.huobi.client.req.account.AccountTransferRequest;
+import com.huobi.client.req.account.SubAccountUpdateRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
-import com.huobi.model.account.AccountChangeEvent;
-import com.huobi.model.account.AccountReq;
-import com.huobi.model.account.SubuserAggregateBalance;
+import com.huobi.model.account.AccountFuturesTransferResult;
+import com.huobi.model.account.AccountHistory;
+import com.huobi.model.account.AccountLedgerResult;
+import com.huobi.model.account.AccountTransferResult;
+import com.huobi.model.account.AccountUpdateEvent;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.account.AccountBalanceParser;
-import com.huobi.service.huobi.parser.account.AccountChangeEventParser;
+import com.huobi.service.huobi.parser.account.AccountFuturesTransferResultParser;
+import com.huobi.service.huobi.parser.account.AccountHistoryParser;
+import com.huobi.service.huobi.parser.account.AccountLedgerParser;
 import com.huobi.service.huobi.parser.account.AccountParser;
-import com.huobi.service.huobi.parser.account.AccountReqParser;
-import com.huobi.service.huobi.parser.account.SubuserAggregateBalanceParser;
+import com.huobi.service.huobi.parser.account.AccountTransferResultParser;
+import com.huobi.service.huobi.parser.account.AccountUpdateEventParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -35,13 +42,13 @@ public class HuobiAccountService implements AccountClient {
 
   public static final String GET_ACCOUNTS_PATH = "/v1/account/accounts";
   public static final String GET_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{account-id}/balance";
-  public static final String GET_SUBUSER_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{sub-uid}";
-  public static final String TRANSFER_SUBUSER_PATH = "/v1/subuser/transfer";
-  public static final String GET_SUBUSER_AGGREGATE_BALANCE_PATH = "/v1/subuser/aggregate-balance";
+  public static final String GET_ACCOUNT_HISTORY_PATH = "/v1/account/history";
+  public static final String GET_ACCOUNT_LEDGER_PATH = "/v2/account/ledger";
+  public static final String ACCOUNT_TRANSFER_PATH = "/v1/account/transfer";
+  public static final String ACCOUNT_FUTURES_TRANSFER_PATH = "/v1/futures/transfer";
 
 
-  public static final String SUB_ACCOUNT_TOPIC = "accounts";
-  public static final String REQ_ACCOUNT_TOPIC = "accounts.list";
+  public static final String SUB_ACCOUNT_UPDATE_TOPIC = "accounts.update#${mode}";
 
 
   private Map<AccountTypeEnum, Account> accountMap = new ConcurrentHashMap<>();
@@ -77,88 +84,105 @@ public class HuobiAccountService implements AccountClient {
     return new AccountBalanceParser().parse(data);
   }
 
-  @Override
-  public long transferSubuser(TransferSubuserRequest request) {
+  public List<AccountHistory> getAccountHistory(AccountHistoryRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getSubUid(), "sub-uid")
+        .shouldNotNull(request.getAccountId(), "account-id");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("account-id", request.getAccountId())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("transact-types", request.getTypesString())
+        .putToUrl("start-time", request.getStartTime())
+        .putToUrl("end-time", request.getEndTime())
+        .putToUrl("sort", request.getSort() == null ? null : request.getSort().getSort())
+        .putToUrl("size", request.getSize());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNT_HISTORY_PATH, builder);
+    JSONArray jsonArray = jsonObject.getJSONArray("data");
+    return new AccountHistoryParser().parseArray(jsonArray);
+  }
+
+  public AccountLedgerResult getAccountLedger(AccountLedgerRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getAccountId(), "accountId");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("accountId", request.getAccountId())
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("transactTypes", request.getTypesString())
+        .putToUrl("startTime", request.getStartTime())
+        .putToUrl("endTime", request.getEndTime())
+        .putToUrl("sort", request.getSort() == null ? null : request.getSort().getSort())
+        .putToUrl("limit", request.getLimit())
+        .putToUrl("fromId", request.getFromId());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNT_LEDGER_PATH, builder);
+    Long nextId = jsonObject.getLong("nextId");
+    JSONArray jsonArray = jsonObject.getJSONArray("data");
+    return AccountLedgerResult.builder()
+        .nextId(nextId)
+        .ledgerList(new AccountLedgerParser().parseArray(jsonArray))
+        .build();
+  }
+
+  public AccountTransferResult accountTransfer(AccountTransferRequest request) {
+
+    InputChecker.checker()
+        .shouldNotNull(request.getFromUser(), "from-user")
+        .shouldNotNull(request.getFromAccount(), "from-account")
+        .shouldNotNull(request.getFromAccountType(), "from-account-type")
+        .shouldNotNull(request.getToUser(), "to-user")
+        .shouldNotNull(request.getToAccount(), "to-account")
+        .shouldNotNull(request.getToAccountType(), "to-account-type")
         .shouldNotNull(request.getCurrency(), "currency")
-        .shouldNotNull(request.getAmount(), "amount")
-        .shouldNotNull(request.getType(), "type");
+        .shouldNotNull(request.getAmount(), "amount");
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToPost("sub-uid", request.getSubUid())
+        .putToPost("from-user", request.getFromUser())
+        .putToPost("from-account", request.getFromAccount())
+        .putToPost("from-account-type", request.getFromAccountType().getAccountType())
+        .putToPost("to-user", request.getToUser())
+        .putToPost("to-account", request.getToAccount())
+        .putToPost("to-account-type", request.getToAccountType().getAccountType())
         .putToPost("currency", request.getCurrency())
-        .putToPost("amount", request.getAmount().toPlainString())
-        .putToPost("type", request.getType().getCode());
+        .putToPost("amount", request.getAmount());
 
-    JSONObject jsonObject = restConnection.executePostWithSignature(TRANSFER_SUBUSER_PATH, builder);
-    return jsonObject.getLong("data");
+    JSONObject jsonObject = restConnection.executePostWithSignature(ACCOUNT_TRANSFER_PATH, builder);
+    return new AccountTransferResultParser().parse(jsonObject.getJSONObject("data"));
   }
 
-  @Override
-  public List<AccountBalance> getSubuserAccountBalance(Long subuserId) {
-
+  public AccountFuturesTransferResult accountFuturesTransfer(AccountFuturesTransferRequest request) {
     InputChecker.checker()
-        .shouldNotNull(subuserId, "sub-uid");
+        .shouldNotNull(request.getCurrency(),"currency")
+        .shouldNotNull(request.getAmount(),"amount")
+        .shouldNotNull(request.getType(),"type");
 
-    String path = GET_SUBUSER_ACCOUNT_BALANCE_PATH.replace("{sub-uid}", subuserId + "");
-    JSONObject jsonObject = restConnection.executeGetWithSignature(path, UrlParamsBuilder.build());
-    JSONArray data = jsonObject.getJSONArray("data");
-    return new AccountBalanceParser().parseArray(data);
-  }
-
-  @Override
-  public List<SubuserAggregateBalance> getSubuserAggregateBalance() {
-
-    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_SUBUSER_AGGREGATE_BALANCE_PATH, UrlParamsBuilder.build());
-    JSONArray data = jsonObject.getJSONArray("data");
-    return new SubuserAggregateBalanceParser().parseArray(data);
-
-  }
-
-  public void getAccountHistory() {
-
-
-    System.out.println("");
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("account-id", 123);
+        .putToPost("currency", request.getCurrency())
+        .putToPost("amount", request.getAmount())
+        .putToPost("type", request.getType().getType());
 
-    JSONObject jsonObject = restConnection.executeGetWithSignature("/v1/account/history", builder);
-    System.out.println(jsonObject.toJSONString());
+    JSONObject jsonObject = restConnection.executePostWithSignature(ACCOUNT_FUTURES_TRANSFER_PATH, builder);
+
+    return new AccountFuturesTransferResultParser().parse(jsonObject);
   }
 
-  @Override
-  public void subAccounts(SubAccountChangeRequest request, ResponseCallback<AccountChangeEvent> callback) {
-
+  public void subAccountsUpdate(SubAccountUpdateRequest request, ResponseCallback<AccountUpdateEvent> callback) {
     InputChecker.checker()
-        .shouldNotNull(request.getBalanceMode(), "balance model");
+        .shouldNotNull(request.getAccountUpdateMode(), "account update model");
 
     JSONObject command = new JSONObject();
-    command.put("op", WebSocketConstants.OP_SUB);
+    command.put("action", WebSocketConstants.ACTION_SUB);
     command.put("cid", System.currentTimeMillis() + "");
-    command.put("topic", SUB_ACCOUNT_TOPIC);
-    command.put("model", request.getBalanceMode().getCode());
+    command.put("ch", SUB_ACCOUNT_UPDATE_TOPIC.replace("${mode}", request.getAccountUpdateMode().getCode()));
+    command.put("model", request.getAccountUpdateMode().getCode());
 
     List<String> commandList = new ArrayList<>();
     commandList.add(command.toJSONString());
 
-    HuobiWebSocketConnection.createAssetConnection(options, commandList, new AccountChangeEventParser(), callback, false);
-
+    HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new AccountUpdateEventParser(), callback, false);
   }
-
-  @Override
-  public void reqAccounts(ResponseCallback<AccountReq> callback) {
-
-    JSONObject command = new JSONObject();
-    command.put("op", WebSocketConstants.OP_REQ);
-    command.put("cid", System.currentTimeMillis() + "");
-    command.put("topic", REQ_ACCOUNT_TOPIC);
-
-    List<String> commandList = new ArrayList<>();
-    commandList.add(command.toJSONString());
-    HuobiWebSocketConnection.createAssetConnection(options, commandList, new AccountReqParser(), callback, true);
-  }
-
 
 }

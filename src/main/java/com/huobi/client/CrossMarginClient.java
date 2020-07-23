@@ -10,6 +10,7 @@ import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
 import com.huobi.model.crossmargin.CrossMarginAccount;
+import com.huobi.model.crossmargin.CrossMarginCurrencyInfo;
 import com.huobi.model.crossmargin.CrossMarginLoadOrder;
 import com.huobi.service.huobi.HuobiCrossMarginService;
 
@@ -24,6 +25,8 @@ public interface CrossMarginClient {
   List<CrossMarginLoadOrder> getLoanOrders(CrossMarginLoanOrdersRequest request);
 
   CrossMarginAccount getLoanBalance();
+
+  List<CrossMarginCurrencyInfo> getLoanInfo();
 
   static CrossMarginClient create(Options options) {
 

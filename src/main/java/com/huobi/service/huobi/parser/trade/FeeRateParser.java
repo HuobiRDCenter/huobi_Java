@@ -13,11 +13,7 @@ public class FeeRateParser implements HuobiModelParser<FeeRate> {
 
   @Override
   public FeeRate parse(JSONObject json) {
-    return FeeRate.builder()
-        .symbol(json.getString("symbol"))
-        .takerFee(json.getBigDecimal("taker-fee"))
-        .makerFee(json.getBigDecimal("maker-fee"))
-        .build();
+    return json.toJavaObject(FeeRate.class);
   }
 
   @Override
@@ -32,12 +28,6 @@ public class FeeRateParser implements HuobiModelParser<FeeRate> {
       return new ArrayList<>();
     }
 
-    List<FeeRate> list = new ArrayList<>();
-    for (int i = 0; i < jsonArray.size(); i++) {
-      JSONObject data = jsonArray.getJSONObject(i);
-      list.add(parse(data));
-    }
-
-    return list;
+    return jsonArray.toJavaList(FeeRate.class);
   }
 }

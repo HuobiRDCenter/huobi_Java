@@ -6,7 +6,7 @@ public interface WebSocketConnection {
 
   ConnectionStateEnum getState();
 
-  int getConnectionId();
+  Long getConnectionId();
 
   void reConnect();
 
@@ -14,4 +14,5 @@ public interface WebSocketConnection {
 
   long getLastReceivedTime();
 
+  void send(String str);
 }

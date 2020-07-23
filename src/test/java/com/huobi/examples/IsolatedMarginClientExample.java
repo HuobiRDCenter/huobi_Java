@@ -7,6 +7,7 @@ import com.huobi.Constants;
 import com.huobi.client.IsolatedMarginClient;
 import com.huobi.client.req.margin.IsolatedMarginAccountRequest;
 import com.huobi.client.req.margin.IsolatedMarginApplyLoanRequest;
+import com.huobi.client.req.margin.IsolatedMarginLoanInfoRequest;
 import com.huobi.client.req.margin.IsolatedMarginLoanOrdersRequest;
 import com.huobi.client.req.margin.IsolatedMarginRepayLoanRequest;
 import com.huobi.client.req.margin.IsolatedMarginTransferRequest;
@@ -14,6 +15,7 @@ import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
 import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
+import com.huobi.model.isolatedmargin.IsolatedMarginSymbolInfo;
 import com.huobi.service.huobi.utils.DataUtils;
 
 public class IsolatedMarginClientExample {
@@ -104,6 +106,13 @@ public class IsolatedMarginClientExample {
     loanOrderList.forEach(order -> {
       System.out.println(order.toString());
     });
+
+    List<IsolatedMarginSymbolInfo> list = marginService.getLoanInfo(IsolatedMarginLoanInfoRequest.builder().symbols("xrpusdt").build());
+    list.forEach(info -> {
+      System.out.println(info);
+    });
+
+
   }
 
 }

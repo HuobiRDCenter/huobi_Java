@@ -10,14 +10,19 @@ import com.huobi.client.req.generic.CurrencyChainsRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.model.generic.CurrencyChain;
+import com.huobi.model.generic.MarketStatus;
 import com.huobi.model.generic.Symbol;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.generic.CurrencyChainParser;
+import com.huobi.service.huobi.parser.generic.MarketStatusParser;
 import com.huobi.service.huobi.parser.generic.SymbolParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 
 public class HuobiGenericService implements GenericClient {
 
+  public static final String GET_SYSTEM_STATUS_URL = "https://status.huobigroup.com/api/v2/summary.json";
+
+  public static final String GET_MARKET_STATUS_PATH = "/v2/market-status";
   public static final String GET_SYMBOLS_PATH = "/v1/common/symbols";
   public static final String GET_CURRENCY_PATH = "/v1/common/currencys";
   public static final String GET_CURRENCY_CHAINS_PATH = "/v2/reference/currencies";
@@ -30,6 +35,19 @@ public class HuobiGenericService implements GenericClient {
   public HuobiGenericService(Options options) {
     this.options = options;
     restConnection = new HuobiRestConnection(options);
+  }
+
+  @Override
+  public String getSystemStatus() {
+    String response = restConnection.executeGetString(GET_SYSTEM_STATUS_URL,UrlParamsBuilder.build());
+    return response;
+  }
+
+  @Override
+  public MarketStatus getMarketStatus() {
+    JSONObject jsonObject = restConnection.executeGet(GET_MARKET_STATUS_PATH, UrlParamsBuilder.build());
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new MarketStatusParser().parse(data);
   }
 
   @Override

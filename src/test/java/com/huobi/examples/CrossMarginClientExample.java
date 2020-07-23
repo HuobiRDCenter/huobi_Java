@@ -12,6 +12,7 @@ import com.huobi.client.req.crossmargin.CrossMarginTransferRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.crossmargin.CrossMarginAccount;
+import com.huobi.model.crossmargin.CrossMarginCurrencyInfo;
 import com.huobi.model.crossmargin.CrossMarginLoadOrder;
 import com.huobi.service.huobi.utils.DataUtils;
 
@@ -96,6 +97,10 @@ public class CrossMarginClientExample {
       System.out.println(order.toString());
     });
 
+    List<CrossMarginCurrencyInfo> currencyInfoList = marginService.getLoanInfo();
+    currencyInfoList.forEach(info -> {
+      System.out.println(info);
+    });
   }
 
 }

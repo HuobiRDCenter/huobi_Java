@@ -7,11 +7,13 @@ import com.huobi.Constants;
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;
+import com.huobi.client.req.wallet.WithdrawAddressRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.DepositWithdrawTypeEnum;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.model.wallet.DepositWithdraw;
+import com.huobi.model.wallet.WithdrawAddressResult;
 import com.huobi.model.wallet.WithdrawQuota;
 import com.huobi.service.huobi.HuobiWalletService;
 
@@ -59,6 +61,15 @@ public class WalletClientExample {
 
     depositWithdrawList.forEach(depositWithdraw -> {
       System.out.println(depositWithdraw.toString());
+    });
+
+    WithdrawAddressResult withdrawAddressResult = walletService.getWithdrawAddress(WithdrawAddressRequest.builder()
+        .currency("usdt")
+        .limit(1)
+        .build());
+    System.out.println(" withdraw address nextId : " + withdrawAddressResult.getNextId());
+    withdrawAddressResult.getWithdrawAddressList().forEach(add -> {
+      System.out.println(add);
     });
 
   }

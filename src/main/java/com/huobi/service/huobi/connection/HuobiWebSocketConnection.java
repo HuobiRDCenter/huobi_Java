@@ -20,8 +20,10 @@ import com.huobi.constant.Options;
 import com.huobi.constant.enums.ConnectionStateEnum;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 import com.huobi.service.huobi.signature.ApiSignature;
+import com.huobi.service.huobi.signature.ApiSignatureV2;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.ConnectionFactory;
+import com.huobi.utils.IdGenerator;
 import com.huobi.utils.InternalUtils;
 import com.huobi.utils.ResponseCallback;
 import com.huobi.utils.WebSocketConnection;
@@ -32,10 +34,12 @@ import com.huobi.utils.WebSocketWatchDog;
 @Slf4j
 public class HuobiWebSocketConnection extends WebSocketListener implements WebSocketConnection {
 
-  private static AtomicInteger CONNECTION_COUNTER = new AtomicInteger();
-
   public static final String HUOBI_TRADING_WEBSOCKET_PATH = "/ws/v1";
+  public static final String HUOBI_TRADING_WEBSOCKET_V2_PATH = "/ws/v2";
   public static final String HUOBI_MARKET_WEBSOCKET_PATH = "/ws";
+
+  public static final String AUTH_VERSION_V1 = "v1";
+  public static final String AUTH_VERSION_V2 = "v2";
 
   private long lastReceivedTime;
 
@@ -45,7 +49,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   private ConnectionStateEnum state;
 
-  private Integer Id;
+  private Long id;
 
   private List<String> commandList;
 
@@ -63,6 +67,8 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   private String host;
 
+  private String authVersion = AUTH_VERSION_V1;
+
   private HuobiWebSocketConnection() {}
 
   public static HuobiWebSocketConnection createAssetConnection(Options options,
@@ -72,6 +78,15 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       Boolean autoClose) {
 
     return createConnection(options, commandList, parser, callback, autoClose, true);
+  }
+
+  public static HuobiWebSocketConnection createAssetV2Connection(Options options,
+      List<String> commandList,
+      HuobiModelParser parser,
+      ResponseCallback callback,
+      Boolean autoClose) {
+
+    return createConnection(options, commandList, parser, callback, autoClose, true, AUTH_VERSION_V2);
   }
 
   public static HuobiWebSocketConnection createMarketConnection(Options options,
@@ -88,6 +103,16 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       ResponseCallback callback,
       Boolean autoClose,
       boolean authNeed) {
+    return createConnection(options, commandList, parser, callback, autoClose, authNeed, AUTH_VERSION_V1);
+  }
+
+  public static HuobiWebSocketConnection createConnection(Options options,
+      List<String> commandList,
+      HuobiModelParser parser,
+      ResponseCallback callback,
+      Boolean autoClose,
+      boolean authNeed,
+      String authVersion) {
 
     HuobiWebSocketConnection connection = new HuobiWebSocketConnection();
     connection.setOptions(options);
@@ -96,12 +121,17 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     connection.setCallback(callback);
     connection.setAuthNeed(authNeed);
     connection.setAutoClose(autoClose);
-    connection.setId(CONNECTION_COUNTER.addAndGet(1));
+    connection.setId(IdGenerator.getNextId());
+    connection.setAuthVersion(authVersion);
 
     // 创建websocket请求
     String url = options.getWebSocketHost() + HUOBI_MARKET_WEBSOCKET_PATH;
     if (authNeed) {
-      url = options.getWebSocketHost() + HUOBI_TRADING_WEBSOCKET_PATH;
+      if (AUTH_VERSION_V1.equals(authVersion)) {
+        url = options.getWebSocketHost() + HUOBI_TRADING_WEBSOCKET_PATH;
+      } else if (AUTH_VERSION_V2.equals(authVersion)) {
+        url = options.getWebSocketHost() + HUOBI_TRADING_WEBSOCKET_V2_PATH;
+      }
     }
     Request request = new Request.Builder().url(url).build();
     connection.setOkhttpRequest(request);
@@ -160,7 +190,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     });
   }
 
-  void send(String str) {
+  public void send(String str) {
     boolean result = false;
     log.info("[Connection Send]{}", str);
     if (webSocket != null) {
@@ -175,7 +205,33 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
   @Override
   public void onMessage(WebSocket webSocket, String text) {
     super.onMessage(webSocket, text);
-    lastReceivedTime =  System.currentTimeMillis();
+    lastReceivedTime = System.currentTimeMillis();
+
+    log.debug("[On Message Text]:{}", text);
+    try {
+      JSONObject json = JSON.parseObject(text);
+
+      if (json.containsKey("action")) {
+        String action = json.getString("action");
+        if ("ping".equals(action)) {
+          processPingOnV2TradingLine(json, webSocket);
+        } else if ("push".equals(action)) {
+          onReceive(json);
+        }
+        if ("req".equals(action)) {
+          String ch = json.getString("ch");
+          if ("auth".equals(ch)) {
+            send(commandList);
+          }
+
+        }
+
+      }
+
+    } catch (Exception e) {
+      log.error("[On Message][{}]: catch exception:", this.getId(), e);
+      closeOnError();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -194,7 +250,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
         closeOnError();
         return;
       }
-      log.info("[Connection On Message][{}] {}", this.getId(), data);
+      log.debug("[Connection On Message][{}] {}", this.getId(), data);
       JSONObject jsonObject = JSON.parseObject(data);
 
       if (jsonObject.containsKey("status") && !"ok".equals(jsonObject.getString("status"))) {
@@ -261,12 +317,18 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     webSocket.send(String.format("{\"pong\":%d}", ts));
   }
 
+  private void processPingOnV2TradingLine(JSONObject jsonWrapper, WebSocket webSocket) {
+    long ts = jsonWrapper.getJSONObject("data").getLong("ts");
+    String pong = String.format("{\"action\": \"pong\",\"params\": {\"ts\": %d}}", ts);
+    webSocket.send(pong);
+  }
+
   public ConnectionStateEnum getState() {
     return state;
   }
 
   @Override
-  public int getConnectionId() {
+  public Long getConnectionId() {
     return this.getId();
   }
 
@@ -291,25 +353,25 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     super.onOpen(webSocket, response);
     this.webSocket = webSocket;
     log.info("[Connection][" + this.getId() + "] Connected to server");
-    WebSocketWatchDog.onConnectionCreated(this);
+    if (options.isWebSocketAutoConnect()) {
+      WebSocketWatchDog.onConnectionCreated(this);
+    }
 
     state = ConnectionStateEnum.CONNECTED;
     lastReceivedTime = System.currentTimeMillis();
 
     if (authNeed) {
-      // 需要验签的部分
-      ApiSignature as = new ApiSignature();
-      UrlParamsBuilder builder = UrlParamsBuilder.build();
-      try {
-        as.createSignature(options.getApiKey(), options.getSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
-      } catch (Exception e) {
-        onError("Unexpected error when create the signature: " + e.getMessage(), e);
+      if (AUTH_VERSION_V1.equals(this.getAuthVersion())) {
+        // 老版本验签
+        sendAuthV2();
+      } else if (AUTH_VERSION_V2.equals(this.getAuthVersion())) {
+        // 新版本2.1验签
+        sendAuthV2_1();
+      } else {
+        onError("Unsupport signature version: " + this.getAuthVersion(), null);
         close();
         return;
       }
-      builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
-          .putToUrl("cid", System.currentTimeMillis());
-      send(builder.buildUrlToJsonString());
       InternalUtils.await(100);
     } else {
 
@@ -334,4 +396,40 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     }
   }
 
+  private void sendAuthV2_1() {
+    ApiSignatureV2 as = new ApiSignatureV2();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    try {
+      as.createSignature(options.getApiKey(), options.getSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_V2_PATH, builder);
+    } catch (Exception e) {
+      onError("Unexpected error when create the signature v2: " + e.getMessage(), e);
+      close();
+      return;
+    }
+
+    JSONObject signObj = JSON.parseObject(builder.buildUrlToJsonString());
+    signObj.put("authType", "api");
+
+    JSONObject json = new JSONObject();
+    json.put("action", "req");
+    json.put("ch", "auth");
+    json.put("params", signObj);
+    send(json.toJSONString());
+  }
+
+  private void sendAuthV2() {
+    // 需要验签的部分
+    ApiSignature as = new ApiSignature();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    try {
+      as.createSignature(options.getApiKey(), options.getSecretKey(), "GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder);
+    } catch (Exception e) {
+      onError("Unexpected error when create the signature: " + e.getMessage(), e);
+      close();
+      return;
+    }
+    builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
+        .putToUrl("cid", System.currentTimeMillis());
+    send(builder.buildUrlToJsonString());
+  }
 }

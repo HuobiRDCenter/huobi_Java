@@ -11,6 +11,8 @@ import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
 import com.huobi.client.req.trade.ReqOrderListRequest;
 import com.huobi.client.req.trade.SubOrderUpdateRequest;
+import com.huobi.client.req.trade.SubOrderUpdateV2Request;
+import com.huobi.client.req.trade.SubTradeClearingRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
@@ -22,6 +24,8 @@ import com.huobi.model.trade.Order;
 import com.huobi.model.trade.OrderDetailReq;
 import com.huobi.model.trade.OrderListReq;
 import com.huobi.model.trade.OrderUpdateEvent;
+import com.huobi.model.trade.OrderUpdateV2Event;
+import com.huobi.model.trade.TradeClearingEvent;
 import com.huobi.service.huobi.HuobiTradeService;
 import com.huobi.utils.ResponseCallback;
 
@@ -53,12 +57,9 @@ public interface TradeClient {
 
   List<FeeRate> getFeeRate(FeeRateRequest request);
 
+  void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback);
 
-  void subOrderUpdate(SubOrderUpdateRequest request, ResponseCallback<OrderUpdateEvent> callback);
-
-  void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListReq> callback);
-
-  void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailReq> callback);
+  void subTradeClearing(SubTradeClearingRequest request, ResponseCallback<TradeClearingEvent> callback);
 
   static TradeClient create(Options options) {
 

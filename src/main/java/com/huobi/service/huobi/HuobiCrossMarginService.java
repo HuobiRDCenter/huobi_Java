@@ -16,9 +16,11 @@ import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.crossmargin.CrossMarginAccount;
+import com.huobi.model.crossmargin.CrossMarginCurrencyInfo;
 import com.huobi.model.crossmargin.CrossMarginLoadOrder;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.crossmargin.CrossMarginAccountParser;
+import com.huobi.service.huobi.parser.crossmargin.CrossMarginCurrencyInfoParser;
 import com.huobi.service.huobi.parser.crossmargin.CrossMarginLoadOrderParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginLoadOrderParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
@@ -32,6 +34,7 @@ public class HuobiCrossMarginService implements CrossMarginClient {
   public static final String REPAY_LOAN_PATH = "/v1/cross-margin/orders/{order-id}/repay";
 
   public static final String GET_BALANCE_PATH = "/v1/cross-margin/accounts/balance";
+  public static final String GET_LOAN_INFO_PATH = "/v1/cross-margin/loan-info";
   public static final String GET_LOAN_ORDER_PATH = "/v1/cross-margin/loan-orders";
 
   private Options options;
@@ -116,6 +119,12 @@ public class HuobiCrossMarginService implements CrossMarginClient {
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_BALANCE_PATH, UrlParamsBuilder.build());
     JSONObject data = jsonObject.getJSONObject("data");
     return new CrossMarginAccountParser().parse(data);
+  }
+
+  public List<CrossMarginCurrencyInfo> getLoanInfo() {
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LOAN_INFO_PATH, UrlParamsBuilder.build());
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new CrossMarginCurrencyInfoParser().parseArray(data);
   }
 
 

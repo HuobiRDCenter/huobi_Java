@@ -2,7 +2,6 @@ package com.huobi.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -15,14 +14,17 @@ import com.huobi.constant.enums.ExchangeEnum;
 public class HuobiOptions implements Options {
 
   @Builder.Default
-  private String restHost = "https://api.huobi.vn";
+  private String restHost = "https://api.huobi.pro";
 
   @Builder.Default
-  private String websocketHost = "wss://api.huobi.vn";
+  private String websocketHost = "wss://api.huobi.pro";
 
   private String apiKey;
 
   private String secretKey;
+
+  @Builder.Default
+  private boolean websocketAutoConnect = true;
 
   @Override
   public String getApiKey() {
@@ -47,6 +49,11 @@ public class HuobiOptions implements Options {
   @Override
   public String getWebSocketHost() {
     return this.websocketHost;
+  }
+
+  @Override
+  public boolean isWebSocketAutoConnect() {
+    return this.websocketAutoConnect;
   }
 
 }

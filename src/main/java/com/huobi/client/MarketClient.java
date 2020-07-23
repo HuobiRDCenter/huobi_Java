@@ -17,6 +17,8 @@ import com.huobi.client.req.market.SubMarketBBORequest;
 import com.huobi.client.req.market.SubMarketDepthRequest;
 import com.huobi.client.req.market.SubMarketDetailRequest;
 import com.huobi.client.req.market.SubMarketTradeRequest;
+import com.huobi.client.req.market.SubMbpIncrementalUpdateRequest;
+import com.huobi.client.req.market.SubMbpRefreshUpdateRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
@@ -35,8 +37,12 @@ import com.huobi.model.market.MarketTicker;
 import com.huobi.model.market.MarketTrade;
 import com.huobi.model.market.MarketTradeEvent;
 import com.huobi.model.market.MarketTradeReq;
+import com.huobi.model.market.MbpIncrementalUpdateEvent;
+import com.huobi.model.market.MbpRefreshUpdateEvent;
 import com.huobi.service.huobi.HuobiMarketService;
+import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.utils.ResponseCallback;
+import com.huobi.utils.WebSocketConnection;
 
 public interface MarketClient {
 
@@ -63,6 +69,12 @@ public interface MarketClient {
   void subMarketTrade(SubMarketTradeRequest request, ResponseCallback<MarketTradeEvent> callback);
 
   void subMarketBBO(SubMarketBBORequest request, ResponseCallback<MarketBBOEvent> callback);
+
+  void subMbpRefreshUpdate(SubMbpRefreshUpdateRequest request, ResponseCallback<MbpRefreshUpdateEvent> callback);
+
+  WebSocketConnection subMbpIncrementalUpdate(SubMbpIncrementalUpdateRequest request, ResponseCallback<MbpIncrementalUpdateEvent> callback);
+
+  WebSocketConnection reqMbpIncrementalUpdate(SubMbpIncrementalUpdateRequest request, WebSocketConnection connection);
 
   void reqCandlestick(ReqCandlestickRequest request, ResponseCallback<CandlestickReq> callback);
 

@@ -17,6 +17,12 @@ public class Chain {
 
   private String chain;
 
+  private String baseChain;
+
+  private String baseChainProtocol;
+
+  private Boolean isDynamic;
+
   private int numOfConfirmations;
 
   private int numOfFastConfirmations;
@@ -29,8 +35,6 @@ public class Chain {
 
   private BigDecimal minWithdrawAmt;
 
-  private int withdrawPrecision;
-
   private BigDecimal maxWithdrawAmt;
 
   private BigDecimal withdrawQuotaPerDay;
@@ -38,6 +42,8 @@ public class Chain {
   private BigDecimal withdrawQuotaPerYear;
 
   private BigDecimal withdrawQuotaTotal;
+
+  private int withdrawPrecision;
 
   private  String withdrawFeeType;
 

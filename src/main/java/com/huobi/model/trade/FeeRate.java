@@ -18,8 +18,12 @@ public class FeeRate {
 
   private String symbol;
 
-  private BigDecimal makerFee;
+  private BigDecimal makerFeeRate;
 
-  private BigDecimal takerFee;
+  private BigDecimal takerFeeRate;
+
+  private BigDecimal actualMakerRate;
+
+  private BigDecimal actualTakerRate;
 
 }

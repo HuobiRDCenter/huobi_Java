@@ -18,6 +18,8 @@ import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
 import com.huobi.client.req.trade.ReqOrderListRequest;
 import com.huobi.client.req.trade.SubOrderUpdateRequest;
+import com.huobi.client.req.trade.SubOrderUpdateV2Request;
+import com.huobi.client.req.trade.SubTradeClearingRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.OrderTypeEnum;
@@ -29,6 +31,8 @@ import com.huobi.model.trade.Order;
 import com.huobi.model.trade.OrderDetailReq;
 import com.huobi.model.trade.OrderListReq;
 import com.huobi.model.trade.OrderUpdateEvent;
+import com.huobi.model.trade.OrderUpdateV2Event;
+import com.huobi.model.trade.TradeClearingEvent;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.trade.BatchCancelOpenOrdersResultParser;
@@ -39,6 +43,8 @@ import com.huobi.service.huobi.parser.trade.OrderDetailReqParser;
 import com.huobi.service.huobi.parser.trade.OrderListReqParser;
 import com.huobi.service.huobi.parser.trade.OrderParser;
 import com.huobi.service.huobi.parser.trade.OrderUpdateEventParser;
+import com.huobi.service.huobi.parser.trade.OrderUpdateEventV2Parser;
+import com.huobi.service.huobi.parser.trade.TradeClearingEventParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -59,12 +65,10 @@ public class HuobiTradeService implements TradeClient {
   public static final String GET_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/getClientOrder";
   public static final String GET_SINGLE_ORDER_MATCH_RESULT_PATH = "/v1/order/orders/{order-id}/matchresults";
   public static final String GET_MATCH_RESULT_PATH = "/v1/order/matchresults";
-  public static final String GET_FEE_RATE_PATH = "/v1/fee/fee-rate/get";
+  public static final String GET_FEE_RATE_PATH = "/v2/reference/transact-fee-rate";
 
-
-  public static final String WEBSOCKET_ORDER_UPDATE_TOPIC = "orders.$symbol.update";
-  public static final String WEBSOCKET_ORDER_LIST_TOPIC = "orders.list";
-  public static final String WEBSOCKET_ORDER_DETAIL_TOPIC = "orders.detail";
+  public static final String WEBSOCKET_ORDER_UPDATE_V2_TOPIC = "orders#${symbol}";
+  public static final String WEBSOCKET_TRADE_CLEARING_TOPIC = "trade.clearing#${symbol}";
 
 
   private Options options;
@@ -314,8 +318,7 @@ public class HuobiTradeService implements TradeClient {
   }
 
 
-  public void subOrderUpdate(SubOrderUpdateRequest request, ResponseCallback<OrderUpdateEvent> callback) {
-
+  public void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback) {
     // 检查参数
     InputChecker.checker()
         .shouldNotNull(request.getSymbols(), "symbols");
@@ -329,64 +332,44 @@ public class HuobiTradeService implements TradeClient {
     List<String> commandList = new ArrayList<>(symbolList.size());
     symbolList.forEach(symbol -> {
 
-      String topic = WEBSOCKET_ORDER_UPDATE_TOPIC
-          .replace("$symbol", symbol);
+      String topic = WEBSOCKET_ORDER_UPDATE_V2_TOPIC
+          .replace("${symbol}", symbol);
 
       JSONObject command = new JSONObject();
-      command.put("op", WebSocketConstants.OP_SUB);
-      command.put("topic", topic);
+      command.put("action", WebSocketConstants.ACTION_SUB);
+      command.put("ch", topic);
       command.put("id", System.nanoTime());
       commandList.add(command.toJSONString());
     });
 
-    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderUpdateEventParser(), callback, false);
+    HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new OrderUpdateEventV2Parser(), callback, false);
   }
 
-  public void reqOrderList(ReqOrderListRequest request, ResponseCallback<OrderListReq> callback) {
-
+  public void subTradeClearing(SubTradeClearingRequest request, ResponseCallback<TradeClearingEvent> callback) {
+    // 检查参数
     InputChecker.checker()
-        .shouldNotNull(request.getAccountId(), "account-id")
-        .shouldNotNull(request.getSymbol(), "symbol")
-        .checkList(request.getStates(), 1, 100, "states");
+        .shouldNotNull(request.getSymbols(), "symbols");
 
+    // 格式化symbol为数组
+    List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbols());
 
-    String startDateString = request.getStartDate() == null
-        ? null : DateFormatUtils.format(request.getStartDate(), "yyyy-MM-dd");
-    String endDateString = request.getEndDate() == null
-        ? null : DateFormatUtils.format(request.getEndDate(), "yyyy-MM-dd");
+    // 检查数组
+    InputChecker.checker().checkSymbolList(symbolList);
 
-    JSONObject command = new JSONObject();
-    command.put("op", WebSocketConstants.OP_REQ);
-    command.put("topic", WEBSOCKET_ORDER_LIST_TOPIC);
-    command.put("account-id", request.getAccountId());
-    command.put("symbol", request.getSymbol());
-    command.put("types", request.getTypesString());
-    command.put("states", request.getStatesString());
-    command.put("start-date", startDateString);
-    command.put("end-date", endDateString);
-    command.put("from", request.getFrom() != null ? request.getFrom() + "" : null);
-    command.put("direct", request.getDirection() != null ? request.getDirection().toString() : null);
-    command.put("size", request.getSize() != null ? request.getSize() + "" : null);
-    List<String> commandList = new ArrayList<>(1);
-    commandList.add(command.toJSONString());
+    List<String> commandList = new ArrayList<>(symbolList.size());
+    symbolList.forEach(symbol -> {
 
-    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderListReqParser(), callback, true);
+      String topic = WEBSOCKET_TRADE_CLEARING_TOPIC
+          .replace("${symbol}", symbol);
 
-  }
+      JSONObject command = new JSONObject();
+      command.put("action", WebSocketConstants.ACTION_SUB);
+      command.put("ch", topic);
+      command.put("id", System.nanoTime());
+      commandList.add(command.toJSONString());
+    });
 
-  public void reqOrderDetail(Long orderId, ResponseCallback<OrderDetailReq> callback) {
-
-    InputChecker.checker()
-        .shouldNotNull(orderId, "order-id");
-
-    JSONObject command = new JSONObject();
-    command.put("op", WebSocketConstants.OP_REQ);
-    command.put("topic", WEBSOCKET_ORDER_DETAIL_TOPIC);
-    command.put("order-id", orderId.toString());
-    List<String> commandList = new ArrayList<>(1);
-    commandList.add(command.toJSONString());
-
-    HuobiWebSocketConnection.createAssetConnection(options, commandList, new OrderDetailReqParser(), callback, true);
+    HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new TradeClearingEventParser(), callback, false);
 
   }
 

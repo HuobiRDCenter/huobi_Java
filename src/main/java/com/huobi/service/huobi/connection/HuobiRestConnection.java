@@ -48,6 +48,15 @@ public class HuobiRestConnection {
     return checkAndGetResponse(resp);
   }
 
+  public String executeGetString(String url, UrlParamsBuilder paramsBuilder){
+    String realUrl = url + paramsBuilder.buildUrl();
+    Request executeRequest = new Request.Builder()
+        .url(realUrl)
+        .addHeader("Content-Type", "application/x-www-form-urlencoded")
+        .build();
+    String resp = ConnectionFactory.execute(executeRequest);
+    return resp;
+  }
 
   public JSONObject executeGetWithSignature(String path, UrlParamsBuilder paramsBuilder) {
 

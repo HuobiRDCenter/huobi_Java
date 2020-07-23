@@ -10,6 +10,8 @@ public class InputChecker {
 
   private static final String regEx = "[ _`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\n|\t";
 
+  public static final String ALL_STR = "*";
+
   private static final InputChecker checkerInst;
 
   static {
@@ -50,6 +52,11 @@ public class InputChecker {
       throw new SDKException(SDKException.INPUT_ERROR,
           "[Input] Symbol is mandatory");
     }
+
+    if (ALL_STR.equals(symbol)) {
+      return checkerInst;
+    }
+
     if (isSpecialChar(symbol)) {
       throw new SDKException(SDKException.INPUT_ERROR,
           "[Input] " + symbol + " is invalid symbol");

@@ -18,8 +18,11 @@ import com.huobi.client.req.market.SubMarketBBORequest;
 import com.huobi.client.req.market.SubMarketDepthRequest;
 import com.huobi.client.req.market.SubMarketDetailRequest;
 import com.huobi.client.req.market.SubMarketTradeRequest;
+import com.huobi.client.req.market.SubMbpIncrementalUpdateRequest;
+import com.huobi.client.req.market.SubMbpRefreshUpdateRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.CandlestickIntervalEnum;
+import com.huobi.constant.enums.DepthLevels;
 import com.huobi.constant.enums.DepthSizeEnum;
 import com.huobi.constant.enums.DepthStepEnum;
 import com.huobi.model.market.Candlestick;
@@ -148,6 +151,16 @@ public class MarketClientExample {
 
       System.out.println(marketDetailReq.toString());
     });
+
+    marketClient.subMbpRefreshUpdate(SubMbpRefreshUpdateRequest.builder().symbols(symbol).levels(DepthLevels.LEVEL_5).build(), event -> {
+      System.out.println(event.toString());
+    });
+
+    marketClient.subMbpIncrementalUpdate(SubMbpIncrementalUpdateRequest.builder().symbol(symbol).build(), event->{
+      System.out.println(event.toString());
+    });
+
+
   }
 
 

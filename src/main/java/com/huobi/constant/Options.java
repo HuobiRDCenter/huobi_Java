@@ -4,14 +4,16 @@ import com.huobi.constant.enums.ExchangeEnum;
 
 public interface Options {
 
-  public String getApiKey();
+  String getApiKey();
 
-  public String getSecretKey();
+  String getSecretKey();
 
-  public ExchangeEnum getExchange();
+  ExchangeEnum getExchange();
 
-  public String getRestHost();
+  String getRestHost();
 
-  public String getWebSocketHost();
+  String getWebSocketHost();
+
+  boolean isWebSocketAutoConnect();
 
 }

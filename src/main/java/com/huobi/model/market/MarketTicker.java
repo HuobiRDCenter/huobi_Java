@@ -31,4 +31,12 @@ public class MarketTicker {
 
   private BigDecimal vol;
 
+  private BigDecimal bid;
+
+  private BigDecimal bidSize;
+
+  private BigDecimal ask;
+
+  private BigDecimal askSize;
+
 }

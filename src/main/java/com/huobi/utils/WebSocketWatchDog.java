@@ -1,6 +1,7 @@
 package com.huobi.utils;
 
-import java.util.Objects;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,15 +19,16 @@ public class WebSocketWatchDog {
 
   public static final int DELAY_ON_FAILURE = 15;
 
-  private static final CopyOnWriteArrayList<WebSocketConnection> TIME_HELPER = new CopyOnWriteArrayList<>();
-  private static final Logger log = LoggerFactory.getLogger(WebSocketConnection.class);
+  private static final Map<Long,WebSocketConnection> TIME_HELPER = new ConcurrentHashMap<>();
+  private static final Logger log = LoggerFactory.getLogger(WebSocketWatchDog.class);
 
 
   static {
     long t = 1_000;
     ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
     exec.scheduleAtFixedRate(() -> {
-      TIME_HELPER.forEach(connection -> {
+      TIME_HELPER.entrySet().forEach(entry -> {
+        WebSocketConnection connection = entry.getValue();
         if (connection.getState() == ConnectionStateEnum.CONNECTED) {
           // Check response
 
@@ -52,7 +54,7 @@ public class WebSocketWatchDog {
 
 
   public static void onConnectionCreated(WebSocketConnection connection) {
-    TIME_HELPER.addIfAbsent(connection);
+    TIME_HELPER.put(connection.getConnectionId(), connection);
   }
 
   public static void onClosedNormally(WebSocketConnection connection) {

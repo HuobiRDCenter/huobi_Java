@@ -21,6 +21,8 @@ import com.huobi.client.req.trade.OrderHistoryRequest;
 import com.huobi.client.req.trade.OrdersRequest;
 import com.huobi.client.req.trade.ReqOrderListRequest;
 import com.huobi.client.req.trade.SubOrderUpdateRequest;
+import com.huobi.client.req.trade.SubOrderUpdateV2Request;
+import com.huobi.client.req.trade.SubTradeClearingRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.OrderSourceEnum;
 import com.huobi.constant.enums.OrderStateEnum;
@@ -40,9 +42,9 @@ public class TradeClientExample {
 
     String symbol = "htusdt";
     String marginSymbol = "xrpusdt";
-    Long spotAccountId = 123L;
-    Long marginXrpAccountId = 456L;
-    Long superMarginAccountId = 789L;
+    Long spotAccountId = 1234L;
+    Long marginXrpAccountId = 678L;
+    Long superMarginAccountId = 567L;
 
     MarketClient marketClient = MarketClient.create(new HuobiOptions());
 
@@ -58,11 +60,11 @@ public class TradeClientExample {
     BigDecimal bidPrice = marketDetailMerged.getBid().getPrice().multiply(new BigDecimal("0.95")).setScale(4, RoundingMode.DOWN);
     BigDecimal askPrice = marketDetailMerged.getAsk().getPrice().multiply(new BigDecimal("1.05")).setScale(4, RoundingMode.DOWN);
 
-    CreateOrderRequest buyLimitRequest = CreateOrderRequest.spotBuyLimit(spotAccountId, clientOrderId, symbol, bidPrice, new BigDecimal("1"));
+    CreateOrderRequest buyLimitRequest = CreateOrderRequest.spotBuyLimit(spotAccountId, clientOrderId, symbol, bidPrice, new BigDecimal("2"));
     Long buyLimitId = tradeService.createOrder(buyLimitRequest);
     System.out.println("create buy-limit order:" + buyLimitId);
 
-    CreateOrderRequest sellLimitRequest = CreateOrderRequest.spotSellLimit(spotAccountId, symbol, askPrice, new BigDecimal("1"));
+    CreateOrderRequest sellLimitRequest = CreateOrderRequest.spotSellLimit(spotAccountId, symbol, askPrice, new BigDecimal("2"));
     Long sellLimitId = tradeService.createOrder(sellLimitRequest);
     System.out.println("create sell-limit order:" + sellLimitId);
 
@@ -76,49 +78,49 @@ public class TradeClientExample {
 
     String superMarginSymbol = "xrpusdt";
     CreateOrderRequest superMarginBuyLimitRequest = CreateOrderRequest
-        .superMarginBuyLimit(superMarginAccountId, superMarginSymbol, new BigDecimal("0.27"), new BigDecimal("4"));
+        .superMarginBuyLimit(superMarginAccountId, superMarginSymbol, new BigDecimal("0.17"), new BigDecimal("30"));
     Long superMarginBuyLimitId = tradeService.createOrder(superMarginBuyLimitRequest);
     System.out.println("create super-margin-buy-limit order:" + superMarginBuyLimitId);
 
     CreateOrderRequest superMarginBuyMarketRequest = CreateOrderRequest
-        .superMarginBuyMarket(superMarginAccountId, superMarginSymbol, new BigDecimal("4"));
+        .superMarginBuyMarket(superMarginAccountId, superMarginSymbol, new BigDecimal("5"));
     Long superMarginBuyMarketId = tradeService.createOrder(superMarginBuyMarketRequest);
     System.out.println("create super-margin-buy-limit order:" + superMarginBuyMarketId);
 
     CreateOrderRequest superMarginSellLimitRequest = CreateOrderRequest
-        .superMarginSellLimit(superMarginAccountId, superMarginSymbol, new BigDecimal("0.29"), new BigDecimal("3.45"));
+        .superMarginSellLimit(superMarginAccountId, superMarginSymbol, new BigDecimal("0.2"), new BigDecimal("30"));
     Long superMarginSellLimitId = tradeService.createOrder(superMarginSellLimitRequest);
     System.out.println("create super-margin-sell-limit order:" + superMarginSellLimitId);
 
     CreateOrderRequest superMarginSellMarketRequest = CreateOrderRequest
-        .superMarginSellMarket(superMarginAccountId, superMarginSymbol, new BigDecimal("3.45"));
+        .superMarginSellMarket(superMarginAccountId, superMarginSymbol, new BigDecimal("20"));
     Long superMarginSellMarketId = tradeService.createOrder(superMarginSellMarketRequest);
     System.out.println("create super-margin-sell-limit order:" + superMarginSellMarketId);
 
     CreateOrderRequest marginBuyLimitRequest = CreateOrderRequest
-        .marginBuyLimit(marginXrpAccountId, marginSymbol, new BigDecimal("0.27"), new BigDecimal("4"));
+        .marginBuyLimit(marginXrpAccountId, marginSymbol, new BigDecimal("0.17"), new BigDecimal("30"));
     Long marginBuyLimitId = tradeService.createOrder(marginBuyLimitRequest);
     System.out.println("create margin-buy-limit order:" + marginBuyLimitId);
 
-    CreateOrderRequest marginBuyMarketRequest = CreateOrderRequest.marginBuyMarket(marginXrpAccountId, marginSymbol, new BigDecimal("4"));
+    CreateOrderRequest marginBuyMarketRequest = CreateOrderRequest.marginBuyMarket(marginXrpAccountId, marginSymbol, new BigDecimal("5.5"));
     Long marginBuyMarketId = tradeService.createOrder(marginBuyMarketRequest);
     System.out.println("create margin-buy-limit order:" + marginBuyMarketId);
 
     CreateOrderRequest marginSellLimitRequest = CreateOrderRequest
-        .marginSellLimit(marginXrpAccountId, marginSymbol, new BigDecimal("0.295"), new BigDecimal("4"));
+        .marginSellLimit(marginXrpAccountId, marginSymbol, new BigDecimal("0.295"), new BigDecimal("20"));
     Long marginSellLimitId = tradeService.createOrder(marginSellLimitRequest);
     System.out.println("create margin-sell-limit order:" + marginSellLimitId);
 
-    CreateOrderRequest marginSellMarketRequest = CreateOrderRequest.marginSellMarket(marginXrpAccountId, marginSymbol, new BigDecimal("3.44"));
+    CreateOrderRequest marginSellMarketRequest = CreateOrderRequest.marginSellMarket(marginXrpAccountId, marginSymbol, new BigDecimal("30"));
     Long marginSellMarketId = tradeService.createOrder(marginSellMarketRequest);
     System.out.println("create margin-sell-limit order:" + marginSellMarketId);
 
     CreateOrderRequest buyStopLossRequest = CreateOrderRequest.buyStopLoss(
         spotAccountId,
         symbol,
-        bidPrice.multiply(new BigDecimal("1.5")).setScale(4,RoundingMode.DOWN),
+        bidPrice.multiply(new BigDecimal("1.5")).setScale(4, RoundingMode.DOWN),
         new BigDecimal("1"),
-        bidPrice.multiply(new BigDecimal("1.5")).setScale(4,RoundingMode.DOWN),
+        bidPrice.multiply(new BigDecimal("1.5")).setScale(4, RoundingMode.DOWN),
         StopOrderOperatorEnum.GTE,
         OrderSourceEnum.API);
 
@@ -128,9 +130,9 @@ public class TradeClientExample {
     CreateOrderRequest sellStopLossRequest = CreateOrderRequest.sellStopLoss(
         spotAccountId,
         symbol,
-        askPrice.multiply(new BigDecimal("0.95")).setScale(4,RoundingMode.DOWN),
+        askPrice.multiply(new BigDecimal("0.95")).setScale(4, RoundingMode.DOWN),
         new BigDecimal("1"),
-        askPrice.multiply(new BigDecimal("0.95")).setScale(4,RoundingMode.DOWN),
+        askPrice.multiply(new BigDecimal("0.95")).setScale(4, RoundingMode.DOWN),
         StopOrderOperatorEnum.LTE,
         OrderSourceEnum.API);
 
@@ -166,19 +168,19 @@ public class TradeClientExample {
         .accountId(spotAccountId)
         .symbol(symbol)
         .build());
-    System.out.println("spot batchCancel open Orders:"+result.toString());
+    System.out.println("spot batchCancel open Orders:" + result.toString());
 
     BatchCancelOpenOrdersResult result1 = tradeService.batchCancelOpenOrders(BatchCancelOpenOrdersRequest.builder()
         .accountId(marginXrpAccountId)
         .symbol(marginSymbol)
         .build());
-    System.out.println("margin xrp batchCancel open Orders:"+result1.toString());
+    System.out.println("margin xrp batchCancel open Orders:" + result1.toString());
 
     BatchCancelOpenOrdersResult result2 = tradeService.batchCancelOpenOrders(BatchCancelOpenOrdersRequest.builder()
         .accountId(superMarginAccountId)
         .symbol(marginSymbol)
         .build());
-    System.out.println("super margin batchCancel open Orders:"+result2.toString());
+    System.out.println("super margin batchCancel open Orders:" + result2.toString());
 
     List<OrderStateEnum> stateList = new ArrayList<>();
     stateList.add(OrderStateEnum.CANCELED);
@@ -227,28 +229,15 @@ public class TradeClientExample {
       System.out.println(feeRate.toString());
     });
 
-    tradeService.subOrderUpdate(SubOrderUpdateRequest.builder().symbols(symbol + "," + marginSymbol).build(), (orderUpdateEvent) -> {
-      System.out.println(orderUpdateEvent.toString());
+
+    tradeService.subOrderUpdateV2(SubOrderUpdateV2Request.builder().symbols("*").build(), orderUpdateV2Event -> {
+
+      System.out.println(orderUpdateV2Event.toString());
+
     });
 
-    tradeService.reqOrderList(ReqOrderListRequest.builder()
-        .accountId(spotAccountId)
-        .symbol(symbol)
-        .states(stateList)
-        .types(typeList)
-        .startDate(new Date(1571362445775L))
-        .endDate(new Date(1571362445775L))
-        .size(5)
-        .build(), (orderListEvent) -> {
-
-      System.out.println(orderListEvent.toString());
-      orderListEvent.getOrderList().forEach(order -> {
-        System.out.println(new Date(order.getCreatedAt()) + "==>" + order.toString());
-      });
-    });
-
-    tradeService.reqOrderDetail(buyLimitId, (orderDetailEvent) -> {
-      System.out.println(orderDetailEvent.toString());
+    tradeService.subTradeClearing(SubTradeClearingRequest.builder().symbols("*").build(), event -> {
+      System.out.println(event.toString());
     });
   }
 

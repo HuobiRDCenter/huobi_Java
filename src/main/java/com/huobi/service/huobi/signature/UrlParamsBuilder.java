@@ -127,7 +127,7 @@ public class UrlParamsBuilder {
     return this;
   }
 
-  public <T> UrlParamsBuilder putToPost(String name, List<String> list) {
+  public <T> UrlParamsBuilder putToPost(String name, List list) {
     postBodyMap.stringListMap.put(name, list);
     return this;
   }

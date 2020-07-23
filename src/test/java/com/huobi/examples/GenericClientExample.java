@@ -12,6 +12,17 @@ public class GenericClientExample {
   public static void main(String[] args) {
     GenericClient genericService = GenericClient.create(HuobiOptions.builder().build());
 
+
+    String systemStatusJSONString = genericService.getSystemStatus();
+    System.out.println(systemStatusJSONString);
+
+    System.out.println("----------------------------------------------------");
+
+    MarketStatus marketStatus = genericService.getMarketStatus();
+    System.out.println("market status :: "+marketStatus.getMarketStatus());
+
+    System.out.println("----------------------------------------------------");
+
     List<Symbol> symbolList = genericService.getSymbols();
     symbolList.forEach(symbol -> {
       System.out.println(symbol.toString());

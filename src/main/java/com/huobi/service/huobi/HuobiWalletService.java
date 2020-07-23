@@ -9,6 +9,7 @@ import com.huobi.client.WalletClient;
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;
+import com.huobi.client.req.wallet.WithdrawAddressRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
 import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
@@ -16,10 +17,12 @@ import com.huobi.constant.Options;
 import com.huobi.constant.enums.DepositWithdrawTypeEnum;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.model.wallet.DepositWithdraw;
+import com.huobi.model.wallet.WithdrawAddressResult;
 import com.huobi.model.wallet.WithdrawQuota;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.wallet.DepositAddressParser;
 import com.huobi.service.huobi.parser.wallet.DepositWithdrawParser;
+import com.huobi.service.huobi.parser.wallet.WithdrawAddressParser;
 import com.huobi.service.huobi.parser.wallet.WithdrawQuotaParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
@@ -28,6 +31,7 @@ public class HuobiWalletService implements WalletClient {
 
 
   public static final String GET_DEPOSIT_ADDRESS_PATH = "/v2/account/deposit/address";
+  public static final String GET_WITHDRAW_ADDRESS_PATH = "/v2/account/withdraw/address";
   public static final String GET_WITHDRAW_QUOTA_PATH = "/v2/account/withdraw/quota";
   public static final String CREATE_WITHDRAW_PATH = "/v1/dw/withdraw/api/create";
   public static final String CANCEL_WITHDRAW_PATH = "/v1/dw/withdraw-virtual/{withdraw-id}/cancel";
@@ -47,12 +51,12 @@ public class HuobiWalletService implements WalletClient {
 
     // 验证参数
     InputChecker.checker()
-        .shouldNotNull(request.getCurrency(),"currency");
+        .shouldNotNull(request.getCurrency(), "currency");
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("currency",request.getCurrency());
+        .putToUrl("currency", request.getCurrency());
 
-    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_DEPOSIT_ADDRESS_PATH,builder);
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_DEPOSIT_ADDRESS_PATH, builder);
     JSONArray array = jsonObject.getJSONArray("data");
     return new DepositAddressParser().parseArray(array);
   }
@@ -61,24 +65,46 @@ public class HuobiWalletService implements WalletClient {
   public WithdrawQuota getWithdrawQuota(WithdrawQuotaRequest request) {
     // 验证参数
     InputChecker.checker()
-        .shouldNotNull(request.getCurrency(),"currency");
+        .shouldNotNull(request.getCurrency(), "currency");
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
-        .putToUrl("currency",request.getCurrency());
+        .putToUrl("currency", request.getCurrency());
 
-    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_WITHDRAW_QUOTA_PATH,builder);
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_WITHDRAW_QUOTA_PATH, builder);
     JSONObject data = jsonObject.getJSONObject("data");
     return new WithdrawQuotaParser().parse(data);
+  }
+
+  public WithdrawAddressResult getWithdrawAddress(WithdrawAddressRequest request) {
+
+    // 验证参数
+    InputChecker.checker()
+        .shouldNotNull(request.getCurrency(), "currency");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+        .putToUrl("currency", request.getCurrency())
+        .putToUrl("chain", request.getChain())
+        .putToUrl("note", request.getNote())
+        .putToUrl("limit", request.getLimit())
+        .putToUrl("fromId", request.getFromId());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_WITHDRAW_ADDRESS_PATH, builder);
+    JSONArray array = jsonObject.getJSONArray("data");
+
+    return WithdrawAddressResult.builder()
+        .nextId(jsonObject.getLong("next-id"))
+        .withdrawAddressList(new WithdrawAddressParser().parseArray(array))
+        .build();
   }
 
   @Override
   public Long createWithdraw(CreateWithdrawRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getAddress(),"address")
-        .shouldNotNull(request.getAmount(),"amount")
-        .shouldNotNull(request.getCurrency(),"currency")
-        .shouldNotNull(request.getFee(),"fee");
+        .shouldNotNull(request.getAddress(), "address")
+        .shouldNotNull(request.getAmount(), "amount")
+        .shouldNotNull(request.getCurrency(), "currency")
+        .shouldNotNull(request.getFee(), "fee");
 
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToPost("address", request.getAddress())
@@ -86,9 +112,9 @@ public class HuobiWalletService implements WalletClient {
         .putToPost("currency", request.getCurrency())
         .putToPost("fee", request.getFee())
         .putToPost("addr-tag", request.getAddrTag())
-        .putToPost("chain",request.getChain());
+        .putToPost("chain", request.getChain());
 
-    JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_WITHDRAW_PATH,builder);
+    JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_WITHDRAW_PATH, builder);
     return jsonObject.getLong("data");
   }
 
@@ -96,11 +122,11 @@ public class HuobiWalletService implements WalletClient {
   public Long cancelWithdraw(Long withdrawId) {
 
     InputChecker.checker()
-        .shouldNotNull(withdrawId,"withdraw-id");
+        .shouldNotNull(withdrawId, "withdraw-id");
 
-    String path = CANCEL_WITHDRAW_PATH.replace("{withdraw-id}",withdrawId+"");
+    String path = CANCEL_WITHDRAW_PATH.replace("{withdraw-id}", withdrawId + "");
 
-    JSONObject jsonObject = restConnection.executePostWithSignature(path,UrlParamsBuilder.build());
+    JSONObject jsonObject = restConnection.executePostWithSignature(path, UrlParamsBuilder.build());
     return jsonObject.getLong("data");
   }
 
@@ -108,7 +134,7 @@ public class HuobiWalletService implements WalletClient {
   public List<DepositWithdraw> getDepositWithdraw(DepositWithdrawRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(request.getType(),"type");
+        .shouldNotNull(request.getType(), "type");
     UrlParamsBuilder builder = UrlParamsBuilder.build()
         .putToUrl("type", request.getType().getType())
         .putToUrl("currency", request.getCurrency())
