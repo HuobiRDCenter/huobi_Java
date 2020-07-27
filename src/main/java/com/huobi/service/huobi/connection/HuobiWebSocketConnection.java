@@ -29,7 +29,6 @@ import com.huobi.utils.ResponseCallback;
 import com.huobi.utils.WebSocketConnection;
 import com.huobi.utils.WebSocketWatchDog;
 
-
 @Data
 @Slf4j
 public class HuobiWebSocketConnection extends WebSocketListener implements WebSocketConnection {

@@ -9,12 +9,10 @@ public class IdGenerator {
 
   private static Set<Long> TIME_SET = new HashSet<>();
 
-
   public static Long getNextId(){
 
     Long time = System.currentTimeMillis();
 
-    int index;
     if (!TIME_SET.contains(time)) {
       COUNTER.set(0);
       TIME_SET.clear();
@@ -24,5 +22,4 @@ public class IdGenerator {
     Long id = (time * 1000) + COUNTER.addAndGet(1);
     return id;
   }
-
 }

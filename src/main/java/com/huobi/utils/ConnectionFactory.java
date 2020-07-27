@@ -59,7 +59,6 @@ public class ConnectionFactory {
       })
       .build();
 
-
   private static final Logger log = LoggerFactory.getLogger(ConnectionFactory.class);
 
   public static String execute(Request request) {
