@@ -24,6 +24,7 @@ public class MatchResult {
   private BigDecimal filledPoints;
   private String feeDeductCurrency;
   private DealRole role;
+  private String feeCurrency;
 
   /**
    * Get the UNIX formatted timestamp in UTC when the match and fill is done.
@@ -190,5 +191,13 @@ public class MatchResult {
 
   public void setRole(DealRole role) {
     this.role = role;
+  }
+
+  public String getFeeCurrency() {
+    return feeCurrency;
+  }
+
+  public void setFeeCurrency(String feeCurrency) {
+    this.feeCurrency = feeCurrency;
   }
 }

@@ -9,9 +9,9 @@ import com.alibaba.fastjson.JSON;
 import com.huobi.client.SyncRequestClient;
 import com.huobi.client.examples.constants.Constants;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.enums.CrossMarginTransferType;
-import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
@@ -26,7 +26,7 @@ public class CrossMarginExamples {
 
     SyncRequestClient syncRequestClient = SyncRequestClient.create(Constants.API_KEY, Constants.SECRET_KEY);
 
-    CrossMarginAccount crossMarginAccount = syncRequestClient.getCrossMarginAccount();
+    CrossMarginAccount crossMarginAccount = syncRequestClient.getCrossMarginAccount(null);
 
     System.out.println("Cross Margin Account:"+JSON.toJSONString(crossMarginAccount));
     crossMarginAccount.getList().forEach(balance -> {
@@ -82,6 +82,13 @@ public class CrossMarginExamples {
       System.out.println("Cross Loan Order:"+new Date(order.getCreatedAt()) +":"+ JSON.toJSONString(order));
     });
 
+
+    List<CrossMarginLoanInfo> infoList = syncRequestClient.getCrossMarginLoanInfo();
+    infoList.forEach(info -> {
+      System.out.println("----------------------");
+      System.out.println("symbol : " + info.getCurrency());
+      System.out.println(JSON.toJSONString(info));
+    });
 
   }
 

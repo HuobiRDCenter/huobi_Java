@@ -20,6 +20,8 @@ public class Withdraw {
   private long createdTimestamp;
   private long updatedTimestamp;
   private WithdrawState withdrawState;
+  private String errorCode;
+  private String errorMsg;
 
   /**
    * Get the transfer id.
@@ -158,5 +160,21 @@ public class Withdraw {
 
   public void setWithdrawState(WithdrawState withdrawState) {
     this.withdrawState = withdrawState;
+  }
+
+  public String getErrorCode() {
+    return errorCode;
+  }
+
+  public void setErrorCode(String errorCode) {
+    this.errorCode = errorCode;
+  }
+
+  public String getErrorMsg() {
+    return errorMsg;
+  }
+
+  public void setErrorMsg(String errorMsg) {
+    this.errorMsg = errorMsg;
   }
 }

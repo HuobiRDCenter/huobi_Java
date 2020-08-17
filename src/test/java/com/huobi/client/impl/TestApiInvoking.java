@@ -59,7 +59,7 @@ public class TestApiInvoking {
   }
 
 
-  @Test
+//  @Test
   public void testASync() {
     RestApiRequest<Long> restApiRequest = new RestApiRequest<>();
     restApiRequest.jsonParser = (jsonWrapper) -> jsonWrapper.getLong("data");

@@ -24,6 +24,7 @@ public class Order {
   private long canceledTimestamp = 0;
   private long finishedTimestamp = 0;
   private long orderId = 0;
+  private String clientOrderId;
   private String symbol;
   private BigDecimal stopPrice;
   private OrderType type = null;
@@ -245,4 +246,14 @@ public class Order {
     this.operator = operator;
   }
 
-}
+  /**
+   * Get client order id
+   * @return The client order id
+   */
+  public String getClientOrderId() {
+    return clientOrderId;
+  }
+
+  public void setClientOrderId(String clientOrderId) {
+    this.clientOrderId = clientOrderId;
+  }}

@@ -7,6 +7,8 @@ import java.util.Map;
 import com.huobi.client.impl.HuobiApiInternalFactory;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.AccountLedger;
+import com.huobi.client.model.AccountTransferResult;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BatchCancelResultV1;
@@ -15,6 +17,7 @@ import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
 import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
@@ -23,16 +26,29 @@ import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.FeeRate;
+import com.huobi.client.model.GetApiKeyListResult;
+import com.huobi.client.model.GetSubUserAccountListResult;
+import com.huobi.client.model.GetSubUserListRequest;
+import com.huobi.client.model.GetSubUserListResult;
+import com.huobi.client.model.GetWithdrawAddressResult;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
+import com.huobi.client.model.MarginLoanInfo;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.SubUserApiKeyGenerationResult;
+import com.huobi.client.model.SubUserApiKeyModificationResult;
+import com.huobi.client.model.SubUserCreationResult;
+import com.huobi.client.model.SubUserState;
+import com.huobi.client.model.SubUserTradableMarketResult;
+import com.huobi.client.model.SubUserTransferabilityResult;
 import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
@@ -40,13 +56,19 @@ import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.AccountLedgerRequest;
+import com.huobi.client.model.request.AccountTransferRequest;
 import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
+import com.huobi.client.model.request.CrossMarginAccountRequest;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
 import com.huobi.client.model.request.CrossMarginTransferRequest;
+import com.huobi.client.model.request.GetApiKeyListRequest;
+import com.huobi.client.model.request.GetSubUserAccountListRequest;
+import com.huobi.client.model.request.GetWithdrawAddressRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -54,6 +76,13 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserApiKeyDeletionRequest;
+import com.huobi.client.model.request.SubUserApiKeyGenerationRequest;
+import com.huobi.client.model.request.SubUserApiKeyModificationRequest;
+import com.huobi.client.model.request.SubUserCreationRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
+import com.huobi.client.model.request.SubUserTradableMarketRequest;
+import com.huobi.client.model.request.SubUserTransferabilityRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
@@ -207,6 +236,9 @@ public interface SyncRequestClient {
    * @return
    */
   List<Deposit> getDepositHistory(String currency, long fromId, int size, QueryDirection queryDirection);
+
+  List<Deposit> getSubUserDepositHistory(SubUserDepositHistoryRequest request);
+
   /**
    * Transfer asset from specified account to another account.
    *
@@ -251,6 +283,7 @@ public interface SyncRequestClient {
    */
   List<Loan> getLoanHistory(LoanOrderRequest loanOrderRequest);
 
+  List<MarginLoanInfo> getLoanInfo(String symbols);
 
   /**
    * This endpoint transfer specific asset `from spot trading account to cross margin account` or `from cross margin account to spot trading account`.
@@ -283,8 +316,9 @@ public interface SyncRequestClient {
    * This endpoint returns the balance of the margin loan account.
    * @return
    */
-  CrossMarginAccount getCrossMarginAccount();
+  CrossMarginAccount getCrossMarginAccount(CrossMarginAccountRequest request);
 
+  List<CrossMarginLoanInfo> getCrossMarginLoanInfo();
 
   /**
    * Get last trade, best bid and best ask of a symbol.
@@ -318,9 +352,44 @@ public interface SyncRequestClient {
    * @return
    */
   List<AccountHistory> getAccountHistory(AccountHistoryRequest request);
+  
+  /**
+   * Get account ledger
+   * @param request
+   * @return
+   */
+  List<AccountLedger> getAccountLedgers(AccountLedgerRequest request);
+
+  GetWithdrawAddressResult getAccountWithdrawAddressList(GetWithdrawAddressRequest request);
+
+  AccountTransferResult accountTransfer(AccountTransferRequest request);
+
+
+  String getSystemStatus();
 
 
   SubuserManagementResult subuserManagement(SubuserManagementRequest request);
+
+
+  SubUserCreationResult subuserCreation(SubUserCreationRequest request);
+
+  GetSubUserListResult getSubuserList(GetSubUserListRequest request);
+
+  SubUserState getSubuserState(Long subUid);
+
+  GetSubUserAccountListResult getSubuserAccountList(GetSubUserAccountListRequest request);
+
+  SubUserTransferabilityResult subuserTransferability(SubUserTransferabilityRequest request);
+
+  SubUserTradableMarketResult subuserTradableMarket(SubUserTradableMarketRequest request);
+
+  SubUserApiKeyGenerationResult subuserApiKeyGeneration(SubUserApiKeyGenerationRequest request);
+
+  SubUserApiKeyModificationResult subuserApiKeyModification(SubUserApiKeyModificationRequest request);
+
+  void subuserApiKeyDeletion(SubUserApiKeyDeletionRequest request);
+
+  GetApiKeyListResult getApiKeyList(GetApiKeyListRequest request);
 
   /**
    * Make an order in huobi.
@@ -411,6 +480,8 @@ public interface SyncRequestClient {
    */
   List<DepositAddress> getDepositAddress(String currency);
 
+  List<DepositAddress> getSubUserDepositAddress(Long subUid, String currency);
+
   /**
    * Get the withdraw quota information.
    * @param currency The currency, like "btc". (mandatory)
@@ -463,6 +534,9 @@ public interface SyncRequestClient {
    * @return  The feeRate list, see {@link FeeRate}
    */
   List<FeeRate> getFeeRate(String symbol);
+
+  List<TransactFeeRate> getTransactFeeRate(String symbol);
+
   /**
    * Transfer Asset between Parent and Sub Account.
    *
@@ -525,7 +599,7 @@ public interface SyncRequestClient {
    * @return The list of candlestick/kline data, see {@link Candlestick}
    */
   List<Candlestick> getEtfCandlestick(String etfSymbol, CandlestickInterval interval,
-      Integer size);
+    Integer size);
 
   /**
    * Get the Balance of the Margin Loan Account

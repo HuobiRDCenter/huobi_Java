@@ -89,6 +89,16 @@ public class Chain {
    */
   private BigDecimal transactFeeRateWithdraw;
 
+  /**
+   * Base chain name
+   */
+  private String baseChain;
+
+  /**
+   * Base chain protocol
+   */
+  private String baseChainProtocol;
+
   public String getChain() {
     return chain;
   }
@@ -223,5 +233,21 @@ public class Chain {
 
   public void setTransactFeeRateWithdraw(BigDecimal transactFeeRateWithdraw) {
     this.transactFeeRateWithdraw = transactFeeRateWithdraw;
+  }
+
+  public String getBaseChain() {
+    return baseChain;
+  }
+
+  public void setBaseChain(String baseChain) {
+    this.baseChain = baseChain;
+  }
+
+  public String getBaseChainProtocol() {
+    return baseChainProtocol;
+  }
+
+  public void setBaseChainProtocol(String baseChainProtocol) {
+    this.baseChainProtocol = baseChainProtocol;
   }
 }

@@ -4,6 +4,8 @@ import com.huobi.client.SyncRequestClient;
 import com.huobi.client.exception.HuobiApiException;
 import com.huobi.client.model.Account;
 import com.huobi.client.model.AccountHistory;
+import com.huobi.client.model.AccountLedger;
+import com.huobi.client.model.AccountTransferResult;
 import com.huobi.client.model.Balance;
 import com.huobi.client.model.BatchCancelResult;
 import com.huobi.client.model.BatchCancelResultV1;
@@ -12,6 +14,7 @@ import com.huobi.client.model.Candlestick;
 import com.huobi.client.model.CompleteSubAccountInfo;
 import com.huobi.client.model.CreateOrderResult;
 import com.huobi.client.model.CrossMarginAccount;
+import com.huobi.client.model.CrossMarginLoanInfo;
 import com.huobi.client.model.CrossMarginLoanOrder;
 import com.huobi.client.model.Currency;
 import com.huobi.client.model.Deposit;
@@ -20,30 +23,49 @@ import com.huobi.client.model.EtfSwapConfig;
 import com.huobi.client.model.EtfSwapHistory;
 import com.huobi.client.model.ExchangeInfo;
 import com.huobi.client.model.FeeRate;
+import com.huobi.client.model.GetApiKeyListResult;
+import com.huobi.client.model.GetSubUserAccountListResult;
+import com.huobi.client.model.GetSubUserListRequest;
+import com.huobi.client.model.GetSubUserListResult;
+import com.huobi.client.model.GetWithdrawAddressResult;
 import com.huobi.client.model.LastTradeAndBestQuote;
 import com.huobi.client.model.Loan;
 import com.huobi.client.model.MarginBalanceDetail;
+import com.huobi.client.model.MarginLoanInfo;
 import com.huobi.client.model.MatchResult;
 import com.huobi.client.model.Order;
 import com.huobi.client.model.PriceDepth;
+import com.huobi.client.model.SubUserApiKeyGenerationResult;
+import com.huobi.client.model.SubUserApiKeyModificationResult;
+import com.huobi.client.model.SubUserCreationResult;
+import com.huobi.client.model.SubUserState;
+import com.huobi.client.model.SubUserTradableMarketResult;
+import com.huobi.client.model.SubUserTransferabilityResult;
 import com.huobi.client.model.SubuserManagementResult;
 import com.huobi.client.model.Symbol;
 import com.huobi.client.model.Trade;
 import com.huobi.client.model.TradeStatistics;
+import com.huobi.client.model.TransactFeeRate;
 import com.huobi.client.model.Withdraw;
 import com.huobi.client.model.WithdrawQuota;
 import com.huobi.client.model.enums.AccountType;
 import com.huobi.client.model.enums.CandlestickInterval;
 import com.huobi.client.model.enums.QueryDirection;
 import com.huobi.client.model.request.AccountHistoryRequest;
+import com.huobi.client.model.request.AccountLedgerRequest;
+import com.huobi.client.model.request.AccountTransferRequest;
 import com.huobi.client.model.request.BatchCancelRequest;
 import com.huobi.client.model.request.CancelOpenOrderRequest;
 import com.huobi.client.model.request.CandlestickRequest;
+import com.huobi.client.model.request.CrossMarginAccountRequest;
 import com.huobi.client.model.enums.EtfSwapType;
 import com.huobi.client.model.request.CrossMarginApplyLoanRequest;
 import com.huobi.client.model.request.CrossMarginLoanOrderRequest;
 import com.huobi.client.model.request.CrossMarginRepayLoanRequest;
 import com.huobi.client.model.request.CrossMarginTransferRequest;
+import com.huobi.client.model.request.GetApiKeyListRequest;
+import com.huobi.client.model.request.GetSubUserAccountListRequest;
+import com.huobi.client.model.request.GetWithdrawAddressRequest;
 import com.huobi.client.model.request.HistoricalOrdersRequest;
 import com.huobi.client.model.request.LoanOrderRequest;
 import com.huobi.client.model.request.MatchResultRequest;
@@ -51,6 +73,13 @@ import com.huobi.client.model.request.NewOrderRequest;
 import com.huobi.client.model.request.OpenOrderRequest;
 import com.huobi.client.model.request.OrdersHistoryRequest;
 import com.huobi.client.model.request.OrdersRequest;
+import com.huobi.client.model.request.SubUserApiKeyDeletionRequest;
+import com.huobi.client.model.request.SubUserApiKeyGenerationRequest;
+import com.huobi.client.model.request.SubUserApiKeyModificationRequest;
+import com.huobi.client.model.request.SubUserCreationRequest;
+import com.huobi.client.model.request.SubUserDepositHistoryRequest;
+import com.huobi.client.model.request.SubUserTradableMarketRequest;
+import com.huobi.client.model.request.SubUserTransferabilityRequest;
 import com.huobi.client.model.request.SubuserManagementRequest;
 import com.huobi.client.model.request.TransferFuturesRequest;
 import com.huobi.client.model.request.TransferMasterRequest;
@@ -183,6 +212,10 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getDepositHistory(currency, fromId, size, direction));
   }
 
+  public List<Deposit> getSubUserDepositHistory(SubUserDepositHistoryRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserDepositHistory(request));
+  }
+
   @Override
   public Long transfer(TransferRequest transferRequest) {
     return RestApiInvoker.callSync(requestImpl.transfer(transferRequest));
@@ -208,6 +241,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public List<MarginLoanInfo> getLoanInfo(String symbols) {
+    return RestApiInvoker.callSync(requestImpl.getLoanInfo(symbols));
+  }
+
+  @Override
   public long transferCrossMargin(CrossMarginTransferRequest request) {
     return RestApiInvoker.callSync(requestImpl.transferCrossMargin(request));
   }
@@ -224,8 +262,12 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getCrossMarginLoanHistory(request));
   }
 
-  public CrossMarginAccount getCrossMarginAccount() {
-    return RestApiInvoker.callSync(requestImpl.getCrossMarginAccount());
+  public CrossMarginAccount getCrossMarginAccount(CrossMarginAccountRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginAccount(request));
+  }
+
+  public List<CrossMarginLoanInfo> getCrossMarginLoanInfo() {
+    return RestApiInvoker.callSync(requestImpl.getCrossMarginLoanInfo());
   }
 
 
@@ -276,9 +318,60 @@ public class SyncRequestImpl implements SyncRequestClient {
     return RestApiInvoker.callSync(requestImpl.getAccountHistory(request));
   }
 
+  @Override
   public SubuserManagementResult subuserManagement(SubuserManagementRequest request) {
     return RestApiInvoker.callSync(requestImpl.subuserManagement(request));
   }
+
+  @Override
+  public SubUserCreationResult subuserCreation(SubUserCreationRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserCreation(request));
+  }
+
+  @Override
+  public GetSubUserListResult getSubuserList(GetSubUserListRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserList(request));
+  }
+
+  @Override
+  public SubUserState getSubuserState(Long subUid) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserState(subUid));
+  }
+
+  @Override
+  public GetSubUserAccountListResult getSubuserAccountList(GetSubUserAccountListRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getSubuserAccountList(request));
+  }
+
+  @Override
+  public SubUserTransferabilityResult subuserTransferability(SubUserTransferabilityRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserTransferability(request));
+  }
+
+  @Override
+  public SubUserTradableMarketResult subuserTradableMarket(SubUserTradableMarketRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserTradableMarket(request));
+  }
+
+  @Override
+  public SubUserApiKeyGenerationResult subuserApiKeyGeneration(SubUserApiKeyGenerationRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserApiKeyGeneration(request));
+  }
+
+  @Override
+  public SubUserApiKeyModificationResult subuserApiKeyModification(SubUserApiKeyModificationRequest request) {
+    return RestApiInvoker.callSync(requestImpl.subuserApiKeyModification(request));
+  }
+
+  public void subuserApiKeyDeletion(SubUserApiKeyDeletionRequest request) {
+    RestApiInvoker.callSync(requestImpl.subuserApiKeyDeletion(request));
+  }
+
+  @Override
+  public GetApiKeyListResult getApiKeyList(GetApiKeyListRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getApiKeyList(request));
+  }
+
 
   @Override
   public Map<String, TradeStatistics> getTickers() {
@@ -356,6 +449,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   }
 
   @Override
+  public List<DepositAddress> getSubUserDepositAddress(Long subUid, String currency) {
+    return RestApiInvoker.callSync(requestImpl.getSubUserDepositAddress(subUid, currency));
+  }
+
+  @Override
   public WithdrawQuota getWithdrawQuota(String currency) {
     return RestApiInvoker.callSync(requestImpl.getWithdrawQuota(currency));
   }
@@ -388,6 +486,11 @@ public class SyncRequestImpl implements SyncRequestClient {
   @Override
   public List<FeeRate> getFeeRate(String symbol) {
     return RestApiInvoker.callSync(requestImpl.getFeeRate(symbol));
+  }
+
+  @Override
+  public List<TransactFeeRate> getTransactFeeRate(String symbols) {
+    return RestApiInvoker.callSync(requestImpl.getTransactFeeRate(symbols));
   }
 
   @Override
@@ -429,4 +532,23 @@ public class SyncRequestImpl implements SyncRequestClient {
   public List<MarginBalanceDetail> getMarginBalanceDetail(String symbol) {
     return RestApiInvoker.callSync(requestImpl.getMarginBalanceDetail(symbol));
   }
+
+	@Override
+	public List<AccountLedger> getAccountLedgers(AccountLedgerRequest request) {
+		return RestApiInvoker.callSync(requestImpl.getAccountLedgeRequest(request));
+	}
+
+  public GetWithdrawAddressResult getAccountWithdrawAddressList(GetWithdrawAddressRequest request) {
+    return RestApiInvoker.callSync(requestImpl.getAccountWithdrawAddressList(request));
+  }
+
+	@Override
+	public AccountTransferResult accountTransfer(AccountTransferRequest request) {
+    return RestApiInvoker.callSync(requestImpl.accountTransfer(request));
+  }
+	
+	@Override
+	public String getSystemStatus() {
+		return RestApiInvoker.callSync(requestImpl.getSystemStatusRequest(), Boolean.FALSE);
+	}
 }

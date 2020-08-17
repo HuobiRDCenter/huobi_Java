@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.huobi.client.SubscriptionClient;
@@ -17,21 +18,25 @@ public class SubscribeOrderUpdate {
 
   public static void main(String[] args) {
 
-    String symbol = "htusdt";
+    String symbol = "hthusd";
     SubscriptionClient client = SubscriptionClient.create(Constants.API_KEY, Constants.SECRET_KEY);
     /**
      * subscribe order updateEvent ,old interface
      */
     client.subscribeOrderUpdateEvent(symbol,(event ->{
-      System.out.println(event.getData().toString());
+      System.out.println(JSON.toJSONString(event));
     }));
 
     /**
      * subscribe order updateEvent ,new interface (recommend)
+     *
+     * Wild card (*) is supported
+     * examples : symbol = "*"
      */
     client.subscribeOrderUpdateNewEvent(symbol,(event ->{
-      System.out.println(event.getData().toString());
+      System.out.println(JSON.toJSONString(event));
     }));
+
 
     /**
      * request order list event
@@ -49,18 +54,16 @@ public class SubscribeOrderUpdate {
     Date today = new Date();
     Date startDate = DateUtils.addDays(today, -2);
 
-    long startOrderId = 48909764277L;
+    long startOrderId = 81964355440L;
 
-    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, startOrderId, 20, QueryDirection.PREV);
+    OrdersRequest ordersRequest = new OrdersRequest(symbol, stateList, typeList, startDate, today, 0L, 20, QueryDirection.PREV);
 
     client.requestOrderListEvent(ordersRequest, orderListEvent -> {
       System.out.println("=================Request Order List======================");
       orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Orders:" + order.toString());
+        System.out.println("Request Orders:" + JSON.toJSONString(order));
       });
     });
-
-    System.out.println("------------------------------------------");
 
     /**
      * request order detail event
@@ -68,10 +71,16 @@ public class SubscribeOrderUpdate {
     client.requestOrderDetailEvent(startOrderId,orderListEvent -> {
       System.out.println("=================Request Order Detail======================");
       orderListEvent.getOrderList().forEach(order -> {
-        System.out.println("Request Order:" + order.toString());
+        System.out.println("Request Order:" + JSON.toJSONString(order));
       });
     });
 
+    /**
+     * subscribe order update v2
+     */
+    client.subscribeOrderChangeEvent(symbol, (event) -> {
+      System.out.println(JSON.toJSONString(event));
+    }, null);
   }
 
 }

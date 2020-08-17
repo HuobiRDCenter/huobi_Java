@@ -13,6 +13,8 @@ public class AccountChangeV2 {
 
   private BigDecimal balance;
 
+  private BigDecimal available;
+
   private String changeType;
 
   private String accountType;
@@ -65,5 +67,13 @@ public class AccountChangeV2 {
 
   public void setChangeTime(Long changeTime) {
     this.changeTime = changeTime;
+  }
+
+  public BigDecimal getAvailable() {
+    return available;
+  }
+
+  public void setAvailable(BigDecimal available) {
+    this.available = available;
   }
 }

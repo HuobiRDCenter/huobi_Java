@@ -132,7 +132,7 @@ public class UrlParamsBuilder {
     return this;
   }
 
-  public <T> UrlParamsBuilder putToPost(String name, List<String> list) {
+  public <T> UrlParamsBuilder putToPost(String name, List list) {
     postBodyMap.stringListMap.put(name, list);
     return this;
   }
@@ -192,9 +192,8 @@ public class UrlParamsBuilder {
         return RequestBody.create(JSON_TYPE, JSON.toJSONString(postBodyMap.map));
       }
     } else {
+      System.out.println("====>"+JSON.toJSONString(postBodyMap.stringListMap));
       return RequestBody.create(JSON_TYPE, JSON.toJSONString(postBodyMap.stringListMap));
-
-
     }
   }
 

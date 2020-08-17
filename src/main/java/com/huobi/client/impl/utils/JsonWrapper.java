@@ -78,7 +78,7 @@ public class JsonWrapper {
     }
   }
 
-  public int getInteger(String name) {
+  public Integer getInteger(String name) {
     checkMandatoryField(name);
     try {
       return json.getInteger(name);
@@ -100,7 +100,7 @@ public class JsonWrapper {
     }
   }
 
-  public long getLong(String name) {
+  public Long getLong(String name) {
     checkMandatoryField(name);
     try {
       return json.getLong(name);
@@ -110,7 +110,7 @@ public class JsonWrapper {
     }
   }
 
-  public long getLongOrDefault(String name, long defValue) {
+  public Long getLongOrDefault(String name, long defValue) {
     try {
       if (!containKey(name)) {
         return defValue;
