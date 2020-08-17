@@ -39,7 +39,7 @@ public abstract class RestApiInvoker {
 
 
     private static OkHttpClient client = new OkHttpClient.Builder()
-            .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1080)))
+            .proxy(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", 10808)))
             .pingInterval(20, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(new Interceptor() {
