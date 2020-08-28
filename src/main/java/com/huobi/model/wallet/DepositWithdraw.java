@@ -23,6 +23,8 @@ public class DepositWithdraw {
 
   private String txHash;
 
+  private String chain;
+
   private BigDecimal amount;
 
   private String address;
@@ -32,6 +34,10 @@ public class DepositWithdraw {
   private BigDecimal fee;
 
   private String state;
+
+  private String errorCode;
+
+  private String errorMessage;
 
   private Long createdAt;
 

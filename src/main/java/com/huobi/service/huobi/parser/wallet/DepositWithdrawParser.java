@@ -19,6 +19,8 @@ public class DepositWithdrawParser implements HuobiModelParser<DepositWithdraw> 
     depositWithdraw.setAddressTag(json.getString("address-tag"));
     depositWithdraw.setCreatedAt(json.getLong("created-at"));
     depositWithdraw.setUpdatedAt(json.getLong("updated-at"));
+    depositWithdraw.setErrorCode(json.getString("error-code"));
+    depositWithdraw.setErrorMessage(json.getString("error-msg"));
     return depositWithdraw;
   }
 

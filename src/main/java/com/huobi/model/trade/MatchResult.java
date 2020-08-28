@@ -41,4 +41,7 @@ public class MatchResult {
 
   private long createdAt;
 
+  private String feeCurrency;
+
+
 }
