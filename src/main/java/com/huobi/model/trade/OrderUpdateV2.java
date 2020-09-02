@@ -53,4 +53,8 @@ public class OrderUpdateV2 {
 
   private Long lastActTime;
 
+  private Long errCode;
+
+  private String errMessage;
+
 }

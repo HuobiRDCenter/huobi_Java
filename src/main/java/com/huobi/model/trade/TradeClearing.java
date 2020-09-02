@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TradeClearing {
 
+  private String eventType;
+
   private String symbol;
 
   private Long orderId;
@@ -36,5 +38,27 @@ public class TradeClearing {
   private BigDecimal feeDeduct;
 
   private String feeDeductType;
+
+  private Long accountId;
+
+  private String source;
+
+  private BigDecimal orderPrice;
+
+  private BigDecimal orderSize;
+
+  private BigDecimal orderValue;
+
+  private String clientOrderId;
+
+  private BigDecimal stopPrice;
+
+  private String operator;
+
+  private Long orderCreateTime;
+
+  private String orderStatus;
+
+  private BigDecimal remainAmt;
 
 }

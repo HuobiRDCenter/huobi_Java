@@ -6,6 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import com.huobi.model.account.Point;
 import com.huobi.model.generic.Symbol;
 import com.huobi.service.huobi.parser.HuobiModelParser;
 
@@ -13,19 +14,7 @@ public class SymbolParser implements HuobiModelParser<Symbol> {
 
   @Override
   public Symbol parse(JSONObject json) {
-    return Symbol.builder()
-        .symbol(json.getString("symbol"))
-        .baseCurrency(json.getString("base-currency"))
-        .quoteCurrency(json.getString("quote-currency"))
-        .pricePrecision(json.getInteger("price-precision"))
-        .amountPrecision(json.getInteger("amount-precision"))
-        .symbolPartition(json.getString("symbol-partition"))
-        .valuePrecision(json.getInteger("value-precision"))
-        .minOrderAmt(json.getBigDecimal("min-order-amt"))
-        .maxOrderAmt(json.getBigDecimal("max-order-amt"))
-        .minOrderValue(json.getBigDecimal("min-order-value"))
-        .leverageRatio(json.getInteger("leverage-ratio"))
-        .build();
+    return json.toJavaObject(Symbol.class);
   }
 
   @Override

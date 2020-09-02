@@ -5,24 +5,31 @@ import java.util.List;
 
 import com.huobi.Constants;
 import com.huobi.client.AccountClient;
+import com.huobi.client.req.account.AccountAssetValuationRequest;
 import com.huobi.client.req.account.AccountBalanceRequest;
 import com.huobi.client.req.account.AccountFuturesTransferRequest;
 import com.huobi.client.req.account.AccountHistoryRequest;
 import com.huobi.client.req.account.AccountLedgerRequest;
 import com.huobi.client.req.account.AccountTransferRequest;
+import com.huobi.client.req.account.PointRequest;
+import com.huobi.client.req.account.PointTransferRequest;
 import com.huobi.client.req.account.SubAccountUpdateRequest;
 import com.huobi.client.req.account.TransferSubuserRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.AccountFuturesTransferTypeEnum;
 import com.huobi.constant.enums.AccountTransferAccountTypeEnum;
+import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.constant.enums.AccountUpdateModeEnum;
 import com.huobi.constant.enums.TransferMasterTypeEnum;
 import com.huobi.model.account.Account;
+import com.huobi.model.account.AccountAssetValuationResult;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.AccountFuturesTransferResult;
 import com.huobi.model.account.AccountHistory;
 import com.huobi.model.account.AccountLedgerResult;
 import com.huobi.model.account.AccountTransferResult;
+import com.huobi.model.account.Point;
+import com.huobi.model.account.PointTransferResult;
 import com.huobi.model.account.SubuserAggregateBalance;
 
 public class AccountClientExample {
@@ -93,6 +100,21 @@ public class AccountClientExample {
         .build());
 
     System.out.println("account futures result:"+accountFuturesTransferResult.toString());
+
+    Point point = accountService.getPoint(PointRequest.builder().build());
+    System.out.println("get point: " + point);
+
+
+    PointTransferResult pointTransferResult = accountService.pointTransfer(PointTransferRequest.builder()
+      .fromUid(123L)
+      .toUid(123L)
+      .groupId(123L)
+      .amount(BigDecimal.ONE)
+      .build());
+    System.out.println(pointTransferResult);
+
+    AccountAssetValuationResult accountAssetValuationResult = accountService.accountAssetValuation(AccountAssetValuationRequest.builder().accountType(AccountTypeEnum.SPOT).build());
+    System.out.println(accountAssetValuationResult);
   }
 
 }

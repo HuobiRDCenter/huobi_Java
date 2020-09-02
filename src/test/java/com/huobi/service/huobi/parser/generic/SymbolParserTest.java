@@ -25,7 +25,8 @@ public class SymbolParserTest {
       + "\t\"value-precision\": 8,\n"
       + "\t\"min-order-amt\": 1,\n"
       + "\t\"max-order-amt\": 10000000,\n"
-      + "\t\"min-order-value\": 0.0001\n"
+      + "\t\"min-order-value\": 0.0001,\n"
+      + "\t\"limit-order-max-order-amt\": 0.0001\n"
       + "}]";
 
   private SymbolParser parser;
