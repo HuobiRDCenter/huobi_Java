@@ -113,7 +113,14 @@ public class HuobiAccountService implements AccountClient {
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNT_HISTORY_PATH, builder);
     JSONArray jsonArray = jsonObject.getJSONArray("data");
-    return new AccountHistoryParser().parseArray(jsonArray);
+    AccountHistoryParser parser = new AccountHistoryParser();
+    List<AccountHistory> list = new ArrayList<>(jsonArray.size());
+    for (int i = 0; i < jsonArray.size(); i++) {
+      JSONObject jsonItem = jsonArray.getJSONObject(i);
+      list.add(parser.parse(jsonItem));
+    }
+    list.get(list.size()-1).setNextId(jsonObject.getLong("next-id"));
+    return list;
   }
 
   public AccountLedgerResult getAccountLedger(AccountLedgerRequest request) {

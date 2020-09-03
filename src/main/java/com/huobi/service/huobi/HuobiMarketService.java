@@ -417,9 +417,6 @@ public class HuobiMarketService implements MarketClient {
         .checkSymbol(request.getSymbol());
 
     int level = request.getLevels() == null ? DepthLevels.LEVEL_150.getLevel() : request.getLevels().getLevel();
-    if (level != DepthLevels.LEVEL_150.getLevel()) {
-      throw new SDKException(SDKException.INPUT_ERROR, " Unsupport Levels : " + request.getLevels() + " incremental update only support level_150");
-    }
     List<String> commandList = new ArrayList<>(1);
 
     String topic = WEBSOCKET_MARKET_MBP_INCREMENT_TOPIC

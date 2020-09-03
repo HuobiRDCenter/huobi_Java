@@ -29,4 +29,6 @@ public class AccountHistory {
 
   private Long recordId;
 
+  private Long nextId;
+
 }

@@ -35,6 +35,8 @@ public class AlgoOrder {
 
   private BigDecimal stopPrice;
 
+  private BigDecimal trailingRate;
+
   private Long orderOrigTime;
 
   private Long lastActTime;

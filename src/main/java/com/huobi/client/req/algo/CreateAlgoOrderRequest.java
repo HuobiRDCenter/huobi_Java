@@ -37,4 +37,6 @@ public class CreateAlgoOrderRequest {
 
   private BigDecimal stopPrice;
 
+  private BigDecimal trailingRate;
+
 }
