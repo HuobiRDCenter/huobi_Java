@@ -22,6 +22,7 @@ public class OrderUpdateParser implements HuobiModelParser<OrderUpdate> {
     update.setOrderType(json.getString("order-type"));
     update.setOrderState(json.getString("order-state"));
     update.setClientOrderId(json.getString("client-order-id"));
+    update.setAccountId(json.getLong("account-id"));
     return update;
   }
 

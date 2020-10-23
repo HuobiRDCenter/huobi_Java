@@ -38,4 +38,7 @@ public class OrderUpdate {
 
   private String role;
 
+  private Long accountId;
+
+
 }
