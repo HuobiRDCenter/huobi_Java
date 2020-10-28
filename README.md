@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/HuobiRDCenter/huobi_Java.svg?branch=master)](https://travis-ci.com/HuobiRDCenter/huobi_Java)
+
 # Huobi Java SDK v2
 
 This is Huobi Java SDK v2, you can import to your project and use this SDK to query all market data, trading and manage your account. The SDK supports RESTful API invoking, and subscribing the market, account and order update from the WebSocket connection.
