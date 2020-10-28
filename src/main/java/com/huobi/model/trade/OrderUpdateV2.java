@@ -57,4 +57,6 @@ public class OrderUpdateV2 {
 
   private String errMessage;
 
+  private Long accountId;
+
 }

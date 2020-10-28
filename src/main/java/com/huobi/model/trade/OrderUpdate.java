@@ -13,6 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Deprecated
 public class OrderUpdate {
 
 
@@ -37,8 +38,5 @@ public class OrderUpdate {
   private String orderState;
 
   private String role;
-
-  private Long accountId;
-
 
 }
