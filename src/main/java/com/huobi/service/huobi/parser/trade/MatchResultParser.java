@@ -26,6 +26,7 @@ public class MatchResultParser implements HuobiModelParser<MatchResult> {
     result.setFilledPoints(json.getBigDecimal("filled-points"));
     result.setFeeDeductCurrency(json.getString("fee-deduct-currency"));
     result.setFeeCurrency(json.getString("fee-currency"));
+    result.setTradeId(json.getLong("trade-id"));
     return result;
   }
 

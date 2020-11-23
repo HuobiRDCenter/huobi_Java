@@ -43,5 +43,7 @@ public class MatchResult {
 
   private String feeCurrency;
 
+  private long tradeId;
+
 
 }
