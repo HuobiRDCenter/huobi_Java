@@ -17,7 +17,6 @@ public class AccountsInfoMap {
     user.setAccounts(accounts);
     AccountsInfoMap.userMap.put(key, user);
   }
-
   static User getUser(String key) {
     if ("".equals(key) || key == null) {
       throw new HuobiApiException(
