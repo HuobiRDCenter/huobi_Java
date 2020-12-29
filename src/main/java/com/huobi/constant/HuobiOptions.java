@@ -7,6 +7,8 @@ import lombok.ToString;
 
 import com.huobi.constant.enums.ExchangeEnum;
 
+import java.net.Proxy;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,7 +24,7 @@ public class HuobiOptions implements Options {
   private String apiKey;
 
   private String secretKey;
-
+  private Proxy proxy;
   @Builder.Default
   private boolean websocketAutoConnect = true;
 
@@ -56,4 +58,8 @@ public class HuobiOptions implements Options {
     return this.websocketAutoConnect;
   }
 
+  @Override
+  public Proxy getProxy(){
+    return this.proxy;
+  };
 }

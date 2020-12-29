@@ -26,6 +26,7 @@ public class HuobiRestConnection {
 
   public HuobiRestConnection(Options options) {
     this.options = options;
+    ConnectionFactory.initFactory(options.getProxy());
     try {
       this.host = new URL(this.options.getRestHost()).getHost();
     } catch (MalformedURLException e) {
