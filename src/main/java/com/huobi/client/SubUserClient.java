@@ -89,4 +89,6 @@ public interface SubUserClient {
     }
     throw new SDKException(SDKException.INPUT_ERROR, "Unsupport Exchange.");
   }
+
+  long getUid();
 }

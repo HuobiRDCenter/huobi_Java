@@ -221,6 +221,9 @@ public class SubUserClientExample {
       System.out.println(deposit);
     });
 
+    long uid = subUserClient.getUid();
+    System.out.println("===========uid:" + uid + "===============");
+
   }
 
 }

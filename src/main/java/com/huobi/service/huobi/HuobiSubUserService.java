@@ -70,6 +70,7 @@ public class HuobiSubUserService implements SubUserClient {
   public static final String GET_SUBUSER_APIKEY_PATH = "/v2/user/api-key";
   public static final String GET_SUBUSER_DEPOSIT_ADDRESS_PATH = "/v2/sub-user/deposit-address";
   public static final String GET_SUBUSER_DEPOSIT_PATH = "/v2/sub-user/query-deposit";
+  public static final String GET_UID_PATH = "/v2/user/uid";
 
 
   private Options options;
@@ -307,6 +308,13 @@ public class HuobiSubUserService implements SubUserClient {
     JSONArray data = jsonObject.getJSONArray("data");
     return new SubuserAggregateBalanceParser().parseArray(data);
 
+  }
+
+  @Override
+  public long getUid() {
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_UID_PATH, UrlParamsBuilder.build());
+    long data = jsonObject.getLong("data");
+    return data;
   }
 
 }
