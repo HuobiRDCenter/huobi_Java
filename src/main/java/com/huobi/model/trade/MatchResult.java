@@ -45,5 +45,7 @@ public class MatchResult {
 
   private long tradeId;
 
+  private String feeDeductState;
+
 
 }
