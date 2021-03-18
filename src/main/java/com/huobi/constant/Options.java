@@ -16,4 +16,8 @@ public interface Options {
 
   boolean isWebSocketAutoConnect();
 
+  default String getOriginRestHost() {
+    return "https://api.huobi.pro";
+  }
+
 }

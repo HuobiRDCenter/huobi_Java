@@ -26,6 +26,7 @@ If you already use SDK v1, it is strongly suggested migrate to v2 as we refactor
   - [Subscribe candlestick update](#subscribe-candlestick-update)
   - [Subscribe order update](#Subscribe-order-update)
   - [Subscribe account change](#subscribe-account-change)
+ - [Nginx proxy](#Nginx-proxy)
 
 ## Quick start
 
@@ -441,4 +442,32 @@ accountService.subAccountsUpdate(SubAccountUpdateRequest.builder()
     .accountUpdateMode(AccountUpdateModeEnum.ACCOUNT_CHANGE).build(), event -> {
   System.out.println(event.toString());
 });
+```
+
+## Nginx proxy
+
+```text
+server {
+    server_name huobi.axboy.cn;
+    listen *:80;
+    client_max_body_size        1m;
+
+    access_log  /var/log/nginx/huobi.axboy.cn.access.log;
+    error_log   /var/log/nginx/huobi.axboy.cn.error.log;
+
+    root        /data/tmp;
+
+    location / {
+        proxy_pass              https://api.huobi.pro;
+        proxy_ssl_name          api.huobi.pro;
+        proxy_ssl_server_name   on;
+        proxy_set_header        Host            api.huobi.pro;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $remote_addr;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
 ```

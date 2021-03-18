@@ -27,7 +27,7 @@ public class HuobiRestConnection {
   public HuobiRestConnection(Options options) {
     this.options = options;
     try {
-      this.host = new URL(this.options.getRestHost()).getHost();
+      this.host = new URL(this.options.getOriginRestHost()).getHost();
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
