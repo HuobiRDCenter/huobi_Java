@@ -1,51 +1,24 @@
 package com.huobi.service.huobi;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.huobi.client.AccountClient;
+import com.huobi.client.req.account.*;
+import com.huobi.constant.Options;
+import com.huobi.constant.WebSocketConstants;
+import com.huobi.constant.enums.AccountTypeEnum;
+import com.huobi.model.account.*;
+import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
+import com.huobi.service.huobi.parser.account.*;
+import com.huobi.service.huobi.signature.UrlParamsBuilder;
+import com.huobi.utils.InputChecker;
+import com.huobi.utils.ResponseCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import com.huobi.client.AccountClient;
-import com.huobi.client.req.account.AccountAssetValuationRequest;
-import com.huobi.client.req.account.AccountBalanceRequest;
-import com.huobi.client.req.account.AccountFuturesTransferRequest;
-import com.huobi.client.req.account.AccountHistoryRequest;
-import com.huobi.client.req.account.AccountLedgerRequest;
-import com.huobi.client.req.account.AccountTransferRequest;
-import com.huobi.client.req.account.PointRequest;
-import com.huobi.client.req.account.PointTransferRequest;
-import com.huobi.client.req.account.SubAccountUpdateRequest;
-import com.huobi.constant.Options;
-import com.huobi.constant.WebSocketConstants;
-import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.model.account.Account;
-import com.huobi.model.account.AccountAssetValuationResult;
-import com.huobi.model.account.AccountBalance;
-import com.huobi.model.account.AccountFuturesTransferResult;
-import com.huobi.model.account.AccountHistory;
-import com.huobi.model.account.AccountLedgerResult;
-import com.huobi.model.account.AccountTransferResult;
-import com.huobi.model.account.AccountUpdateEvent;
-import com.huobi.model.account.Point;
-import com.huobi.model.account.PointTransferResult;
-import com.huobi.service.huobi.connection.HuobiRestConnection;
-import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
-import com.huobi.service.huobi.parser.account.AccountAssetValuationResultParser;
-import com.huobi.service.huobi.parser.account.AccountBalanceParser;
-import com.huobi.service.huobi.parser.account.AccountFuturesTransferResultParser;
-import com.huobi.service.huobi.parser.account.AccountHistoryParser;
-import com.huobi.service.huobi.parser.account.AccountLedgerParser;
-import com.huobi.service.huobi.parser.account.AccountParser;
-import com.huobi.service.huobi.parser.account.AccountTransferResultParser;
-import com.huobi.service.huobi.parser.account.AccountUpdateEventParser;
-import com.huobi.service.huobi.parser.account.PointParser;
-import com.huobi.service.huobi.parser.account.PointTransferResultParser;
-import com.huobi.service.huobi.signature.UrlParamsBuilder;
-import com.huobi.utils.InputChecker;
-import com.huobi.utils.ResponseCallback;
 
 public class HuobiAccountService implements AccountClient {
 
@@ -113,13 +86,16 @@ public class HuobiAccountService implements AccountClient {
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNT_HISTORY_PATH, builder);
     JSONArray jsonArray = jsonObject.getJSONArray("data");
-    AccountHistoryParser parser = new AccountHistoryParser();
+
     List<AccountHistory> list = new ArrayList<>(jsonArray.size());
-    for (int i = 0; i < jsonArray.size(); i++) {
-      JSONObject jsonItem = jsonArray.getJSONObject(i);
-      list.add(parser.parse(jsonItem));
+    if(!jsonArray.isEmpty()) {
+      AccountHistoryParser parser = new AccountHistoryParser();
+      for (int i = 0; i < jsonArray.size(); i++) {
+        JSONObject jsonItem = jsonArray.getJSONObject(i);
+        list.add(parser.parse(jsonItem));
+      }
+      list.get(list.size() - 1).setNextId(jsonObject.getLong("next-id"));
     }
-    list.get(list.size()-1).setNextId(jsonObject.getLong("next-id"));
     return list;
   }
 
