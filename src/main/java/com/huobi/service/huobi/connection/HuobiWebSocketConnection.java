@@ -152,8 +152,12 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
       log.info("[Connection][" + this.getId() + "] Already connected");
       return;
     }
+    state = ConnectionStateEnum.CONNECTING;
     log.info("[Connection][" + this.getId() + "] Connecting...");
     webSocket = ConnectionFactory.createWebSocket(okhttpRequest, this);
+    if (options.isWebSocketAutoConnect()) {
+      WebSocketWatchDog.onConnectionCreated(this);
+    }
   }
 
   public void reConnect(int delayInSecond) {
@@ -352,9 +356,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     super.onOpen(webSocket, response);
     this.webSocket = webSocket;
     log.info("[Connection][" + this.getId() + "] Connected to server");
-    if (options.isWebSocketAutoConnect()) {
-      WebSocketWatchDog.onConnectionCreated(this);
-    }
+
 
     state = ConnectionStateEnum.CONNECTED;
     lastReceivedTime = System.currentTimeMillis();
