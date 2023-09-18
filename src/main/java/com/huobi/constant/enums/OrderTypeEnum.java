@@ -5,7 +5,8 @@ import lombok.Getter;
 
 /**
  * buy-market, sell-market, buy-limit, buy-ioc, sell-ioc,
- * buy-limit-maker, sell-limit-maker, buy-stop-limit, sell-stop-limit.
+ * buy-limit-maker, sell-limit-maker, buy-stop-limit, sell-stop-limit,
+ * buy-limit-fok, sell-limit-fok, buy-stop-limit-fok, sell-stop-limit-fok
  */
 @Getter
 @AllArgsConstructor
@@ -20,7 +21,10 @@ public enum OrderTypeEnum {
   SELL_LIMIT_MAKER("sell-limit-maker"),
   BUY_STOP_LIMIT("buy-stop-limit"),
   SELL_STOP_LIMIT("sell-stop-limit"),
-
+  BUY_LIMIT_FOK("buy-limit-fok"),
+  SELL_LIMIT_FOK("sell-limit-fok"),
+  BUY_STOP_LIMIT_FOK("buy-stop-limit-fok"),
+  SELL_STOP_LIMIT_FOK("sell-stop-limit-fok"),
   INVALID("invalid");
 
   private final String code;
