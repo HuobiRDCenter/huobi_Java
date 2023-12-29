@@ -8,18 +8,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.TradeClient;
-import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
-import com.huobi.client.req.trade.CreateOrderRequest;
-import com.huobi.client.req.trade.FeeRateRequest;
-import com.huobi.client.req.trade.MatchResultRequest;
-import com.huobi.client.req.trade.OpenOrdersRequest;
-import com.huobi.client.req.trade.OrderHistoryRequest;
-import com.huobi.client.req.trade.OrdersRequest;
-import com.huobi.client.req.trade.SubOrderUpdateV2Request;
-import com.huobi.client.req.trade.SubTradeClearingRequest;
+import com.huobi.client.req.trade.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.OrderTypeEnum;
+import com.huobi.exception.SDKException;
 import com.huobi.model.trade.BatchCancelOpenOrdersResult;
 import com.huobi.model.trade.BatchCancelOrderResult;
 import com.huobi.model.trade.FeeRate;
@@ -59,7 +52,7 @@ public class HuobiTradeService implements TradeClient {
   public static final String GET_FEE_RATE_PATH = "/v2/reference/transact-fee-rate";
 
   public static final String WEBSOCKET_ORDER_UPDATE_V2_TOPIC = "orders#${symbol}";
-  public static final String WEBSOCKET_TRADE_CLEARING_TOPIC = "trade.clearing#${symbol}";
+  public static final String WEBSOCKET_TRADE_CLEARING_TOPIC = "trade.clearing#${symbol}#${mode}";
 
 
   private Options options;
@@ -104,21 +97,23 @@ public class HuobiTradeService implements TradeClient {
         .putToPost("client-order-id", request.getClientOrderId())
         .putToPost("source", request.getOrderSource().getCode())
         .putToPost("stop-price", request.getStopPrice())
-        .putToPost("operator", request.getOperator() == null ? null : request.getOperator().getOperator());
+        .putToPost("operator", request.getOperator() == null ? null : request.getOperator().getOperator())
+        .putToPost("self-match-prevent", request.getSelfMatchPrevent());
 
     JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_ORDER_PATH, builder);
     return jsonObject.getLong("data");
   }
 
   @Override
-  public Long cancelOrder(Long orderId) {
+  public Long cancelOrder(CancelOrderRequest request) {
 
     InputChecker.checker()
-        .shouldNotNull(orderId, "order-id");
+        .shouldNotNull(request.getOrderId(), "order-id");
 
-    String path = CANCEL_ORDER_PATH.replace("{order-id}", orderId + "");
-
-    JSONObject jsonObject = restConnection.executePostWithSignature(path, UrlParamsBuilder.build());
+    String path = CANCEL_ORDER_PATH.replace("{order-id}", request.getOrderId() + "");
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    builder.putToPost("symbol", request.getSymbol());
+    JSONObject jsonObject = restConnection.executePostWithSignature(path, builder);
     return jsonObject.getLong("data");
   }
 
@@ -149,7 +144,8 @@ public class HuobiTradeService implements TradeClient {
         .putToPost("account-id", request.getAccountId())
         .putToPost("symbol", request.getSymbol())
         .putToPost("side", request.getSide() == null ? null : request.getSide().getCode())
-        .putToPost("size", request.getSize());
+        .putToPost("size", request.getSize())
+        .putToPost("types", request.getTypes());
 
     JSONObject jsonObject = restConnection.executePostWithSignature(BATCH_CANCEL_OPEN_ORDERS_PATH, builder);
     JSONObject data = jsonObject.getJSONObject("data");
@@ -190,7 +186,8 @@ public class HuobiTradeService implements TradeClient {
         .putToUrl("side", request.getSide() == null ? null : request.getSide().getCode())
         .putToUrl("size", request.getSize())
         .putToUrl("direct", request.getDirect() == null ? null : request.getDirect().getCode())
-        .putToUrl("from", request.getFrom());
+        .putToUrl("from", request.getFrom())
+        .putToUrl("types", request.getTypes());
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_OPEN_ORDERS_PATH, builder);
     JSONArray data = jsonObject.getJSONArray("data");
@@ -343,23 +340,23 @@ public class HuobiTradeService implements TradeClient {
 
     // 格式化symbol为数组
     List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbols());
-
+    int[] modeArray = request.getModes();
     // 检查数组
     InputChecker.checker().checkSymbolList(symbolList);
-
+    if (symbolList.size() != modeArray.length) {
+      throw new SDKException(SDKException.INPUT_ERROR, "[Input] The number of symbol and mode must be equal");
+    }
     List<String> commandList = new ArrayList<>(symbolList.size());
-    symbolList.forEach(symbol -> {
-
+    for (int i = 0; i < symbolList.size(); i++) {
       String topic = WEBSOCKET_TRADE_CLEARING_TOPIC
-          .replace("${symbol}", symbol);
-
+              .replace("${symbol}", symbolList.get(i))
+              .replace("${mode}", String.valueOf(modeArray[i]));
       JSONObject command = new JSONObject();
       command.put("action", WebSocketConstants.ACTION_SUB);
       command.put("ch", topic);
       command.put("id", System.nanoTime());
       commandList.add(command.toJSONString());
-    });
-
+    }
     HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new TradeClearingEventParser(), callback, false);
 
   }

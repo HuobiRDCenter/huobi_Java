@@ -2,6 +2,7 @@ package com.huobi.client;
 
 import java.util.List;
 
+import com.huobi.client.req.account.GetBalanceRequest;
 import com.huobi.client.req.crossmargin.CrossMarginApplyLoanRequest;
 import com.huobi.client.req.crossmargin.CrossMarginLoanOrdersRequest;
 import com.huobi.client.req.crossmargin.CrossMarginRepayLoanRequest;
@@ -28,7 +29,7 @@ public interface CrossMarginClient {
 
   List<CrossMarginLoadOrder> getLoanOrders(CrossMarginLoanOrdersRequest request);
 
-  CrossMarginAccount getLoanBalance();
+  CrossMarginAccount getLoanBalance(GetBalanceRequest request);
 
   List<CrossMarginCurrencyInfo> getLoanInfo();
 

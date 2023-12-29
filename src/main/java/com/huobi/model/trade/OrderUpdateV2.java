@@ -27,6 +27,10 @@ public class OrderUpdateV2 {
 
   private BigDecimal remainAmt;
 
+  private String orderSource;
+
+  private String execAmt;
+
   /******* creation field ******/
 
   private BigDecimal orderPrice;

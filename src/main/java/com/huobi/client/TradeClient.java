@@ -2,17 +2,7 @@ package com.huobi.client;
 
 import java.util.List;
 
-import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
-import com.huobi.client.req.trade.CreateOrderRequest;
-import com.huobi.client.req.trade.FeeRateRequest;
-import com.huobi.client.req.trade.MatchResultRequest;
-import com.huobi.client.req.trade.OpenOrdersRequest;
-import com.huobi.client.req.trade.OrderHistoryRequest;
-import com.huobi.client.req.trade.OrdersRequest;
-import com.huobi.client.req.trade.ReqOrderListRequest;
-import com.huobi.client.req.trade.SubOrderUpdateRequest;
-import com.huobi.client.req.trade.SubOrderUpdateV2Request;
-import com.huobi.client.req.trade.SubTradeClearingRequest;
+import com.huobi.client.req.trade.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
@@ -33,7 +23,7 @@ public interface TradeClient {
 
   Long createOrder(CreateOrderRequest request);
 
-  Long cancelOrder(Long orderId);
+  Long cancelOrder(CancelOrderRequest request);
 
   Integer cancelOrder(String clientOrderId);
 

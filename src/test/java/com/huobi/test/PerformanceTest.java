@@ -14,6 +14,7 @@ import com.huobi.client.req.market.CandlestickRequest;
 import com.huobi.client.req.market.MarketDepthRequest;
 import com.huobi.client.req.market.MarketDetailRequest;
 import com.huobi.client.req.market.MarketTradeRequest;
+import com.huobi.client.req.trade.CancelOrderRequest;
 import com.huobi.client.req.trade.CreateOrderRequest;
 import com.huobi.client.req.trade.FeeRateRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
@@ -134,7 +135,9 @@ public class PerformanceTest {
 
     // 撤单
     startNano = System.nanoTime();
-    tradeClient.cancelOrder(orderId);
+    CancelOrderRequest cancelOrderRequest = new CancelOrderRequest();
+    cancelOrderRequest.setOrderId(orderId);
+    tradeClient.cancelOrder(cancelOrderRequest);
     endNano = System.nanoTime();
     networkLatency = ConnectionFactory.getLatencyDebugQueue().poll();
     print(networkLatency, startNano, endNano);

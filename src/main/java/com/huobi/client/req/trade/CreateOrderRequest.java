@@ -40,6 +40,8 @@ public class CreateOrderRequest {
 
   private OrderSourceEnum orderSource;
 
+  private Integer selfMatchPrevent;
+
   //------------------------------- Spot ---------------------------------------//
 
   public static CreateOrderRequest spotBuyLimit(Long spotAccountId, String symbol, BigDecimal price, BigDecimal amount) {

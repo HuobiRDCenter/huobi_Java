@@ -53,4 +53,8 @@ public class IsolatedMarginLoadOrder {
 
   private Long accruedAt;
 
+  private BigDecimal hourInterestRate;
+
+  private BigDecimal dayInterestRate;
+
 }

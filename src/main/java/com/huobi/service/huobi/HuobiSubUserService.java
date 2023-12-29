@@ -283,7 +283,8 @@ public class HuobiSubUserService implements SubUserClient {
         .putToPost("sub-uid", request.getSubUid())
         .putToPost("currency", request.getCurrency())
         .putToPost("amount", request.getAmount().toPlainString())
-        .putToPost("type", request.getType().getCode());
+        .putToPost("type", request.getType().getCode())
+            .putToPost("client-order-id", request.getClientOrderId());
 
     JSONObject jsonObject = restConnection.executePostWithSignature(TRANSFER_SUBUSER_PATH, builder);
     return jsonObject.getLong("data");

@@ -15,6 +15,8 @@ public class GetSubUserAccountListResult {
 
   private Long uid;
 
+  private String deductMode;
+
   private List<SubUserAccountInfo> list;
 
 }

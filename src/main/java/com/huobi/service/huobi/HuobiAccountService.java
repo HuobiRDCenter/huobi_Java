@@ -109,7 +109,8 @@ public class HuobiAccountService implements AccountClient {
         .putToUrl("start-time", request.getStartTime())
         .putToUrl("end-time", request.getEndTime())
         .putToUrl("sort", request.getSort() == null ? null : request.getSort().getSort())
-        .putToUrl("size", request.getSize());
+        .putToUrl("size", request.getSize())
+        .putToUrl("from-id", request.getFromId());
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ACCOUNT_HISTORY_PATH, builder);
     JSONArray jsonArray = jsonObject.getJSONArray("data");

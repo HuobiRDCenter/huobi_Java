@@ -49,6 +49,7 @@ public class OrderParser implements HuobiModelParser<Order> {
     order.setCreatedAt(json.getLong("created-at"));
     order.setCanceledAt(json.getLong("canceled-at"));
     order.setFinishedAt(json.getLong("finished-at"));
+    order.setClientOrderId(json.getString("client-order-id"));
     return order;
   }
 

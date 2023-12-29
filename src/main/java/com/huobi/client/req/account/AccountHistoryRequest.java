@@ -31,6 +31,8 @@ public class AccountHistoryRequest {
 
   private Integer size;
 
+  private Long fromId;
+
   public String getTypesString(){
     String typeString = null;
     if (this.getTypes() != null && this.getTypes().size() > 0) {

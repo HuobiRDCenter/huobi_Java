@@ -27,4 +27,6 @@ public class MarketBBO {
 
   private BigDecimal askSize;
 
+  private Long seqId;
+
 }

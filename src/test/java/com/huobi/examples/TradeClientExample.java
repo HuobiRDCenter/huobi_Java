@@ -6,23 +6,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.huobi.client.req.trade.*;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.huobi.Constants;
 import com.huobi.client.MarketClient;
 import com.huobi.client.TradeClient;
 import com.huobi.client.req.market.MarketDetailMergedRequest;
-import com.huobi.client.req.trade.BatchCancelOpenOrdersRequest;
-import com.huobi.client.req.trade.CreateOrderRequest;
-import com.huobi.client.req.trade.FeeRateRequest;
-import com.huobi.client.req.trade.MatchResultRequest;
-import com.huobi.client.req.trade.OpenOrdersRequest;
-import com.huobi.client.req.trade.OrderHistoryRequest;
-import com.huobi.client.req.trade.OrdersRequest;
-import com.huobi.client.req.trade.ReqOrderListRequest;
-import com.huobi.client.req.trade.SubOrderUpdateRequest;
-import com.huobi.client.req.trade.SubOrderUpdateV2Request;
-import com.huobi.client.req.trade.SubTradeClearingRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.OrderSourceEnum;
 import com.huobi.constant.enums.OrderStateEnum;
@@ -157,7 +147,9 @@ public class TradeClientExample {
     orderList.forEach(order -> {
       System.out.println(order.toString());
       openOrderList.add(order.getId());
-      Long res = tradeService.cancelOrder(order.getId());
+      CancelOrderRequest cancelOrderRequest = new CancelOrderRequest();
+      cancelOrderRequest.setOrderId(order.getId());
+      Long res = tradeService.cancelOrder(cancelOrderRequest);
       System.out.println("--------cancel order res:" + res + "-----------");
     });
 

@@ -23,4 +23,6 @@ public class BatchCancelOpenOrdersRequest {
 
   private Integer size;
 
+  private String types;
+
 }

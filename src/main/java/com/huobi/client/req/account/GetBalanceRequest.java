@@ -1,20 +1,14 @@
-package com.huobi.client.req.trade;
+package com.huobi.client.req.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class SubTradeClearingRequest {
-
-  private String symbols;
-
-  private int[] modes;
-
+public class GetBalanceRequest {
+    private Long subUid;
 }

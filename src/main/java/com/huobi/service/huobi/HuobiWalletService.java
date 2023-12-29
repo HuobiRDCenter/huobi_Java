@@ -112,7 +112,8 @@ public class HuobiWalletService implements WalletClient {
         .putToPost("currency", request.getCurrency())
         .putToPost("fee", request.getFee())
         .putToPost("addr-tag", request.getAddrTag())
-        .putToPost("chain", request.getChain());
+        .putToPost("chain", request.getChain())
+        .putToPost("client-order-id", request.getClientOrderId());
 
     JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_WITHDRAW_PATH, builder);
     return jsonObject.getLong("data");

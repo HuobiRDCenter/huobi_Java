@@ -118,7 +118,8 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
         .putToUrl("states", request.getStatesString())
         .putToUrl("from", request.getFrom())
         .putToUrl("size", request.getSize())
-        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode());
+        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode())
+        .putToUrl("sub-uid", request.getSubUid());
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LOAN_ORDER_PATH, builder);
     JSONArray data = jsonObject.getJSONArray("data");

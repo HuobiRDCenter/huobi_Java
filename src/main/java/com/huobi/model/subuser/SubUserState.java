@@ -15,4 +15,8 @@ public class SubUserState {
 
   private String userState;
 
+  private String subUserName;
+
+  private String note;
+
 }

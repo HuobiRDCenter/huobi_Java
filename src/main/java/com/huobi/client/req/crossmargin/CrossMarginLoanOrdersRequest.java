@@ -33,6 +33,8 @@ public class CrossMarginLoanOrdersRequest {
 
   private Integer size;
 
+  private Long subUid;
+
   public String getStatesString(){
     String stateString = null;
     if (this.getStates() != null && this.getStates().size() > 0) {

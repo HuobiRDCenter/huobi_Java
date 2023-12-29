@@ -49,4 +49,6 @@ public class AlgoOrder {
 
   private String errMessage;
 
+  private String orderSide;
+
 }

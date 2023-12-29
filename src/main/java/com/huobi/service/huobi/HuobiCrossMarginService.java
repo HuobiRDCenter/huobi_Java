@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.huobi.client.req.account.GetBalanceRequest;
 import org.apache.commons.lang.StringUtils;
 
 import com.huobi.client.CrossMarginClient;
@@ -112,7 +113,8 @@ public class HuobiCrossMarginService implements CrossMarginClient {
                 .putToUrl("states", request.getStatesString())
                 .putToUrl("from", request.getFrom())
                 .putToUrl("size", request.getSize())
-                .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode());
+                .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode())
+                .putToUrl("sub-uid", request.getSubUid());
 
         JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LOAN_ORDER_PATH, builder);
         JSONArray data = jsonObject.getJSONArray("data");
@@ -120,9 +122,10 @@ public class HuobiCrossMarginService implements CrossMarginClient {
     }
 
     @Override
-    public CrossMarginAccount getLoanBalance() {
-
-        JSONObject jsonObject = restConnection.executeGetWithSignature(GET_BALANCE_PATH, UrlParamsBuilder.build());
+    public CrossMarginAccount getLoanBalance(GetBalanceRequest request) {
+        UrlParamsBuilder builder = UrlParamsBuilder.build()
+                .putToUrl("sub-uid", request.getSubUid());
+        JSONObject jsonObject = restConnection.executeGetWithSignature(GET_BALANCE_PATH, builder);
         JSONObject data = jsonObject.getJSONObject("data");
         return new CrossMarginAccountParser().parse(data);
     }

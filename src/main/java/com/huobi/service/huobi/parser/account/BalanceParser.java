@@ -15,6 +15,9 @@ public class BalanceParser implements HuobiModelParser<Balance> {
   public Balance parse(JSONObject json) {
     Balance balance = json.toJavaObject(Balance.class);
     balance.setType(json.getString("type"));
+    if (json.containsKey("seq-num")) {
+      balance.setSeqNum(json.getLong("seq-num"));
+    }
     return balance;
   }
 

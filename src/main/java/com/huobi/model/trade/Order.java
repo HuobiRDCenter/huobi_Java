@@ -46,6 +46,8 @@ public class Order {
 
   private BigDecimal stopPrice;
 
+  private String clientOrderId;
+
   @JSONField(deserialize = false)
   private StopOrderOperatorEnum operator;
 

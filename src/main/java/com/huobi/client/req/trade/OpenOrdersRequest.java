@@ -26,4 +26,6 @@ public class OpenOrdersRequest {
 
   private Long from;
 
+  private String types;
+
 }

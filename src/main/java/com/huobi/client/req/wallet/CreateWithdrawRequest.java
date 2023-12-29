@@ -27,4 +27,6 @@ public class CreateWithdrawRequest {
 
   private String addrTag;
 
+  private String clientOrderId;
+
 }
