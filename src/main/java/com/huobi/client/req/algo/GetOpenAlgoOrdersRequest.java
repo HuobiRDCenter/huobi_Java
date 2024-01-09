@@ -1,9 +1,6 @@
 package com.huobi.client.req.algo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.QuerySortEnum;
 import com.huobi.constant.enums.algo.AlgoOrderSideEnum;
@@ -13,6 +10,7 @@ import com.huobi.constant.enums.algo.AlgoOrderTypeEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class GetOpenAlgoOrdersRequest {
 
   private Long accountId;

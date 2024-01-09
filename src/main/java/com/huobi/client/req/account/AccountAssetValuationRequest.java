@@ -1,9 +1,6 @@
 package com.huobi.client.req.account;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.AccountTypeEnum;
 
@@ -11,6 +8,7 @@ import com.huobi.constant.enums.AccountTypeEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class AccountAssetValuationRequest {
 
   AccountTypeEnum accountType;

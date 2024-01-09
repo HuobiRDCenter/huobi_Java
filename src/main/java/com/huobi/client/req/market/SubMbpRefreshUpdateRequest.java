@@ -1,9 +1,6 @@
 package com.huobi.client.req.market;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.DepthLevels;
 
@@ -11,6 +8,7 @@ import com.huobi.constant.enums.DepthLevels;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class SubMbpRefreshUpdateRequest {
 
   private String symbols;

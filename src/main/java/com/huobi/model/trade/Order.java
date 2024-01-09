@@ -3,10 +3,7 @@ package com.huobi.model.trade;
 import java.math.BigDecimal;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.StopOrderOperatorEnum;
 
@@ -14,6 +11,7 @@ import com.huobi.constant.enums.StopOrderOperatorEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Order {
 
   private Long id;

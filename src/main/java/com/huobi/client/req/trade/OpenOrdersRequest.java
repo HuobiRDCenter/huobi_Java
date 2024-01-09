@@ -1,9 +1,6 @@
 package com.huobi.client.req.trade;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.OrderSideEnum;
 import com.huobi.constant.enums.QueryDirectionEnum;
@@ -12,6 +9,7 @@ import com.huobi.constant.enums.QueryDirectionEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class OpenOrdersRequest {
 
   private  String symbol;

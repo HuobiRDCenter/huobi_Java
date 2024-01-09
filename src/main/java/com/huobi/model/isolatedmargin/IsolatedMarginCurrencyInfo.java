@@ -2,15 +2,13 @@ package com.huobi.model.isolatedmargin;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class IsolatedMarginCurrencyInfo {
 
   private String currency;

@@ -1,9 +1,6 @@
 package com.huobi.client.req.subuser;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.QuerySortEnum;
 
@@ -11,6 +8,7 @@ import com.huobi.constant.enums.QuerySortEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class GetSubUserDepositRequest {
 
   private Long subUid;

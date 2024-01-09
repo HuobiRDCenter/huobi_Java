@@ -1,15 +1,13 @@
 package com.huobi.client.req.trade;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class MarginOrderRequest {
     private String symbol;
     @JSONField(name = "account-id")

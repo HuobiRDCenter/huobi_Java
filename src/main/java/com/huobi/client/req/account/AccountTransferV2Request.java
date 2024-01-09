@@ -1,10 +1,7 @@
 package com.huobi.client.req.account;
 
 import com.huobi.constant.enums.BusinessLineAccountTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -12,6 +9,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class AccountTransferV2Request {
     private BusinessLineAccountTypeEnum from;
     private BusinessLineAccountTypeEnum to;

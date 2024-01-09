@@ -2,10 +2,7 @@ package com.huobi.client.req.account;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang.StringUtils;
 
 import com.huobi.constant.enums.AccountLedgerTransactTypeEnum;
@@ -15,6 +12,7 @@ import com.huobi.constant.enums.QuerySortEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class AccountLedgerRequest {
 
   private Long accountId;
