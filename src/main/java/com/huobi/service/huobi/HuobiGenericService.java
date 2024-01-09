@@ -6,16 +6,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.GenericClient;
+import com.huobi.client.req.generic.ChainRequest;
 import com.huobi.client.req.generic.CurrencyChainsRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
-import com.huobi.model.generic.CurrencyChain;
-import com.huobi.model.generic.MarketStatus;
-import com.huobi.model.generic.Symbol;
+import com.huobi.model.generic.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
-import com.huobi.service.huobi.parser.generic.CurrencyChainParser;
-import com.huobi.service.huobi.parser.generic.MarketStatusParser;
-import com.huobi.service.huobi.parser.generic.SymbolParser;
+import com.huobi.service.huobi.parser.generic.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 
 public class HuobiGenericService implements GenericClient {
@@ -27,6 +24,12 @@ public class HuobiGenericService implements GenericClient {
   public static final String GET_CURRENCY_PATH = "/v1/common/currencys";
   public static final String GET_CURRENCY_CHAINS_PATH = "/v2/reference/currencies";
   public static final String GET_TIMESTAMP = "/v1/common/timestamp";
+  public static final String GET_SYMBOLS_PATH_V2 = "/v2/settings/common/symbols";
+  public static final String GET_CURRENCY_PATH_V2 = "/v2/settings/common/currencies";
+  public static final String GET_CURRENCY_PATH_V1 = "/v1/settings/common/currencys";
+  public static final String GET_SYMBOLS_PATH_V1 = "/v1/settings/common/symbols";
+  public static final String GET_MARKET_SYMBOLS_PATH = "/v1/settings/common/market-symbols";
+  public static final String GET_CHAIN_PATH = "/v1/settings/common/chains";
 
   private Options options;
 
@@ -84,5 +87,63 @@ public class HuobiGenericService implements GenericClient {
     JSONObject jsonObject = restConnection.executeGet(GET_TIMESTAMP, UrlParamsBuilder.build());
     return jsonObject.getLong("data");
   }
+
+  @Override
+  public List<SymbolV2> getSymbolsV2(Long ts) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("ts", ts);
+    JSONObject jsonObject = restConnection.executeGet(GET_SYMBOLS_PATH_V2, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new SymbolV2Parser().parseArray(data);
+  }
+
+  @Override
+  public List<Currency> getCurrencyV1(Long ts) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("ts", ts);
+    JSONObject jsonObject = restConnection.executeGet(GET_CURRENCY_PATH_V1, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new CurrencyParser().parseArray(data);
+  }
+
+  @Override
+  public List<CurrencyV2> getCurrencyV2(Long ts) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("ts", ts);
+    JSONObject jsonObject = restConnection.executeGet(GET_CURRENCY_PATH_V2, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new CurrencyV2Parser().parseArray(data);
+  }
+
+  @Override
+  public List<SymbolV1> getSymbolsV1(Long ts) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("ts", ts);
+    JSONObject jsonObject = restConnection.executeGet(GET_SYMBOLS_PATH_V1, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new SymbolV1Parser().parseArray(data);
+  }
+
+  @Override
+  public List<MarketSymbol> getMarketSymbol(String symbols, Long ts) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("symbols", symbols)
+            .putToUrl("ts", ts);
+    JSONObject jsonObject = restConnection.executeGet(GET_MARKET_SYMBOLS_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new MarketSymbolParser().parseArray(data);
+  }
+
+  @Override
+  public List<ChainV1> getChain(ChainRequest request) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("show-desc", request.getShowDesc())
+            .putToUrl("currency", request.getCurrency())
+            .putToUrl("ts", request.getTs());
+    JSONObject jsonObject = restConnection.executeGet(GET_CHAIN_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new ChainV1Parser().parseArray(data);
+  }
+
 
 }

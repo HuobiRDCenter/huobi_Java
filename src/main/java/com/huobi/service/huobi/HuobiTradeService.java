@@ -1,8 +1,6 @@
 package com.huobi.service.huobi;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -13,22 +11,10 @@ import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.exception.SDKException;
-import com.huobi.model.trade.BatchCancelOpenOrdersResult;
-import com.huobi.model.trade.BatchCancelOrderResult;
-import com.huobi.model.trade.FeeRate;
-import com.huobi.model.trade.MatchResult;
-import com.huobi.model.trade.Order;
-import com.huobi.model.trade.OrderUpdateV2Event;
-import com.huobi.model.trade.TradeClearingEvent;
+import com.huobi.model.trade.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
-import com.huobi.service.huobi.parser.trade.BatchCancelOpenOrdersResultParser;
-import com.huobi.service.huobi.parser.trade.BatchCancelOrderResultParser;
-import com.huobi.service.huobi.parser.trade.FeeRateParser;
-import com.huobi.service.huobi.parser.trade.MatchResultParser;
-import com.huobi.service.huobi.parser.trade.OrderParser;
-import com.huobi.service.huobi.parser.trade.OrderUpdateEventV2Parser;
-import com.huobi.service.huobi.parser.trade.TradeClearingEventParser;
+import com.huobi.service.huobi.parser.trade.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -50,6 +36,8 @@ public class HuobiTradeService implements TradeClient {
   public static final String GET_SINGLE_ORDER_MATCH_RESULT_PATH = "/v1/order/orders/{order-id}/matchresults";
   public static final String GET_MATCH_RESULT_PATH = "/v1/order/matchresults";
   public static final String GET_FEE_RATE_PATH = "/v2/reference/transact-fee-rate";
+  public static final String BATCH_ORDERS_PATH = "/v1/order/batch-orders";
+  public static final String MARGIN_ORDER_PATH = "/v1/order/auto/place";
 
   public static final String WEBSOCKET_ORDER_UPDATE_V2_TOPIC = "orders#${symbol}";
   public static final String WEBSOCKET_TRADE_CLEARING_TOPIC = "trade.clearing#${symbol}#${mode}";
@@ -359,6 +347,62 @@ public class HuobiTradeService implements TradeClient {
     }
     HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new TradeClearingEventParser(), callback, false);
 
+  }
+
+  @Override
+  public List<BatchOrdersResult> batchOrders(List<BatchOrdersRequest> list) {
+    for (BatchOrdersRequest request : list) {
+      InputChecker.checker()
+              .shouldNotNull(request.getAccountId(), "account-id")
+              .shouldNotNull(request.getSymbol(), "symbol")
+              .shouldNotNull(request.getType(), "type")
+              .shouldNotNull(request.getAmount(), "amount");
+    }
+    List<Map<String, Object>> postList = new ArrayList<>();
+    for (BatchOrdersRequest request : list) {
+      HashMap<String, Object> postDataMap = new HashMap();
+      postDataMap.put("account-id", request.getAccountId());
+      postDataMap.put("symbol", request.getSymbol());
+      postDataMap.put("type", request.getType());
+      postDataMap.put("amount", request.getAmount());
+      postDataMap.put("price", request.getPrice());
+      postDataMap.put("source", request.getSource());
+      postDataMap.put("client-order-id", request.getClientOrderId());
+      postDataMap.put("self-match-prevent", request.getSelfMatchPrevent());
+      postDataMap.put("stop-price", request.getStopPrice());
+      postDataMap.put("operator", request.getOperator());
+      postList.add(postDataMap);
+    }
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("data", list);
+    JSONObject jsonObject = restConnection.executePostWithSignature(BATCH_ORDERS_PATH, builder);
+    JSONArray array = jsonObject.getJSONArray("data");
+    return new BatchOrdersResultParser().parseArray(array);
+  }
+
+  @Override
+  public OrderResp marginOrder(MarginOrderRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getSymbol(), "symbol")
+            .shouldNotNull(request.getAccountId(), "account-id")
+            .shouldNotNull(request.getType(), "type")
+            .shouldNotNull(request.getTradePurpose(), "trade-purpose")
+            .shouldNotNull(request.getSource(), "source");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("symbol", request.getSymbol())
+            .putToPost("account-id", request.getAccountId())
+            .putToPost("amount", request.getAmount())
+            .putToPost("market-amount", request.getMarketAmount())
+            .putToPost("borrow-amount", request.getBorrowAmount())
+            .putToPost("type", request.getType())
+            .putToPost("trade-purpose", request.getTradePurpose())
+            .putToPost("price", request.getPrice())
+            .putToPost("stop-price", request.getStopPrice())
+            .putToPost("operator", request.getOperator())
+            .putToPost("source", request.getSource());
+    JSONObject jsonObject = restConnection.executePostWithSignature(MARGIN_ORDER_PATH, builder);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new OrderRespParser().parse(data);
   }
 
 }

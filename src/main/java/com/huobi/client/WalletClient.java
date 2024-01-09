@@ -10,10 +10,7 @@ import com.huobi.client.req.wallet.WithdrawQuotaRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
-import com.huobi.model.wallet.DepositAddress;
-import com.huobi.model.wallet.DepositWithdraw;
-import com.huobi.model.wallet.WithdrawAddressResult;
-import com.huobi.model.wallet.WithdrawQuota;
+import com.huobi.model.wallet.*;
 import com.huobi.service.huobi.HuobiWalletService;
 
 public interface WalletClient {
@@ -29,6 +26,8 @@ public interface WalletClient {
   Long cancelWithdraw(Long withdrawId);
 
   List<DepositWithdraw> getDepositWithdraw(DepositWithdrawRequest request);
+
+  WithdrawOrderResult getWithdrawOrder(String clientOrderId);
 
   static WalletClient create(Options options) {
 

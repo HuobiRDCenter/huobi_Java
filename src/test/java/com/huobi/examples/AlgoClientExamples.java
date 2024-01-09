@@ -28,7 +28,7 @@ public class AlgoClientExamples {
   public static void main(String[] args) {
 
     String symbol = "htusdt";
-    Long accountId = 2982L;
+    Long accountId = 59373420L;
     AlgoClient algoClient = AlgoClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).build());
 
     CreateAlgoOrderResult createAlgoOrderResult = algoClient.createAlgoOrder(CreateAlgoOrderRequest.builder()

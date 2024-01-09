@@ -6,12 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.IsolatedMarginClient;
-import com.huobi.client.req.margin.IsolatedMarginAccountRequest;
-import com.huobi.client.req.margin.IsolatedMarginApplyLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanInfoRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanOrdersRequest;
-import com.huobi.client.req.margin.IsolatedMarginRepayLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginTransferRequest;
+import com.huobi.client.req.margin.*;
 import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
@@ -19,10 +14,12 @@ import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
 import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.model.isolatedmargin.IsolatedMarginSymbolInfo;
+import com.huobi.model.isolatedmargin.LeveragePositionLimitResult;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginAccountParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginLoadOrderParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginSymbolInfoParser;
+import com.huobi.service.huobi.parser.isolatedmargin.LeveragePositionLimitResultParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
@@ -36,6 +33,7 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
 
   public static final String APPLY_LOAN_PATH = "/v1/margin/orders";
   public static final String REPAY_LOAN_PATH = "/v1/margin/orders/{order-id}/repay";
+  public static final String GET_LEVERAGE_POSITION_LIMIT_PATH = "/v2/margin/limit";
 
 
   private Options options;
@@ -148,7 +146,17 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
     return new IsolatedMarginSymbolInfoParser().parseArray(data);
   }
 
+  @Override
+  public List<LeveragePositionLimitResult> getLeveragePositionLimit(LeveragePositionLimitRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getCurrency(), "currency");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("currency", request.getCurrency());
 
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LEVERAGE_POSITION_LIMIT_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new LeveragePositionLimitResultParser().parseArray(data);
+  }
 
 
 }

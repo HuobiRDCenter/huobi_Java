@@ -9,40 +9,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.AccountClient;
-import com.huobi.client.req.account.AccountAssetValuationRequest;
-import com.huobi.client.req.account.AccountBalanceRequest;
-import com.huobi.client.req.account.AccountFuturesTransferRequest;
-import com.huobi.client.req.account.AccountHistoryRequest;
-import com.huobi.client.req.account.AccountLedgerRequest;
-import com.huobi.client.req.account.AccountTransferRequest;
-import com.huobi.client.req.account.PointRequest;
-import com.huobi.client.req.account.PointTransferRequest;
-import com.huobi.client.req.account.SubAccountUpdateRequest;
+import com.huobi.client.req.account.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.AccountTypeEnum;
-import com.huobi.model.account.Account;
-import com.huobi.model.account.AccountAssetValuationResult;
-import com.huobi.model.account.AccountBalance;
-import com.huobi.model.account.AccountFuturesTransferResult;
-import com.huobi.model.account.AccountHistory;
-import com.huobi.model.account.AccountLedgerResult;
-import com.huobi.model.account.AccountTransferResult;
-import com.huobi.model.account.AccountUpdateEvent;
-import com.huobi.model.account.Point;
-import com.huobi.model.account.PointTransferResult;
+import com.huobi.model.account.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
-import com.huobi.service.huobi.parser.account.AccountAssetValuationResultParser;
-import com.huobi.service.huobi.parser.account.AccountBalanceParser;
-import com.huobi.service.huobi.parser.account.AccountFuturesTransferResultParser;
-import com.huobi.service.huobi.parser.account.AccountHistoryParser;
-import com.huobi.service.huobi.parser.account.AccountLedgerParser;
-import com.huobi.service.huobi.parser.account.AccountParser;
-import com.huobi.service.huobi.parser.account.AccountTransferResultParser;
-import com.huobi.service.huobi.parser.account.AccountUpdateEventParser;
-import com.huobi.service.huobi.parser.account.PointParser;
-import com.huobi.service.huobi.parser.account.PointTransferResultParser;
+import com.huobi.service.huobi.parser.account.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -58,6 +32,8 @@ public class HuobiAccountService implements AccountClient {
   public static final String POINT_ACCOUNT_PATH = "/v2/point/account";
   public static final String POINT_TRANSFER_PATH = "/v2/point/transfer";
   public static final String ACCOUNT_ASSET_VALUATION_PATH = "/v2/account/asset-valuation";
+  public static final String ACCOUNT_VALUATION_PATH = "/v2/account/valuation";
+  public static final String ACCOUNT_TRANSFER_PATH_V2 = "/v2/account/transfer";
 
 
 
@@ -221,6 +197,35 @@ public class HuobiAccountService implements AccountClient {
       ;
     JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_ASSET_VALUATION_PATH, builder);
     return new AccountAssetValuationResultParser().parse(jsonObject);
+  }
+
+  @Override
+  public AccountValuationResult accountValuation(AccountValuationRequest request) {
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("accountType", request.getAccountType().getCode())
+            .putToUrl("valuationCurrency", request.getValuationCurrency());
+    JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_VALUATION_PATH, builder);
+    return new AccountValuationResultParser().parse(jsonObject);
+  }
+
+  @Override
+  public AccountTransferV2Result accountTransferV2(AccountTransferV2Request request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getFrom(), "from")
+            .shouldNotNull(request.getTo(), "to")
+            .shouldNotNull(request.getCurrency(), "currency")
+            .shouldNotNull(request.getAmount(), "amount")
+            .shouldNotNull(request.getMarginAccount(), "margin-account");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("from", request.getFrom().getType())
+            .putToPost("to", request.getTo().getType())
+            .putToPost("currency", request.getCurrency())
+            .putToPost("amount", request.getAmount())
+            .putToPost("margin-account", request.getMarginAccount());
+
+    JSONObject jsonObject = restConnection.executePostWithSignature(ACCOUNT_TRANSFER_PATH_V2, builder);
+    return new AccountTransferV2ResultParser().parse(jsonObject);
   }
 
   public void subAccountsUpdate(SubAccountUpdateRequest request, ResponseCallback<AccountUpdateEvent> callback) {

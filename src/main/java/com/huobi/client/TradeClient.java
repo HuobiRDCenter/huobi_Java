@@ -6,16 +6,7 @@ import com.huobi.client.req.trade.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
-import com.huobi.model.trade.BatchCancelOpenOrdersResult;
-import com.huobi.model.trade.BatchCancelOrderResult;
-import com.huobi.model.trade.FeeRate;
-import com.huobi.model.trade.MatchResult;
-import com.huobi.model.trade.Order;
-import com.huobi.model.trade.OrderDetailReq;
-import com.huobi.model.trade.OrderListReq;
-import com.huobi.model.trade.OrderUpdateEvent;
-import com.huobi.model.trade.OrderUpdateV2Event;
-import com.huobi.model.trade.TradeClearingEvent;
+import com.huobi.model.trade.*;
 import com.huobi.service.huobi.HuobiTradeService;
 import com.huobi.utils.ResponseCallback;
 
@@ -50,6 +41,10 @@ public interface TradeClient {
   void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback);
 
   void subTradeClearing(SubTradeClearingRequest request, ResponseCallback<TradeClearingEvent> callback);
+
+  List<BatchOrdersResult> batchOrders(List<BatchOrdersRequest> list);
+
+  OrderResp marginOrder(MarginOrderRequest request);
 
   static TradeClient create(Options options) {
 

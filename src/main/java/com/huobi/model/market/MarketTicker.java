@@ -39,4 +39,8 @@ public class MarketTicker {
 
   private BigDecimal askSize;
 
+  private BigDecimal lastPrice;
+
+  private BigDecimal lastSize;
+
 }

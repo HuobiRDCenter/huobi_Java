@@ -7,65 +7,17 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.MarketClient;
-import com.huobi.client.req.market.CandlestickRequest;
-import com.huobi.client.req.market.MarketDepthRequest;
-import com.huobi.client.req.market.MarketDetailMergedRequest;
-import com.huobi.client.req.market.MarketDetailRequest;
-import com.huobi.client.req.market.MarketHistoryTradeRequest;
-import com.huobi.client.req.market.MarketTradeRequest;
-import com.huobi.client.req.market.ReqCandlestickRequest;
-import com.huobi.client.req.market.ReqMarketDepthRequest;
-import com.huobi.client.req.market.ReqMarketDetailRequest;
-import com.huobi.client.req.market.ReqMarketTradeRequest;
-import com.huobi.client.req.market.SubCandlestickRequest;
-import com.huobi.client.req.market.SubMarketBBORequest;
-import com.huobi.client.req.market.SubMarketDepthRequest;
-import com.huobi.client.req.market.SubMarketDetailRequest;
-import com.huobi.client.req.market.SubMarketTradeRequest;
-import com.huobi.client.req.market.SubMbpIncrementalUpdateRequest;
-import com.huobi.client.req.market.SubMbpRefreshUpdateRequest;
+import com.huobi.client.req.market.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
 import com.huobi.constant.enums.DepthLevels;
 import com.huobi.constant.enums.DepthSizeEnum;
 import com.huobi.constant.enums.DepthStepEnum;
 import com.huobi.exception.SDKException;
-import com.huobi.model.market.Candlestick;
-import com.huobi.model.market.CandlestickEvent;
-import com.huobi.model.market.CandlestickReq;
-import com.huobi.model.market.MarketBBOEvent;
-import com.huobi.model.market.MarketDepth;
-import com.huobi.model.market.MarketDepthEvent;
-import com.huobi.model.market.MarketDepthReq;
-import com.huobi.model.market.MarketDetail;
-import com.huobi.model.market.MarketDetailEvent;
-import com.huobi.model.market.MarketDetailMerged;
-import com.huobi.model.market.MarketDetailReq;
-import com.huobi.model.market.MarketTicker;
-import com.huobi.model.market.MarketTrade;
-import com.huobi.model.market.MarketTradeEvent;
-import com.huobi.model.market.MarketTradeReq;
-import com.huobi.model.market.MbpIncrementalUpdateEvent;
-import com.huobi.model.market.MbpRefreshUpdateEvent;
+import com.huobi.model.market.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
-import com.huobi.service.huobi.parser.market.CandlestickEventParser;
-import com.huobi.service.huobi.parser.market.CandlestickParser;
-import com.huobi.service.huobi.parser.market.CandlestickReqParser;
-import com.huobi.service.huobi.parser.market.MarketBBOEventParser;
-import com.huobi.service.huobi.parser.market.MarketDepthEventParser;
-import com.huobi.service.huobi.parser.market.MarketDepthParser;
-import com.huobi.service.huobi.parser.market.MarketDepthReqParser;
-import com.huobi.service.huobi.parser.market.MarketDetailEventParser;
-import com.huobi.service.huobi.parser.market.MarketDetailMergedParser;
-import com.huobi.service.huobi.parser.market.MarketDetailParser;
-import com.huobi.service.huobi.parser.market.MarketDetailReqParser;
-import com.huobi.service.huobi.parser.market.MarketTickerParser;
-import com.huobi.service.huobi.parser.market.MarketTradeEventParser;
-import com.huobi.service.huobi.parser.market.MarketTradeParser;
-import com.huobi.service.huobi.parser.market.MarketTradeReqParser;
-import com.huobi.service.huobi.parser.market.MbpIncrementalUpdateEventParser;
-import com.huobi.service.huobi.parser.market.MbpRefreshUpdateEventParser;
+import com.huobi.service.huobi.parser.market.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
@@ -100,6 +52,7 @@ public class HuobiMarketService implements MarketClient {
   public static final String WEBSOCKET_MARKET_BBO_TOPIC = "market.$symbol.bbo";
   public static final String WEBSOCKET_MARKET_MBP_REFRESH_TOPIC = "market.$symbol.mbp.refresh.$levels";
   public static final String WEBSOCKET_MARKET_MBP_INCREMENT_TOPIC = "market.$symbol.mbp.$levels";
+  public static final String WEBSOCKET_MARKET_TICKERS_PATH = "market.$symbol.ticker";
 
   @Override
   public List<Candlestick> getCandlestick(CandlestickRequest request) {
@@ -431,6 +384,33 @@ public class HuobiMarketService implements MarketClient {
     return HuobiWebSocketConnection.createMarketConnection(options, commandList, new MbpIncrementalUpdateEventParser(), callback, false);
   }
 
+  @Override
+  public void subMarketTicker(SubMarketTickerRequest request, ResponseCallback<MarketTickerEvent> callback) {
+    // 检查参数
+    InputChecker.checker()
+            .shouldNotNull(request.getSymbol(), "symbol");
+
+    // 格式化symbol为数组
+    List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbol());
+
+    // 检查数组
+    InputChecker.checker()
+            .checkSymbolList(symbolList);
+
+    List<String> commandList = new ArrayList<>(symbolList.size());
+    symbolList.forEach(symbol -> {
+
+      String topic = WEBSOCKET_MARKET_TICKERS_PATH
+              .replace("$symbol", symbol);
+
+      JSONObject command = new JSONObject();
+      command.put("sub", topic);
+      commandList.add(command.toJSONString());
+    });
+
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketTickerEventParser(), callback, false);
+  }
+
   public WebSocketConnection reqMbpIncrementalUpdate(SubMbpIncrementalUpdateRequest request, WebSocketConnection connection) {
 
     // 检查参数
@@ -516,6 +496,23 @@ public class HuobiMarketService implements MarketClient {
     List<String> commandList = new ArrayList<>(1);
     commandList.add(command.toJSONString());
     HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketTradeReqParser(), callback, true);
+  }
+
+  @Override
+  public void reqMarketTicker(ReqMarketTickerRequest request, ResponseCallback<MarketTickerReq> callback) {
+    // 检查参数
+    InputChecker.checker()
+            .shouldNotNull(request.getSymbol(), "symbol");
+
+    String topic = WEBSOCKET_MARKET_TICKERS_PATH
+            .replace("$symbol", request.getSymbol());
+
+    JSONObject command = new JSONObject();
+    command.put(WebSocketConstants.OP_REQ, topic);
+
+    List<String> commandList = new ArrayList<>(1);
+    commandList.add(command.toJSONString());
+    HuobiWebSocketConnection.createMarketConnection(options, commandList, new MarketTickerReqParser(), callback, true);
   }
 
   public void reqMarketDetail(ReqMarketDetailRequest request, ResponseCallback<MarketDetailReq> callback) {

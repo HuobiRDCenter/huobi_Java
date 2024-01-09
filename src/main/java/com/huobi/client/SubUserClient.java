@@ -3,17 +3,7 @@ package com.huobi.client;
 import java.util.List;
 
 import com.huobi.client.req.account.TransferSubuserRequest;
-import com.huobi.client.req.subuser.GetApiKeyListRequest;
-import com.huobi.client.req.subuser.GetSubUserAccountListRequest;
-import com.huobi.client.req.subuser.GetSubUserDepositRequest;
-import com.huobi.client.req.subuser.GetSubUserListRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyDeletionRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyGenerationRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyModificationRequest;
-import com.huobi.client.req.subuser.SubUserCreationRequest;
-import com.huobi.client.req.subuser.SubUserManagementRequest;
-import com.huobi.client.req.subuser.SubUserTradableMarketRequest;
-import com.huobi.client.req.subuser.SubUserTransferabilityRequest;
+import com.huobi.client.req.subuser.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
@@ -30,6 +20,7 @@ import com.huobi.model.subuser.SubUserManagementResult;
 import com.huobi.model.subuser.SubUserState;
 import com.huobi.model.subuser.SubUserTradableMarketResult;
 import com.huobi.model.subuser.SubUserTransferabilityResult;
+import com.huobi.model.wallet.DeductModeResult;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.service.huobi.HuobiSubUserService;
 
@@ -81,6 +72,8 @@ public interface SubUserClient {
    * @return
    */
   List<SubuserAggregateBalance> getSubuserAggregateBalance();
+
+  List<DeductModeResult> setDeductMode(DeductModeRequest request);
 
   static SubUserClient create(Options options) {
 

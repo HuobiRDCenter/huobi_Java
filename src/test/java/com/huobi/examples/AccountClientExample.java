@@ -36,7 +36,7 @@ public class AccountClientExample {
 
   public static void main(String[] args) {
 
-    Long accountId = 123L;
+    Long accountId = 59373420L;
     AccountClient accountService = AccountClient.create(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
         .secretKey(Constants.SECRET_KEY)

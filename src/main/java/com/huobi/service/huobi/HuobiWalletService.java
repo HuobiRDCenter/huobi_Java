@@ -15,15 +15,9 @@ import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.DepositWithdrawTypeEnum;
-import com.huobi.model.wallet.DepositAddress;
-import com.huobi.model.wallet.DepositWithdraw;
-import com.huobi.model.wallet.WithdrawAddressResult;
-import com.huobi.model.wallet.WithdrawQuota;
+import com.huobi.model.wallet.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
-import com.huobi.service.huobi.parser.wallet.DepositAddressParser;
-import com.huobi.service.huobi.parser.wallet.DepositWithdrawParser;
-import com.huobi.service.huobi.parser.wallet.WithdrawAddressParser;
-import com.huobi.service.huobi.parser.wallet.WithdrawQuotaParser;
+import com.huobi.service.huobi.parser.wallet.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
@@ -36,6 +30,7 @@ public class HuobiWalletService implements WalletClient {
   public static final String CREATE_WITHDRAW_PATH = "/v1/dw/withdraw/api/create";
   public static final String CANCEL_WITHDRAW_PATH = "/v1/dw/withdraw-virtual/{withdraw-id}/cancel";
   public static final String DEPOSIT_WITHDRAW_PATH = "/v1/query/deposit-withdraw";
+  public static final String GET_WITHDRAW_ORDER_PATH = "/v1/query/withdraw/client-order-id";
 
   private Options options;
 
@@ -146,6 +141,18 @@ public class HuobiWalletService implements WalletClient {
     JSONObject jsonObject = restConnection.executeGetWithSignature(DEPOSIT_WITHDRAW_PATH, builder);
     JSONArray data = jsonObject.getJSONArray("data");
     return new DepositWithdrawParser().parseArray(data);
+  }
+
+  @Override
+  public WithdrawOrderResult getWithdrawOrder(String clientOrderId) {
+    InputChecker.checker()
+            .shouldNotNull(clientOrderId, "clientOrderId");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("clientOrderId", clientOrderId);
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_WITHDRAW_ORDER_PATH, builder);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new WithdrawOrderResultParser().parse(data);
   }
 
 

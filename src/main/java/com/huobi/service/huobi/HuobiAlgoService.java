@@ -3,23 +3,12 @@ package com.huobi.service.huobi;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.AlgoClient;
-import com.huobi.client.req.algo.CancelAlgoOrderRequest;
-import com.huobi.client.req.algo.CreateAlgoOrderRequest;
-import com.huobi.client.req.algo.GetHistoryAlgoOrdersRequest;
-import com.huobi.client.req.algo.GetOpenAlgoOrdersRequest;
+import com.huobi.client.req.algo.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.algo.AlgoOrderTypeEnum;
-import com.huobi.model.algo.AlgoOrder;
-import com.huobi.model.algo.CancelAlgoOrderResult;
-import com.huobi.model.algo.CreateAlgoOrderResult;
-import com.huobi.model.algo.GetHistoryAlgoOrdersResult;
-import com.huobi.model.algo.GetOpenAlgoOrdersResult;
+import com.huobi.model.algo.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
-import com.huobi.service.huobi.parser.algo.AlgoOrderParser;
-import com.huobi.service.huobi.parser.algo.CancelAlgoOrderResultParser;
-import com.huobi.service.huobi.parser.algo.CreateAlgoOrderResultParser;
-import com.huobi.service.huobi.parser.algo.GetHistoryAlgoOrdersResultParser;
-import com.huobi.service.huobi.parser.algo.GetOpenAlgoOrdersResultParser;
+import com.huobi.service.huobi.parser.algo.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
@@ -31,6 +20,8 @@ public class HuobiAlgoService implements AlgoClient {
   private static final String GET_HISTORY_ALGO_ORDERS_PATH = "/v2/algo-orders/history";
   private static final String CREATE_ALGO_ORDER_PATH = "/v2/algo-orders";
   private static final String CANCEL_ALGO_ORDER_PATH = "/v2/algo-orders/cancellation";
+
+  private static final String CANCEL_ALGO_ALL_ORDER_PATH = "/v2/algo-orders/cancel-all-after";
 
 
   private Options options;
@@ -141,5 +132,16 @@ public class HuobiAlgoService implements AlgoClient {
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ALGO_ORDERS_SPECIFIC_PATH, builder);
     return new AlgoOrderParser().parse(jsonObject.getJSONObject("data"));
+  }
+
+  @Override
+  public CancelAlgoAllOrderResult cancelAlgoAllOrder(CancelAlgoAllOrderRequest request) {
+    InputChecker.checker().shouldNotNull(request.getTimeout(), "timeout");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("timeout", request.getTimeout());
+
+    JSONObject jsonObject = restConnection.executeGetWithSignature(CANCEL_ALGO_ALL_ORDER_PATH, builder);
+    return new CancelAlgoAllOrderResultParser().parse(jsonObject.getJSONObject("data"));
   }
 }

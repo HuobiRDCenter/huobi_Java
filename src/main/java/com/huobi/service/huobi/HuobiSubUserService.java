@@ -7,17 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.SubUserClient;
 import com.huobi.client.req.account.TransferSubuserRequest;
-import com.huobi.client.req.subuser.GetApiKeyListRequest;
-import com.huobi.client.req.subuser.GetSubUserAccountListRequest;
-import com.huobi.client.req.subuser.GetSubUserDepositRequest;
-import com.huobi.client.req.subuser.GetSubUserListRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyDeletionRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyGenerationRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyModificationRequest;
-import com.huobi.client.req.subuser.SubUserCreationRequest;
-import com.huobi.client.req.subuser.SubUserManagementRequest;
-import com.huobi.client.req.subuser.SubUserTradableMarketRequest;
-import com.huobi.client.req.subuser.SubUserTransferabilityRequest;
+import com.huobi.client.req.subuser.*;
 import com.huobi.constant.Options;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.SubuserAggregateBalance;
@@ -32,21 +22,12 @@ import com.huobi.model.subuser.SubUserManagementResult;
 import com.huobi.model.subuser.SubUserState;
 import com.huobi.model.subuser.SubUserTradableMarketResult;
 import com.huobi.model.subuser.SubUserTransferabilityResult;
+import com.huobi.model.wallet.DeductModeResult;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.account.AccountBalanceParser;
 import com.huobi.service.huobi.parser.account.SubuserAggregateBalanceParser;
-import com.huobi.service.huobi.parser.subuser.GetApiKeyListResultParser;
-import com.huobi.service.huobi.parser.subuser.GetSubUserAccountListResultParser;
-import com.huobi.service.huobi.parser.subuser.GetSubUserDepositResultParser;
-import com.huobi.service.huobi.parser.subuser.GetSubUserListResultParser;
-import com.huobi.service.huobi.parser.subuser.SubUserApiKeyGenerationResultParser;
-import com.huobi.service.huobi.parser.subuser.SubUserApiKeyModificationResultParser;
-import com.huobi.service.huobi.parser.subuser.SubUserCreationInfoParser;
-import com.huobi.service.huobi.parser.subuser.SubUserManagementResultParser;
-import com.huobi.service.huobi.parser.subuser.SubUserStateParser;
-import com.huobi.service.huobi.parser.subuser.SubUserTradableMarketResultParser;
-import com.huobi.service.huobi.parser.subuser.SubUserTransferabilityResultParser;
+import com.huobi.service.huobi.parser.subuser.*;
 import com.huobi.service.huobi.parser.wallet.DepositAddressParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
@@ -71,6 +52,7 @@ public class HuobiSubUserService implements SubUserClient {
   public static final String GET_SUBUSER_DEPOSIT_ADDRESS_PATH = "/v2/sub-user/deposit-address";
   public static final String GET_SUBUSER_DEPOSIT_PATH = "/v2/sub-user/query-deposit";
   public static final String GET_UID_PATH = "/v2/user/uid";
+  public static final String SET_DDEDUCT_MODE_PATH = "/v2/sub-user/deduct-mode";
 
 
   private Options options;
@@ -309,6 +291,19 @@ public class HuobiSubUserService implements SubUserClient {
     JSONArray data = jsonObject.getJSONArray("data");
     return new SubuserAggregateBalanceParser().parseArray(data);
 
+  }
+
+  @Override
+  public List<DeductModeResult> setDeductMode(DeductModeRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getSubUids(), "subUids")
+            .shouldNotNull(request.getDeductMode(), "deductMode");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("subUids", request.getSubUids())
+            .putToPost("deductMode", request.getDeductMode());
+    JSONObject jsonObject = restConnection.executePostWithSignature(SET_DDEDUCT_MODE_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new DeductModeResultParser().parseArray(data);
   }
 
   @Override
