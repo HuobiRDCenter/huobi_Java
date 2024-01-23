@@ -3,23 +3,7 @@ package com.huobi.examples;
 import java.util.List;
 
 import com.huobi.client.MarketClient;
-import com.huobi.client.req.market.CandlestickRequest;
-import com.huobi.client.req.market.MarketDepthRequest;
-import com.huobi.client.req.market.MarketDetailMergedRequest;
-import com.huobi.client.req.market.MarketDetailRequest;
-import com.huobi.client.req.market.MarketHistoryTradeRequest;
-import com.huobi.client.req.market.MarketTradeRequest;
-import com.huobi.client.req.market.ReqCandlestickRequest;
-import com.huobi.client.req.market.ReqMarketDepthRequest;
-import com.huobi.client.req.market.ReqMarketDetailRequest;
-import com.huobi.client.req.market.ReqMarketTradeRequest;
-import com.huobi.client.req.market.SubCandlestickRequest;
-import com.huobi.client.req.market.SubMarketBBORequest;
-import com.huobi.client.req.market.SubMarketDepthRequest;
-import com.huobi.client.req.market.SubMarketDetailRequest;
-import com.huobi.client.req.market.SubMarketTradeRequest;
-import com.huobi.client.req.market.SubMbpIncrementalUpdateRequest;
-import com.huobi.client.req.market.SubMbpRefreshUpdateRequest;
+import com.huobi.client.req.market.*;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.CandlestickIntervalEnum;
 import com.huobi.constant.enums.DepthLevels;
@@ -160,6 +144,13 @@ public class MarketClientExample {
       System.out.println(event.toString());
     });
 
+    marketClient.subMarketTicker(SubMarketTickerRequest.builder().symbol(symbol).build(), event->{
+      System.out.println(event.toString());
+    });
+
+    marketClient.reqMarketTicker(ReqMarketTickerRequest.builder().symbol(symbol).build(), event->{
+      System.out.println(event.toString());
+    });
 
   }
 

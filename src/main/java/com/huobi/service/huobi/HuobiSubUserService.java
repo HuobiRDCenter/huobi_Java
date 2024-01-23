@@ -34,25 +34,24 @@ import com.huobi.utils.InputChecker;
 
 public class HuobiSubUserService implements SubUserClient {
 
-  public static final String GET_SUBUSER_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{sub-uid}";
-  public static final String GET_SUBUSER_AGGREGATE_BALANCE_PATH = "/v1/subuser/aggregate-balance";
-  public static final String TRANSFER_SUBUSER_PATH = "/v1/subuser/transfer";
-
-  public static final String SUBUSER_CREATION_PATH = "/v2/sub-user/creation";
-  public static final String GET_SUBUSER_LIST_PATH = "/v2/sub-user/user-list";
-  public static final String GET_SUBUSER_STATE_PATH = "/v2/sub-user/user-state";
-  public static final String SUBUSER_MANAGEMENT_PATH = "/v2/sub-user/management";
-  public static final String GET_SUBUSER_ACCOUNT_LIST_PATH = "/v2/sub-user/account-list";
-  public static final String SUBUSER_TRANSFERABILITY_PATH = "/v2/sub-user/transferability";
-  public static final String SUBUSER_TRADABLE_MARKET_PATH = "/v2/sub-user/tradable-market";
-  public static final String SUBUSER_APIKEY_GENERATION_PATH = "/v2/sub-user/api-key-generation";
-  public static final String SUBUSER_APIKEY_MODIFICATION_PATH = "/v2/sub-user/api-key-modification";
-  public static final String SUBUSER_APIKEY_DELETION_PATH = "/v2/sub-user/api-key-deletion";
-  public static final String GET_SUBUSER_APIKEY_PATH = "/v2/user/api-key";
-  public static final String GET_SUBUSER_DEPOSIT_ADDRESS_PATH = "/v2/sub-user/deposit-address";
-  public static final String GET_SUBUSER_DEPOSIT_PATH = "/v2/sub-user/query-deposit";
-  public static final String GET_UID_PATH = "/v2/user/uid";
-  public static final String SET_DDEDUCT_MODE_PATH = "/v2/sub-user/deduct-mode";
+  public static final String GET_SUBUSER_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{sub-uid}";//子用户余额
+  public static final String GET_SUBUSER_AGGREGATE_BALANCE_PATH = "/v1/subuser/aggregate-balance";//子用户余额（汇总）
+  public static final String TRANSFER_SUBUSER_PATH = "/v1/subuser/transfer";//资产划转（母子用户之间）
+  public static final String SUBUSER_CREATION_PATH = "/v2/sub-user/creation";//子用户创建
+  public static final String GET_SUBUSER_LIST_PATH = "/v2/sub-user/user-list";//获取子用户列表
+  public static final String GET_SUBUSER_STATE_PATH = "/v2/sub-user/user-state";//获取特定子用户的用户状态
+  public static final String SUBUSER_MANAGEMENT_PATH = "/v2/sub-user/management";//冻结/解冻子用户
+  public static final String GET_SUBUSER_ACCOUNT_LIST_PATH = "/v2/sub-user/account-list";//获取特定子用户的账户列表
+  public static final String SUBUSER_TRANSFERABILITY_PATH = "/v2/sub-user/transferability";//设置子用户资产转出权限
+  public static final String SUBUSER_TRADABLE_MARKET_PATH = "/v2/sub-user/tradable-market";//设置子用户交易权限
+  public static final String SUBUSER_APIKEY_GENERATION_PATH = "/v2/sub-user/api-key-generation";//子用户APIkey创建
+  public static final String SUBUSER_APIKEY_MODIFICATION_PATH = "/v2/sub-user/api-key-modification";//修改子用户APIkey
+  public static final String SUBUSER_APIKEY_DELETION_PATH = "/v2/sub-user/api-key-deletion";//删除子用户APIkey
+  public static final String GET_SUBUSER_APIKEY_PATH = "/v2/user/api-key";//母子用户APIkey信息查询
+  public static final String GET_SUBUSER_DEPOSIT_ADDRESS_PATH = "/v2/sub-user/deposit-address";//子用户充币地址查询
+  public static final String GET_SUBUSER_DEPOSIT_PATH = "/v2/sub-user/query-deposit";//子用户充币记录查询
+  public static final String GET_UID_PATH = "/v2/user/uid";//母子用户获取用户UID
+  public static final String SET_DDEDUCT_MODE_PATH = "/v2/sub-user/deduct-mode";//设置子用户手续费抵扣模式
 
 
   private Options options;

@@ -3,6 +3,7 @@ package com.huobi.examples;
 import java.util.List;
 
 import com.huobi.client.GenericClient;
+import com.huobi.client.req.generic.ChainRequest;
 import com.huobi.client.req.generic.CurrencyChainsRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.model.generic.*;
@@ -21,19 +22,6 @@ public class GenericClientExample {
     MarketStatus marketStatus = genericService.getMarketStatus();
     System.out.println("market status :: "+marketStatus.getMarketStatus());
 
-    System.out.println("----------------------------------------------------");
-
-    List<Symbol> symbolList = genericService.getSymbols();
-    symbolList.forEach(symbol -> {
-      System.out.println(symbol.toString());
-    });
-
-    System.out.println("----------------------------------------------------");
-
-    List<String> currencyList = genericService.getCurrencys();
-    currencyList.forEach(currency -> {
-      System.out.println(currency);
-    });
 
     System.out.println("----------------------------------------------------");
 
@@ -51,6 +39,43 @@ public class GenericClientExample {
         System.out.println("chain:::"+chain.toString());
       });
     });
+
+    System.out.println("----------------------------------------------------");
+
+    Long timeStamp = genericService.getTimestamp();
+    System.out.println(timeStamp);
+
+    System.out.println("----------------------------------------------------");
+
+    List<SymbolV2> symbolsV2 = genericService.getSymbolsV2(null);
+    System.out.println(symbolsV2);
+
+    System.out.println("----------------------------------------------------");
+
+    List<Currency> currencyV1 = genericService.getCurrencyV1(null);
+    System.out.println(currencyV1);
+
+    System.out.println("----------------------------------------------------");
+
+    List<CurrencyV2> currencyV2 = genericService.getCurrencyV2(null);
+    System.out.println(currencyV2);
+
+    System.out.println("----------------------------------------------------");
+
+    List<SymbolV1> symbolsV1 = genericService.getSymbolsV1(null);
+    System.out.println(symbolsV1);
+
+    System.out.println("----------------------------------------------------");
+
+    List<MarketSymbol> marketSymbol = genericService.getMarketSymbol(null, null);
+    System.out.println(marketSymbol);
+
+    System.out.println("----------------------------------------------------");
+
+    ChainRequest request = ChainRequest.builder().build();
+    List<ChainV1> chain = genericService.getChain(request);
+    System.out.println(chain);
+
   }
 
 }

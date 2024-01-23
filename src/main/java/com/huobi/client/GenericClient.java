@@ -16,10 +16,6 @@ public interface GenericClient {
 
   MarketStatus getMarketStatus();
 
-  List<Symbol> getSymbols();
-
-  List<String> getCurrencys();
-
   List<CurrencyChain> getCurrencyChains(CurrencyChainsRequest request);
 
   Long getTimestamp();

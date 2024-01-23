@@ -32,16 +32,16 @@ import com.huobi.utils.InputChecker;
 
 public class HuobiCrossMarginService implements CrossMarginClient {
 
-    public static final String TRANSFER_TO_MARGIN_PATH = "/v1/cross-margin/transfer-in";
-    public static final String TRANSFER_TO_SPOT_PATH = "/v1/cross-margin/transfer-out";
-    public static final String APPLY_LOAN_PATH = "/v1/cross-margin/orders";
-    public static final String REPAY_LOAN_PATH = "/v1/cross-margin/orders/{order-id}/repay";
+    public static final String TRANSFER_TO_MARGIN_PATH = "/v1/cross-margin/transfer-in";//资产划入（全仓）
+    public static final String TRANSFER_TO_SPOT_PATH = "/v1/cross-margin/transfer-out";//资产划出（全仓）
+    public static final String APPLY_LOAN_PATH = "/v1/cross-margin/orders";//申请借币（全仓）
+    public static final String REPAY_LOAN_PATH = "/v1/cross-margin/orders/{order-id}/repay";//归还借币（全仓）
 
-    public static final String GET_BALANCE_PATH = "/v1/cross-margin/accounts/balance";
-    public static final String GET_LOAN_INFO_PATH = "/v1/cross-margin/loan-info";
-    public static final String GET_LOAN_ORDER_PATH = "/v1/cross-margin/loan-orders";
-    public static final String GENERAL_REPAY_LOAN_PATH = "/v2/account/repayment";
-    public static final String GENERAL_GET_REPAYMENT_LOAN_RECORDS_PATH = "/v2/account/repayment";
+    public static final String GET_BALANCE_PATH = "/v1/cross-margin/accounts/balance";//借币账户详情（全仓）
+    public static final String GET_LOAN_INFO_PATH = "/v1/cross-margin/loan-info";//查询借币币息率及额度（全仓）
+    public static final String GET_LOAN_ORDER_PATH = "/v1/cross-margin/loan-orders";//查询借币订单（全仓）
+    public static final String GENERAL_REPAY_LOAN_PATH = "/v2/account/repayment";//还币交易记录查询
+    public static final String GENERAL_GET_REPAYMENT_LOAN_RECORDS_PATH = "/v2/account/repayment";//归还借币（全仓逐仓通用）
 
 
     private Options options;
@@ -130,6 +130,7 @@ public class HuobiCrossMarginService implements CrossMarginClient {
         return new CrossMarginAccountParser().parse(data);
     }
 
+    @Override
     public List<CrossMarginCurrencyInfo> getLoanInfo() {
         JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LOAN_INFO_PATH, UrlParamsBuilder.build());
         JSONArray data = jsonObject.getJSONArray("data");

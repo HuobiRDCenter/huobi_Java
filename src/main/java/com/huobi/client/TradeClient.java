@@ -38,10 +38,6 @@ public interface TradeClient {
 
   List<FeeRate> getFeeRate(FeeRateRequest request);
 
-  void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback);
-
-  void subTradeClearing(SubTradeClearingRequest request, ResponseCallback<TradeClearingEvent> callback);
-
   List<BatchOrdersResult> batchOrders(List<BatchOrdersRequest> list);
 
   OrderResp marginOrder(MarginOrderRequest request);

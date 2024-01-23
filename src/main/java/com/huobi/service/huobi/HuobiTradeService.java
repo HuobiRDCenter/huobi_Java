@@ -23,24 +23,23 @@ import com.huobi.utils.SymbolUtils;
 public class HuobiTradeService implements TradeClient {
 
 
-  public static final String CREATE_ORDER_PATH = "/v1/order/orders/place";
-  public static final String CANCEL_ORDER_PATH = "/v1/order/orders/{order-id}/submitcancel";
-  public static final String CANCEL_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/submitCancelClientOrder";
-  public static final String BATCH_CANCEL_OPEN_ORDERS_PATH = "/v1/order/orders/batchCancelOpenOrders";
-  public static final String BATCH_CANCEL_ORDERS_PATH = "/v1/order/orders/batchcancel";
-  public static final String GET_OPEN_ORDERS_PATH = "/v1/order/openOrders";
-  public static final String GET_ORDER_PATH = "/v1/order/orders/{order-id}";
-  public static final String GET_ORDERS_PATH = "/v1/order/orders";
-  public static final String GET_ORDERS_HISTORY_PATH = "/v1/order/history";
-  public static final String GET_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/getClientOrder";
-  public static final String GET_SINGLE_ORDER_MATCH_RESULT_PATH = "/v1/order/orders/{order-id}/matchresults";
-  public static final String GET_MATCH_RESULT_PATH = "/v1/order/matchresults";
-  public static final String GET_FEE_RATE_PATH = "/v2/reference/transact-fee-rate";
-  public static final String BATCH_ORDERS_PATH = "/v1/order/batch-orders";
-  public static final String MARGIN_ORDER_PATH = "/v1/order/auto/place";
+  public static final String CREATE_ORDER_PATH = "/v1/order/orders/place";//下单
+  public static final String CANCEL_ORDER_PATH = "/v1/order/orders/{order-id}/submitcancel";//撤销订单
+  public static final String CANCEL_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/submitCancelClientOrder";//撤销订单（基于clientorderID）
+  public static final String BATCH_CANCEL_OPEN_ORDERS_PATH = "/v1/order/orders/batchCancelOpenOrders";//批量撤销所有订单
+  public static final String BATCH_CANCEL_ORDERS_PATH = "/v1/order/orders/batchcancel";//批量撤销指定订单
+  public static final String GET_OPEN_ORDERS_PATH = "/v1/order/openOrders";//查询当前未成交订单
+  public static final String GET_ORDER_PATH = "/v1/order/orders/{order-id}";//查询订单详情
+  public static final String GET_ORDERS_PATH = "/v1/order/orders";//搜索历史订单
+  public static final String GET_ORDERS_HISTORY_PATH = "/v1/order/history";//搜索最近48小时内历史订单
+  public static final String GET_ORDER_BY_CLIENT_ORDER_ID_PATH = "/v1/order/orders/getClientOrder";//查询订单详情（基于clientorderID）
+  public static final String GET_SINGLE_ORDER_MATCH_RESULT_PATH = "/v1/order/orders/{order-id}/matchresults";//成交明细
+  public static final String GET_MATCH_RESULT_PATH = "/v1/order/matchresults";//当前和历史成交
+  public static final String GET_FEE_RATE_PATH = "/v2/reference/transact-fee-rate";//获取用户当前手续费率
+  public static final String BATCH_ORDERS_PATH = "/v1/order/batch-orders";//批量下单
+  public static final String MARGIN_ORDER_PATH = "/v1/order/auto/place";//杠杆下单
 
-  public static final String WEBSOCKET_ORDER_UPDATE_V2_TOPIC = "orders#${symbol}";
-  public static final String WEBSOCKET_TRADE_CLEARING_TOPIC = "trade.clearing#${symbol}#${mode}";
+
 
 
   private Options options;
@@ -291,62 +290,6 @@ public class HuobiTradeService implements TradeClient {
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_FEE_RATE_PATH, builder);
     JSONArray array = jsonObject.getJSONArray("data");
     return new FeeRateParser().parseArray(array);
-  }
-
-
-  public void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback) {
-    // 检查参数
-    InputChecker.checker()
-        .shouldNotNull(request.getSymbols(), "symbols");
-
-    // 格式化symbol为数组
-    List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbols());
-
-    // 检查数组
-    InputChecker.checker().checkSymbolList(symbolList);
-
-    List<String> commandList = new ArrayList<>(symbolList.size());
-    symbolList.forEach(symbol -> {
-
-      String topic = WEBSOCKET_ORDER_UPDATE_V2_TOPIC
-          .replace("${symbol}", symbol);
-
-      JSONObject command = new JSONObject();
-      command.put("action", WebSocketConstants.ACTION_SUB);
-      command.put("ch", topic);
-      command.put("id", System.nanoTime());
-      commandList.add(command.toJSONString());
-    });
-
-    HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new OrderUpdateEventV2Parser(), callback, false);
-  }
-
-  public void subTradeClearing(SubTradeClearingRequest request, ResponseCallback<TradeClearingEvent> callback) {
-    // 检查参数
-    InputChecker.checker()
-        .shouldNotNull(request.getSymbols(), "symbols");
-
-    // 格式化symbol为数组
-    List<String> symbolList = SymbolUtils.parseSymbols(request.getSymbols());
-    int[] modeArray = request.getModes();
-    // 检查数组
-    InputChecker.checker().checkSymbolList(symbolList);
-    if (symbolList.size() != modeArray.length) {
-      throw new SDKException(SDKException.INPUT_ERROR, "[Input] The number of symbol and mode must be equal");
-    }
-    List<String> commandList = new ArrayList<>(symbolList.size());
-    for (int i = 0; i < symbolList.size(); i++) {
-      String topic = WEBSOCKET_TRADE_CLEARING_TOPIC
-              .replace("${symbol}", symbolList.get(i))
-              .replace("${mode}", String.valueOf(modeArray[i]));
-      JSONObject command = new JSONObject();
-      command.put("action", WebSocketConstants.ACTION_SUB);
-      command.put("ch", topic);
-      command.put("id", System.nanoTime());
-      commandList.add(command.toJSONString());
-    }
-    HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new TradeClearingEventParser(), callback, false);
-
   }
 
   @Override

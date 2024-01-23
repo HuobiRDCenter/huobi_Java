@@ -4,24 +4,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.huobi.client.req.algo.*;
+import com.huobi.model.algo.*;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.huobi.Constants;
 import com.huobi.client.AlgoClient;
-import com.huobi.client.req.algo.CancelAlgoOrderRequest;
-import com.huobi.client.req.algo.CreateAlgoOrderRequest;
-import com.huobi.client.req.algo.GetHistoryAlgoOrdersRequest;
-import com.huobi.client.req.algo.GetOpenAlgoOrdersRequest;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.algo.AlgoOrderSideEnum;
 import com.huobi.constant.enums.algo.AlgoOrderStatusEnum;
 import com.huobi.constant.enums.algo.AlgoOrderTimeInForceEnum;
 import com.huobi.constant.enums.algo.AlgoOrderTypeEnum;
-import com.huobi.model.algo.AlgoOrder;
-import com.huobi.model.algo.CancelAlgoOrderResult;
-import com.huobi.model.algo.CreateAlgoOrderResult;
-import com.huobi.model.algo.GetHistoryAlgoOrdersResult;
-import com.huobi.model.algo.GetOpenAlgoOrdersResult;
 
 public class AlgoClientExamples {
 
@@ -67,6 +60,10 @@ public class AlgoClientExamples {
     getHistoryAlgoOrdersResult.getList().forEach(order -> {
       System.out.println(order);
     });
+
+    CancelAlgoAllOrderRequest cancelAlgoAllOrderRequest = CancelAlgoAllOrderRequest.builder().timeout(10).build();
+    CancelAlgoAllOrderResult cancelAlgoAllOrderResult = algoClient.cancelAlgoAllOrder(cancelAlgoAllOrderRequest);
+    System.out.println(cancelAlgoAllOrderResult);
 
   }
 

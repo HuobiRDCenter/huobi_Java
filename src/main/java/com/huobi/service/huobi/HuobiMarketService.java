@@ -36,23 +36,23 @@ public class HuobiMarketService implements MarketClient {
   }
 
 
-  public static final String REST_CANDLESTICK_PATH = "/market/history/kline";
-  public static final String REST_MARKET_DETAIL_MERGED_PATH = "/market/detail/merged";
-  public static final String REST_MARKET_DETAIL_PATH = "/market/detail";
-  public static final String REST_MARKET_TICKERS_PATH = "/market/tickers";
-  public static final String REST_MARKET_DEPTH_PATH = "/market/depth";
-  public static final String REST_MARKET_TRADE_PATH = "/market/trade";
-  public static final String REST_MARKET_HISTORY_TRADE_PATH = "/market/history/trade";
+  public static final String REST_CANDLESTICK_PATH = "/market/history/kline";//K线数据（蜡烛图）
+  public static final String REST_MARKET_DETAIL_MERGED_PATH = "/market/detail/merged";//聚合行情（Ticker）
+  public static final String REST_MARKET_DETAIL_PATH = "/market/detail";//最近24小时行情数据
+  public static final String REST_MARKET_TICKERS_PATH = "/market/tickers";//所有交易对的最新Tickers
+  public static final String REST_MARKET_DEPTH_PATH = "/market/depth";//市场深度数据
+  public static final String REST_MARKET_TRADE_PATH = "/market/trade";//最近市场成交记录
+  public static final String REST_MARKET_HISTORY_TRADE_PATH = "/market/history/trade";//获得近期交易记录
 
 
-  public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";
-  public static final String WEBSOCKET_MARKET_DETAIL_TOPIC = "market.$symbol.detail";
-  public static final String WEBSOCKET_MARKET_DEPTH_TOPIC = "market.$symbol.depth.$type";
-  public static final String WEBSOCKET_MARKET_TRADE_TOPIC = "market.$symbol.trade.detail";
-  public static final String WEBSOCKET_MARKET_BBO_TOPIC = "market.$symbol.bbo";
-  public static final String WEBSOCKET_MARKET_MBP_REFRESH_TOPIC = "market.$symbol.mbp.refresh.$levels";
-  public static final String WEBSOCKET_MARKET_MBP_INCREMENT_TOPIC = "market.$symbol.mbp.$levels";
-  public static final String WEBSOCKET_MARKET_TICKERS_PATH = "market.$symbol.ticker";
+  public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";//K线数据
+  public static final String WEBSOCKET_MARKET_DETAIL_TOPIC = "market.$symbol.detail";//市场概要
+  public static final String WEBSOCKET_MARKET_DEPTH_TOPIC = "market.$symbol.depth.$type";//市场深度行情数据
+  public static final String WEBSOCKET_MARKET_TRADE_TOPIC = "market.$symbol.trade.detail";//成交明细
+  public static final String WEBSOCKET_MARKET_BBO_TOPIC = "market.$symbol.bbo";//买一卖一逐笔行情
+  public static final String WEBSOCKET_MARKET_MBP_REFRESH_TOPIC = "market.$symbol.mbp.refresh.$levels";//市场深度MBP行情数据（全量推送）
+  public static final String WEBSOCKET_MARKET_MBP_INCREMENT_TOPIC = "market.$symbol.mbp.$levels";//市场深度MBP行情数据（增量推送）
+  public static final String WEBSOCKET_MARKET_TICKERS_PATH = "market.$symbol.ticker";//聚合行情（Ticker）数据
 
   @Override
   public List<Candlestick> getCandlestick(CandlestickRequest request) {

@@ -24,13 +24,13 @@ import com.huobi.utils.InputChecker;
 public class HuobiWalletService implements WalletClient {
 
 
-  public static final String GET_DEPOSIT_ADDRESS_PATH = "/v2/account/deposit/address";
-  public static final String GET_WITHDRAW_ADDRESS_PATH = "/v2/account/withdraw/address";
-  public static final String GET_WITHDRAW_QUOTA_PATH = "/v2/account/withdraw/quota";
-  public static final String CREATE_WITHDRAW_PATH = "/v1/dw/withdraw/api/create";
-  public static final String CANCEL_WITHDRAW_PATH = "/v1/dw/withdraw-virtual/{withdraw-id}/cancel";
-  public static final String DEPOSIT_WITHDRAW_PATH = "/v1/query/deposit-withdraw";
-  public static final String GET_WITHDRAW_ORDER_PATH = "/v1/query/withdraw/client-order-id";
+  public static final String GET_DEPOSIT_ADDRESS_PATH = "/v2/account/deposit/address";//充币地址查询
+  public static final String GET_WITHDRAW_ADDRESS_PATH = "/v2/account/withdraw/address";//提币地址查询
+  public static final String GET_WITHDRAW_QUOTA_PATH = "/v2/account/withdraw/quota";//提币额度查询
+  public static final String CREATE_WITHDRAW_PATH = "/v1/dw/withdraw/api/create";//虚拟币提币
+  public static final String CANCEL_WITHDRAW_PATH = "/v1/dw/withdraw-virtual/{withdraw-id}/cancel";//取消提币
+  public static final String DEPOSIT_WITHDRAW_PATH = "/v1/query/deposit-withdraw";//充提记录
+  public static final String GET_WITHDRAW_ORDER_PATH = "/v1/query/withdraw/client-order-id";//通过clientOrderId查询提币订单
 
   private Options options;
 
