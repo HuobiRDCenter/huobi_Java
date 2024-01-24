@@ -40,8 +40,8 @@ public class HuobiCrossMarginService implements CrossMarginClient {
     public static final String GET_BALANCE_PATH = "/v1/cross-margin/accounts/balance";//借币账户详情（全仓）
     public static final String GET_LOAN_INFO_PATH = "/v1/cross-margin/loan-info";//查询借币币息率及额度（全仓）
     public static final String GET_LOAN_ORDER_PATH = "/v1/cross-margin/loan-orders";//查询借币订单（全仓）
-    public static final String GENERAL_REPAY_LOAN_PATH = "/v2/account/repayment";//还币交易记录查询
-    public static final String GENERAL_GET_REPAYMENT_LOAN_RECORDS_PATH = "/v2/account/repayment";//归还借币（全仓逐仓通用）
+    public static final String GENERAL_REPAY_LOAN_PATH = "/v2/account/repayment";//归还借币（全仓逐仓通用）
+    public static final String GENERAL_GET_REPAYMENT_LOAN_RECORDS_PATH = "/v2/account/repayment";//还币交易记录查询
 
 
     private Options options;

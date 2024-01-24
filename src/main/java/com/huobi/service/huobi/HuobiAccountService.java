@@ -35,13 +35,13 @@ public class HuobiAccountService implements AccountClient {
   public static final String GET_ACCOUNT_BALANCE_PATH = "/v1/account/accounts/{account-id}/balance";//账户余额
   public static final String GET_ACCOUNT_HISTORY_PATH = "/v1/account/history";//账户流水
   public static final String GET_ACCOUNT_LEDGER_PATH = "/v2/account/ledger";//财务流水
-  public static final String ACCOUNT_TRANSFER_PATH = "/v1/account/transfer";//【通用】现货-合约账户和OTC账户间进行资金的划转
+  public static final String ACCOUNT_TRANSFER_PATH = "/v1/account/transfer";//资产划转
   public static final String ACCOUNT_FUTURES_TRANSFER_PATH = "/v1/futures/transfer";//币币现货账户与合约账户划转
   public static final String POINT_ACCOUNT_PATH = "/v2/point/account";//点卡余额查询
   public static final String POINT_TRANSFER_PATH = "/v2/point/transfer";//点卡划转
   public static final String ACCOUNT_ASSET_VALUATION_PATH = "/v2/account/asset-valuation";//获取指定账户资产估值（现货、杠杆、OTC）
   public static final String ACCOUNT_VALUATION_PATH = "/v2/account/valuation";//获取平台资产总估值
-  public static final String ACCOUNT_TRANSFER_PATH_V2 = "/v2/account/transfer";//资产划转
+  public static final String ACCOUNT_TRANSFER_PATH_V2 = "/v2/account/transfer";//【通用】现货-合约账户和OTC账户间进行资金的划转
 
 
 
@@ -183,7 +183,8 @@ public class HuobiAccountService implements AccountClient {
         .putToUrl("subUid", request.getSubUid());
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(POINT_ACCOUNT_PATH, builder);
-    return new PointParser().parse(jsonObject);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new PointParser().parse(data);
   }
 
   @Override
@@ -195,7 +196,8 @@ public class HuobiAccountService implements AccountClient {
         .putToPost("amount", request.getAmount())
       ;
     JSONObject jsonObject = restConnection.executePostWithSignature(POINT_TRANSFER_PATH, builder);
-    return new PointTransferResultParser().parse(jsonObject);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new PointTransferResultParser().parse(data);
   }
 
   @Override
@@ -206,7 +208,8 @@ public class HuobiAccountService implements AccountClient {
         .putToUrl("subUid", request.getSubUid())
       ;
     JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_ASSET_VALUATION_PATH, builder);
-    return new AccountAssetValuationResultParser().parse(jsonObject);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new AccountAssetValuationResultParser().parse(data);
   }
 
   @Override
@@ -215,7 +218,8 @@ public class HuobiAccountService implements AccountClient {
             .putToUrl("accountType", request.getAccountType().getCode())
             .putToUrl("valuationCurrency", request.getValuationCurrency());
     JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_VALUATION_PATH, builder);
-    return new AccountValuationResultParser().parse(jsonObject);
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new AccountValuationResultParser().parse(data);
   }
 
   @Override

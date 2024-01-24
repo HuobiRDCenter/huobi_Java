@@ -13,7 +13,7 @@ public class SubUserCreationInfo {
 
   private String userName;
 
-  private String node;
+  private String note;
 
   private String errCode;
 
