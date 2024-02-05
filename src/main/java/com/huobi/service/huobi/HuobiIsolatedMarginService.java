@@ -6,12 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.IsolatedMarginClient;
-import com.huobi.client.req.margin.IsolatedMarginAccountRequest;
-import com.huobi.client.req.margin.IsolatedMarginApplyLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanInfoRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanOrdersRequest;
-import com.huobi.client.req.margin.IsolatedMarginRepayLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginTransferRequest;
+import com.huobi.client.req.margin.*;
 import com.huobi.constant.Constants;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.Options;
@@ -19,23 +14,25 @@ import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
 import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.model.isolatedmargin.IsolatedMarginSymbolInfo;
+import com.huobi.model.isolatedmargin.LeveragePositionLimitResult;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginAccountParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginLoadOrderParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginSymbolInfoParser;
+import com.huobi.service.huobi.parser.isolatedmargin.LeveragePositionLimitResultParser;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 
 public class HuobiIsolatedMarginService implements IsolatedMarginClient {
 
-  public static final String TRANSFER_TO_MARGIN_PATH = "/v1/dw/transfer-in/margin";
-  public static final String TRANSFER_TO_SPOT_PATH = "/v1/dw/transfer-out/margin";
-  public static final String GET_BALANCE_PATH = "/v1/margin/accounts/balance";
-  public static final String GET_LOAN_ORDER_PATH = "/v1/margin/loan-orders";
-  public static final String GET_LOAN_INFO_PATH = "/v1/margin/loan-info";
-
-  public static final String APPLY_LOAN_PATH = "/v1/margin/orders";
-  public static final String REPAY_LOAN_PATH = "/v1/margin/orders/{order-id}/repay";
+  public static final String TRANSFER_TO_MARGIN_PATH = "/v1/dw/transfer-in/margin";//资产划入（逐仓）
+  public static final String TRANSFER_TO_SPOT_PATH = "/v1/dw/transfer-out/margin";//资产划出（逐仓）
+  public static final String GET_BALANCE_PATH = "/v1/margin/accounts/balance";//借币账户详情（逐仓）
+  public static final String GET_LOAN_ORDER_PATH = "/v1/margin/loan-orders";//查询借币订单（逐仓）
+  public static final String GET_LOAN_INFO_PATH = "/v1/margin/loan-info";//查询借币币息率及额度（逐仓）
+  public static final String APPLY_LOAN_PATH = "/v1/margin/orders";//申请借币（逐仓）
+  public static final String REPAY_LOAN_PATH = "/v1/margin/orders/{order-id}/repay";//归还借币（逐仓）
+  public static final String GET_LEVERAGE_POSITION_LIMIT_PATH = "/v2/margin/limit";//获取杠杆持仓限额（全仓）
 
 
   private Options options;
@@ -118,7 +115,8 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
         .putToUrl("states", request.getStatesString())
         .putToUrl("from", request.getFrom())
         .putToUrl("size", request.getSize())
-        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode());
+        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode())
+        .putToUrl("sub-uid", request.getSubUid());
 
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LOAN_ORDER_PATH, builder);
     JSONArray data = jsonObject.getJSONArray("data");
@@ -147,7 +145,17 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
     return new IsolatedMarginSymbolInfoParser().parseArray(data);
   }
 
+  @Override
+  public List<LeveragePositionLimitResult> getLeveragePositionLimit(LeveragePositionLimitRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getCurrency(), "currency");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToUrl("currency", request.getCurrency());
 
+    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_LEVERAGE_POSITION_LIMIT_PATH, builder);
+    JSONArray data = jsonObject.getJSONArray("data");
+    return new LeveragePositionLimitResultParser().parseArray(data);
+  }
 
 
 }

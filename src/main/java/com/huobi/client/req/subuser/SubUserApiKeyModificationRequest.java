@@ -1,14 +1,12 @@
 package com.huobi.client.req.subuser;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class SubUserApiKeyModificationRequest {
 
   private Long subUid;

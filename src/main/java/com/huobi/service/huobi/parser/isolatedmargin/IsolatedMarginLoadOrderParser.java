@@ -33,6 +33,8 @@ public class IsolatedMarginLoadOrderParser implements HuobiModelParser<IsolatedM
         .accruedAt(json.getLong("accrued-at"))
         .createdAt(json.getLong("created-at"))
         .updatedAt(json.getLong("updated-at"))
+        .hourInterestRate(json.getBigDecimal("hour-interest-rate"))
+        .dayInterestRate(json.getBigDecimal("day-interest-rate"))
         .build();
   }
 

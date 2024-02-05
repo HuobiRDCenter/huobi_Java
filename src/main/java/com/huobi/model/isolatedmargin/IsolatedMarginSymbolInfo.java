@@ -2,15 +2,13 @@ package com.huobi.model.isolatedmargin;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class IsolatedMarginSymbolInfo {
 
   private String symbol;

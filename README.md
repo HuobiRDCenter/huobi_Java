@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.com/HuobiRDCenter/huobi_Java.svg?branch=master)](https://travis-ci.com/HuobiRDCenter/huobi_Java)
 
-# Huobi Java SDK v2
+# Huobi Java SDK v3
 
-This is Huobi Java SDK v2, you can import to your project and use this SDK to query all market data, trading and manage your account. The SDK supports RESTful API invoking, and subscribing the market, account and order update from the WebSocket connection.
+This is Huobi Java SDK v3, you can import to your project and use this SDK to query all market data, trading and manage your account. The SDK supports RESTful API invoking, and subscribing the market, account and order update from the WebSocket connection.
 
-If you already use SDK v1, it is strongly suggested migrate to v2 as we refactor the implementation to make it simpler and easy to maintain. We will stop the maintenance of v1 in the near future. Please refer to the instruction on how to migrate v1 to v2 in section [Migrate from v1](#Migrate-from-v1)
+If you already use SDK v1 or v2, it is strongly suggested migrate to v3 as we refactor the implementation to make it simpler and easy to maintain. We will stop the maintenance of v2 in the near future. Please refer to the instruction on how to migrate v1 or v2 to v3 in section [Migrate from v1 or v2](#Migrate-from-v1)
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ If you already use SDK v1, it is strongly suggested migrate to v2 as we refactor
   - [Folder structure](#Folder-structure)
   - [Run examples](#Run-examples)
   - [Client](#client)
-  - [Migrate from v1](#Migrate-from-v1)
+  - [Migrate from v1 or v2](#Migrate-from-v1 or v2)
 - [Request example](#Request-example)
   - [Reference data](#Reference-data)
   - [Market data](#Market-data)
@@ -31,7 +31,7 @@ If you already use SDK v1, it is strongly suggested migrate to v2 as we refactor
 
 *The SDK is compiled by Java8*, you can import the source code in java IDE (idea or eclipse)
 
-The example code are in folder */java/src/test/java/com/huobi/examples* that you can run directly
+The example code are in folder */java/src/test/java/com/huobi/examples* that you can run directly
 
 If you want to create your own application, you can follow below steps:
 
@@ -108,11 +108,10 @@ All the client is listed in below table. Each client is very small and simple, i
 | Account         | AccountClient        | Private | Rest, WebSocket v2 |
 | Wallet          | WalletClient         | Private | Rest               |
 | Sub user        | SubUserClient        | Private | Rest               |
-| Trade           | TradeClient          | Private | Rest, WebSocket v2 |
+| Trade           | TradeClient          | Private | Rest               |
 | Algo            | AlgoClient           | Private | Rest               |
 | Isolated margin | IsolatedMarginClient | Private | Rest               |
 | Cross margin    | CrossMarginClient    | Private | Rest               |
-| ETF             | ETFClient            | Private | Rest               |
 
 #### Public and Private
 
@@ -157,9 +156,9 @@ There are two protocols of API, Rest and WebSocket
 - Request method: The method name starts with "req-", it will receive the once-off data after sending the request.
 - Subscription: The method name starts with "sub-", it will receive update after sending the subscription.
 
-### Migrate from v1
+### Migrate from v1 or v2
 
-#### Why v2
+#### Why v3
 
 The major difference between v1 and v2 is that the client category.
 
@@ -167,9 +166,11 @@ In SDK v1, the client is categorized as two protocol, request client and subscri
 
 The thing is different in SDK v2, the client class is categorized as seven data categories, so that the responsibility for each client is clear. For example, if you only need to access market data, you can use MarketClient without applying API Key, and all the market data can be retrieved from MarketClient. If you want to operate your order, then you know you should use TradeClient and all the order related methods are there. Since the category is exactly same as the API document, so it is easy to find the relationship between API and SDK. In SDK v2, each client is smaller and simpler, which means it is easier to maintain and less bugs.
 
+Compared to SDK versions v1 and v2, due to changes and updates in the out and in parameters of many interfaces, in order to match the latest interface in and out parameter situation, v3 version has made adjustments and updates to the out and in parameters of more than 80 interfaces to ensure that requests can be correctly initiated and accurate response data can be obtained. Meanwhile, the v3 version has added over 130 new interfaces available for use, greatly expanding the number of available interfaces.
+
 #### How to migrate
 
-You don't need to change your business logic, what you need is to find the v1 request client and subscription client, and replace with the proper v2 client. The additional cost is that you need to have additional initialization for each v2 client.
+You don't need to change your business logic, what you need is to find the v1 or v2 request client and subscription client, and replace with the proper v3 client. The additional cost is that you need to have additional initialization for each v3 client.
 
 ## Request example
 
@@ -186,8 +187,8 @@ Long serverTime = genericService.getTimestamp();
 
 ```java
 GenericClient genericService = GenericClient.create(new HuobiOptions());
-List<Symbol> symbolList = genericService.getSymbols();
-List<String> currencyList = genericService.getCurrencys();
+List<SymbolV2> symbolList = genericService.getSymbolsV2();
+List<CurrencyV2> currencyList = genericService.getCurrencyV2();
 ```
 
 ### Market data

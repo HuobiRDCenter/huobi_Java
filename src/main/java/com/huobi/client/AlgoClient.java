@@ -1,17 +1,10 @@
 package com.huobi.client;
 
-import com.huobi.client.req.algo.CancelAlgoOrderRequest;
-import com.huobi.client.req.algo.CreateAlgoOrderRequest;
-import com.huobi.client.req.algo.GetHistoryAlgoOrdersRequest;
-import com.huobi.client.req.algo.GetOpenAlgoOrdersRequest;
+import com.huobi.client.req.algo.*;
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.ExchangeEnum;
 import com.huobi.exception.SDKException;
-import com.huobi.model.algo.AlgoOrder;
-import com.huobi.model.algo.CancelAlgoOrderResult;
-import com.huobi.model.algo.CreateAlgoOrderResult;
-import com.huobi.model.algo.GetHistoryAlgoOrdersResult;
-import com.huobi.model.algo.GetOpenAlgoOrdersResult;
+import com.huobi.model.algo.*;
 import com.huobi.service.huobi.HuobiAlgoService;
 
 public interface AlgoClient {
@@ -25,6 +18,8 @@ public interface AlgoClient {
   GetHistoryAlgoOrdersResult getHistoryAlgoOrders(GetHistoryAlgoOrdersRequest request);
 
   AlgoOrder getAlgoOrdersSpecific(String clientOrderId);
+
+  CancelAlgoAllOrderResult cancelAlgoAllOrder(CancelAlgoAllOrderRequest request);
 
 
   static AlgoClient create(Options options) {

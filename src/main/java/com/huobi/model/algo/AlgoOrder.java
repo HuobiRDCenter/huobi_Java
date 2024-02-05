@@ -2,15 +2,13 @@ package com.huobi.model.algo;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class AlgoOrder {
 
   private Long accountId;
@@ -48,5 +46,7 @@ public class AlgoOrder {
   private Integer errCode;
 
   private String errMessage;
+
+  private String orderSide;
 
 }

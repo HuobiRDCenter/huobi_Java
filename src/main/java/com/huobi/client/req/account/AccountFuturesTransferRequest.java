@@ -2,10 +2,7 @@ package com.huobi.client.req.account;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.huobi.constant.enums.AccountFuturesTransferTypeEnum;
 
@@ -13,6 +10,7 @@ import com.huobi.constant.enums.AccountFuturesTransferTypeEnum;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class AccountFuturesTransferRequest {
 
   private String currency;

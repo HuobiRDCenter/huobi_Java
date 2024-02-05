@@ -5,17 +5,13 @@ import java.util.List;
 
 import com.huobi.Constants;
 import com.huobi.client.IsolatedMarginClient;
-import com.huobi.client.req.margin.IsolatedMarginAccountRequest;
-import com.huobi.client.req.margin.IsolatedMarginApplyLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanInfoRequest;
-import com.huobi.client.req.margin.IsolatedMarginLoanOrdersRequest;
-import com.huobi.client.req.margin.IsolatedMarginRepayLoanRequest;
-import com.huobi.client.req.margin.IsolatedMarginTransferRequest;
+import com.huobi.client.req.margin.*;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
 import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.model.isolatedmargin.IsolatedMarginSymbolInfo;
+import com.huobi.model.isolatedmargin.LeveragePositionLimitResult;
 import com.huobi.service.huobi.utils.DataUtils;
 
 public class IsolatedMarginClientExample {
@@ -29,6 +25,7 @@ public class IsolatedMarginClientExample {
 
     String symbol = "xrpusdt";
     String currency = "usdt";
+
 
     // 划转至margin
     Long transferInId = marginService.transfer(IsolatedMarginTransferRequest.builder()
@@ -112,6 +109,9 @@ public class IsolatedMarginClientExample {
       System.out.println(info);
     });
 
+    LeveragePositionLimitRequest leveragePositionLimitRequest = LeveragePositionLimitRequest.builder().currency("").build();
+    List<LeveragePositionLimitResult> leveragePositionLimit = marginService.getLeveragePositionLimit(leveragePositionLimitRequest);
+    System.out.println(leveragePositionLimit);
 
   }
 

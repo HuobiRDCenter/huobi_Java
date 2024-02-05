@@ -24,4 +24,6 @@ public class Balance {
 
   private BigDecimal balance;
 
+  private Long seqNum;
+
 }

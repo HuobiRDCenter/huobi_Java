@@ -26,4 +26,6 @@ public class TransferSubuserRequest {
 
   private TransferMasterTypeEnum type;
 
+  private String clientOrderId;
+
 }

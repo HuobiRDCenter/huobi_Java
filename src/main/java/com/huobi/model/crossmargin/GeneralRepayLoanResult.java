@@ -16,5 +16,5 @@ public class GeneralRepayLoanResult {
 
     private String repayId;
 
-    private long repayTime;
+    private Long repayTime;
 }

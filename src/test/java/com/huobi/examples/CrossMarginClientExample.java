@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.huobi.Constants;
 import com.huobi.client.CrossMarginClient;
+import com.huobi.client.req.account.GetBalanceRequest;
 import com.huobi.client.req.crossmargin.CrossMarginApplyLoanRequest;
 import com.huobi.client.req.crossmargin.CrossMarginLoanOrdersRequest;
 import com.huobi.client.req.crossmargin.CrossMarginRepayLoanRequest;
@@ -37,9 +38,9 @@ public class CrossMarginClientExample {
                 .amount(new BigDecimal("50"))
                 .build());
         System.out.println(" transfer to margin: " + transferInId);
-
+        GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
         // 查询余额
-        CrossMarginAccount crossMarginAccount = marginService.getLoanBalance();
+        CrossMarginAccount crossMarginAccount = marginService.getLoanBalance(getBalanceRequest);
 
         System.out.println("account:" + crossMarginAccount.toString());
         crossMarginAccount.getBalanceList().forEach(balance -> {
@@ -59,7 +60,7 @@ public class CrossMarginClientExample {
         System.out.println(" apply id:" + applyId);
 
         // 查询余额
-        CrossMarginAccount crossMarginAccount1 = marginService.getLoanBalance();
+        CrossMarginAccount crossMarginAccount1 = marginService.getLoanBalance(getBalanceRequest);
         System.out.println("account:" + crossMarginAccount1.toString());
         crossMarginAccount1.getBalanceList().forEach(balance -> {
             System.out.println("======>" + balance.toString());
@@ -77,7 +78,7 @@ public class CrossMarginClientExample {
         System.out.println(" repay finish:");
 
         // 查询余额
-        CrossMarginAccount crossMarginAccount2 = marginService.getLoanBalance();
+        CrossMarginAccount crossMarginAccount2 = marginService.getLoanBalance(getBalanceRequest);
         System.out.println("account:" + crossMarginAccount2.toString());
         crossMarginAccount2.getBalanceList().forEach(balance -> {
             System.out.println("======>" + balance.toString());

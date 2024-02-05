@@ -1,14 +1,12 @@
 package com.huobi.model.subuser;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class SubUserManagementResult {
 
   private Long subUid;

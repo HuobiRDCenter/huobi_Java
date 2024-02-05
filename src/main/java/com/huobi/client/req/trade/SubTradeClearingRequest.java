@@ -15,4 +15,6 @@ public class SubTradeClearingRequest {
 
   private String symbols;
 
+  private int[] modes;
+
 }

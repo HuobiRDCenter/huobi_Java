@@ -13,18 +13,7 @@ import com.huobi.client.SubUserClient;
 import com.huobi.client.req.account.AccountBalanceRequest;
 import com.huobi.client.req.account.SubAccountUpdateRequest;
 import com.huobi.client.req.account.TransferSubuserRequest;
-import com.huobi.client.req.subuser.GetApiKeyListRequest;
-import com.huobi.client.req.subuser.GetSubUserAccountListRequest;
-import com.huobi.client.req.subuser.GetSubUserDepositRequest;
-import com.huobi.client.req.subuser.GetSubUserListRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyDeletionRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyGenerationRequest;
-import com.huobi.client.req.subuser.SubUserApiKeyModificationRequest;
-import com.huobi.client.req.subuser.SubUserCreationParam;
-import com.huobi.client.req.subuser.SubUserCreationRequest;
-import com.huobi.client.req.subuser.SubUserManagementRequest;
-import com.huobi.client.req.subuser.SubUserTradableMarketRequest;
-import com.huobi.client.req.subuser.SubUserTransferabilityRequest;
+import com.huobi.client.req.subuser.*;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.AccountUpdateModeEnum;
 import com.huobi.constant.enums.SubUserApiKeyPermissionEnums;
@@ -49,6 +38,7 @@ import com.huobi.model.subuser.SubUserTradableMarketResult;
 import com.huobi.model.subuser.SubUserTradableMarketState;
 import com.huobi.model.subuser.SubUserTransferabilityResult;
 import com.huobi.model.subuser.SubUserTransferabilityState;
+import com.huobi.model.wallet.DeductModeResult;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.service.huobi.utils.GoogleAuthHelper;
 
@@ -220,6 +210,9 @@ public class SubUserClientExample {
     getSubUserDepositResult.getList().forEach(deposit -> {
       System.out.println(deposit);
     });
+
+    List<DeductModeResult> deductModeResults = subUserClient.setDeductMode(DeductModeRequest.builder().subUids(178211L).deductMode("master").build());
+    System.out.println(deductModeResults);
 
     long uid = subUserClient.getUid();
     System.out.println("===========uid:" + uid + "===============");
