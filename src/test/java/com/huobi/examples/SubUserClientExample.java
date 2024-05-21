@@ -214,6 +214,9 @@ public class SubUserClientExample {
     List<DeductModeResult> deductModeResults = subUserClient.setDeductMode(DeductModeRequest.builder().subUids(178211L).deductMode("master").build());
     System.out.println(deductModeResults);
 
+    boolean setCreditResults = subUserClient.setCredit(CreditRequest.builder().userId(41262769L).accountId(31260495L).currency("usdt").amount(new BigDecimal(10)).transactionId(17L).build());
+    System.out.println(setCreditResults);
+
     long uid = subUserClient.getUid();
     System.out.println("===========uid:" + uid + "===============");
 

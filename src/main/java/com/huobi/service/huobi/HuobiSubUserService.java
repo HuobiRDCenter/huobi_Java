@@ -52,6 +52,7 @@ public class HuobiSubUserService implements SubUserClient {
   public static final String GET_SUBUSER_DEPOSIT_PATH = "/v2/sub-user/query-deposit";//子用户充币记录查询
   public static final String GET_UID_PATH = "/v2/user/uid";//母子用户获取用户UID
   public static final String SET_DDEDUCT_MODE_PATH = "/v2/sub-user/deduct-mode";//设置子用户手续费抵扣模式
+  public static final String SET_CREDIT_PATH = "/v1/trust/user/active/credit";//用户主动授信
 
 
   private Options options;
@@ -310,6 +311,25 @@ public class HuobiSubUserService implements SubUserClient {
     JSONObject jsonObject = restConnection.executeGetWithSignature(GET_UID_PATH, UrlParamsBuilder.build());
     long data = jsonObject.getLong("data");
     return data;
+  }
+
+  @Override
+  public boolean setCredit(CreditRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getTransactionId(), "transactionId")
+            .shouldNotNull(request.getCurrency(), "currency")
+            .shouldNotNull(request.getAmount(), "amount")
+            .shouldNotNull(request.getAccountId(), "accountId")
+            .shouldNotNull(request.getUserId(), "userId");
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("transactionId", request.getTransactionId())
+            .putToPost("currency", request.getCurrency())
+            .putToPost("amount", request.getAmount())
+            .putToPost("accountId", request.getAccountId())
+            .putToPost("userId", request.getUserId())
+            ;
+    JSONObject jsonObject = restConnection.executePostWithSignature(SET_CREDIT_PATH, builder);
+    return jsonObject.getBoolean("data");
   }
 
 }

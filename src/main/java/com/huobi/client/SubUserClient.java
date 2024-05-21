@@ -75,6 +75,8 @@ public interface SubUserClient {
 
   List<DeductModeResult> setDeductMode(DeductModeRequest request);
 
+  public boolean setCredit(CreditRequest request);
+
   static SubUserClient create(Options options) {
 
     if (options.getExchange().equals(ExchangeEnum.HUOBI)) {

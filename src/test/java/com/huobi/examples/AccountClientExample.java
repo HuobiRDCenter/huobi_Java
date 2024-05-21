@@ -114,6 +114,13 @@ public class AccountClientExample {
     AccountTransferV2Result accountTransferV2Result = accountService.accountTransferV2(accountTransferV2Request);
     System.out.println(accountTransferV2Result);
 
+    UserInfo accountUserInfo = accountService.getAccountUserInfo();
+    System.out.println(accountUserInfo);
+
+    OverviewInfo overviewInfo = accountService.getOverviewInfo();
+    System.out.println(overviewInfo);
+
+    accountService.feeSwitch(FeeSwitchRequest.builder().switchType(1).deductionCurrency("TRX").build());
 
   }
 

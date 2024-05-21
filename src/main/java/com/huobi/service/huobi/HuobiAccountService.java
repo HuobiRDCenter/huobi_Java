@@ -42,6 +42,9 @@ public class HuobiAccountService implements AccountClient {
   public static final String ACCOUNT_ASSET_VALUATION_PATH = "/v2/account/asset-valuation";//获取指定账户资产估值（现货、杠杆、OTC）
   public static final String ACCOUNT_VALUATION_PATH = "/v2/account/valuation";//获取平台资产总估值
   public static final String ACCOUNT_TRANSFER_PATH_V2 = "/v2/account/transfer";//【通用】现货-合约账户和OTC账户间进行资金的划转
+  public static final String ACCOUNT_USER_INFO_PATH = "/v1/account/switch/user/info";// 用户抵扣信息查询
+  public static final String ACCOUNT_OVERVIEW_INFO_PATH = "/v1/account/overview/info";// 可抵扣币种查询信息
+  public static final String ACCOUNT_FEE_SWITCH_PATH = "/v1/account/fee/switch";// 设置现货/杠杆抵扣手续费方式
 
 
 
@@ -242,6 +245,34 @@ public class HuobiAccountService implements AccountClient {
     return new AccountTransferV2ResultParser().parse(jsonObject);
   }
 
+  @Override
+  public UserInfo getAccountUserInfo() {
+    JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_USER_INFO_PATH, UrlParamsBuilder.build());
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new UserInfoParser().parse(data);
+  }
+
+  @Override
+  public OverviewInfo getOverviewInfo() {
+    JSONObject jsonObject = restConnection.executeGetWithSignature(ACCOUNT_OVERVIEW_INFO_PATH, UrlParamsBuilder.build());
+    JSONObject data = jsonObject.getJSONObject("data");
+    return new OverviewInfoParser().parse(data);
+  }
+
+  @Override
+  public void feeSwitch(FeeSwitchRequest request) {
+    InputChecker.checker()
+            .shouldNotNull(request.getSwitchType(), "switchType")
+            .shouldNotNull(request.getDeductionCurrency(), "deductionCurrency");
+
+    UrlParamsBuilder builder = UrlParamsBuilder.build()
+            .putToPost("switchType", request.getSwitchType())
+            .putToPost("deductionCurrency", request.getDeductionCurrency());
+
+    restConnection.executePostWithSignature(ACCOUNT_FEE_SWITCH_PATH, builder);
+  }
+
+
   public void subAccountsUpdate(SubAccountUpdateRequest request, ResponseCallback<AccountUpdateEvent> callback) {
     InputChecker.checker()
         .shouldNotNull(request.getAccountUpdateMode(), "account update model");
@@ -312,7 +343,6 @@ public class HuobiAccountService implements AccountClient {
       commandList.add(command.toJSONString());
     }
     HuobiWebSocketConnection.createAssetV2Connection(options, commandList, new TradeClearingEventParser(), callback, false);
-
   }
 
 }

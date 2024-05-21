@@ -48,6 +48,12 @@ public interface AccountClient {
 
   AccountTransferV2Result accountTransferV2(AccountTransferV2Request request);
 
+  UserInfo getAccountUserInfo();
+
+  OverviewInfo getOverviewInfo();
+
+  void feeSwitch(FeeSwitchRequest request);
+
   void subAccountsUpdate(SubAccountUpdateRequest request, ResponseCallback<AccountUpdateEvent> callback);
 
   void subOrderUpdateV2(SubOrderUpdateV2Request request, ResponseCallback<OrderUpdateV2Event> callback);
