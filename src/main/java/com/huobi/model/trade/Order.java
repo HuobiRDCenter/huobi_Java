@@ -34,6 +34,9 @@ public class Order {
 
   private String source;
 
+  @JSONField(name = "canceled-source")
+  private String canceledSource;
+
   private String state;
 
   private Long createdAt;
