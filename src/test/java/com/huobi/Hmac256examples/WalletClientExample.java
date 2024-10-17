@@ -3,7 +3,7 @@ package com.huobi.Hmac256examples;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;

@@ -3,7 +3,7 @@ package com.huobi.Hmac256examples;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.IsolatedMarginClient;
 import com.huobi.client.req.margin.*;
 import com.huobi.constant.HuobiOptions;

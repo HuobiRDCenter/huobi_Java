@@ -14,7 +14,7 @@ import com.huobi.constant.enums.ExchangeEnum;
 public class HuobiOptions implements Options {
 
   @Builder.Default
-  private String restHost = "http://dawn-broker-pro.global-base.tc-jp1.huobiapps.com";
+  private String restHost = "http://api.huobi.pro";
 
   @Builder.Default
   private String websocketHost = "wss://api.huobi.pro";

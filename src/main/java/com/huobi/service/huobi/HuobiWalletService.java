@@ -11,8 +11,7 @@ import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;
 import com.huobi.client.req.wallet.WithdrawAddressRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
+
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.DepositWithdrawTypeEnum;
 import com.huobi.model.wallet.*;

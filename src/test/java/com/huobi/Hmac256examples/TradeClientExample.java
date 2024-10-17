@@ -10,7 +10,7 @@ import com.huobi.client.req.trade.*;
 import com.huobi.model.trade.*;
 import org.apache.commons.lang.RandomStringUtils;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.MarketClient;
 import com.huobi.client.TradeClient;
 import com.huobi.client.req.market.MarketDetailMergedRequest;

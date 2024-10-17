@@ -8,7 +8,7 @@ import com.huobi.client.req.algo.*;
 import com.huobi.model.algo.*;
 import org.apache.commons.lang.RandomStringUtils;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AlgoClient;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.algo.AlgoOrderSideEnum;

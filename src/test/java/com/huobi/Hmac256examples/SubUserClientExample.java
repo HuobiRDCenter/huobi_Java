@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.SubUserClient;
 import com.huobi.client.req.account.TransferSubuserRequest;
 import com.huobi.client.req.subuser.*;

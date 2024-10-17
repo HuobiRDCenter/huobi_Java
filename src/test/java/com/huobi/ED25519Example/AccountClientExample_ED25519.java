@@ -1,6 +1,6 @@
 package com.huobi.ED25519Example;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AccountClient;
 import com.huobi.client.req.account.*;
 import com.huobi.client.req.trade.SubOrderUpdateV2Request;
@@ -21,7 +21,7 @@ public class AccountClientExample_ED25519 {
     AccountClient accountService
             = AccountClient.create(HuobiOptions.builder()
         .apiKey(Constants.PUBLIC_KEY)
-        .secretKey(Constants.PRIVATE_KEY).sign(Constants.SIGN2)
+        .secretKey(Constants.PRIVATE_KEY).sign(Constants.SIGN)
         .build());
 
 //    List<Account> accountList = accountService.getAccounts();

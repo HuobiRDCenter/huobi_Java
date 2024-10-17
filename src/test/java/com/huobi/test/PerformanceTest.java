@@ -2,7 +2,7 @@ package com.huobi.test;
 
 import java.math.BigDecimal;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AccountClient;
 import com.huobi.client.GenericClient;
 import com.huobi.client.MarketClient;

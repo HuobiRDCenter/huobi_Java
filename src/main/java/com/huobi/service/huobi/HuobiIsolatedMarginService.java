@@ -7,8 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.IsolatedMarginClient;
 import com.huobi.client.req.margin.*;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
+
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
