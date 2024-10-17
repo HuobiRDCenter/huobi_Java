@@ -1,4 +1,4 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import com.huobi.client.req.algo.*;
 import com.huobi.model.algo.*;
 import org.apache.commons.lang.RandomStringUtils;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AlgoClient;
 import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.algo.AlgoOrderSideEnum;
@@ -22,7 +22,8 @@ public class AlgoClientExamples {
 
     String symbol = "htusdt";
     Long accountId = 59373420L;
-    AlgoClient algoClient = AlgoClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).build());
+    AlgoClient algoClient = AlgoClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY)
+            .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN).build());
 
     CreateAlgoOrderResult createAlgoOrderResult = algoClient.createAlgoOrder(CreateAlgoOrderRequest.builder()
         .clientOrderId(getRandomClientOrderId())

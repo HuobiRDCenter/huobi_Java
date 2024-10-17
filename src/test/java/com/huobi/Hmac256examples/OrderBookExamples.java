@@ -1,4 +1,4 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

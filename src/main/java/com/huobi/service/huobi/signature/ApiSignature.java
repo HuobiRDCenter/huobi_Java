@@ -50,6 +50,7 @@ public class ApiSignature {
         .putToUrl(timestamp, gmtNow());
 
     sb.append(builder.buildSignature());
+
     Mac hmacSha256;
     try {
       hmacSha256 = Mac.getInstance(signatureMethodValue);
@@ -63,6 +64,7 @@ public class ApiSignature {
       throw new SDKException(SDKException.RUNTIME_ERROR,
           "[Signature] Invalid key: " + e.getMessage());
     }
+
     String payload = sb.toString();
     byte[] hash = hmacSha256.doFinal(payload.getBytes(StandardCharsets.UTF_8));
 

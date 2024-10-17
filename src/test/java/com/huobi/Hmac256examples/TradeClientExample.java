@@ -1,4 +1,4 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,7 +10,7 @@ import com.huobi.client.req.trade.*;
 import com.huobi.model.trade.*;
 import org.apache.commons.lang.RandomStringUtils;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.MarketClient;
 import com.huobi.client.TradeClient;
 import com.huobi.client.req.market.MarketDetailMergedRequest;
@@ -36,7 +36,7 @@ public class TradeClientExample {
 
     TradeClient tradeService = TradeClient.create(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
-        .secretKey(Constants.SECRET_KEY)
+        .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN)
         .build());
 
     String clientOrderId = "T" + System.nanoTime() + "_" + RandomStringUtils.randomAlphanumeric(4);

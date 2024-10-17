@@ -1,9 +1,9 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.req.wallet.CreateWithdrawRequest;
 import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;
@@ -23,7 +23,7 @@ public class WalletClientExample {
 
     HuobiWalletService walletService = new HuobiWalletService(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
-        .secretKey(Constants.SECRET_KEY)
+        .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN)
         .build());
 
     List<DepositAddress> addressList = walletService.getDepositAddress(DepositAddressRequest.builder().currency("usdt").build());
