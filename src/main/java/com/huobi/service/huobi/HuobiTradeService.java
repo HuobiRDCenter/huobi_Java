@@ -13,6 +13,7 @@ import com.huobi.constant.enums.OrderTypeEnum;
 import com.huobi.exception.SDKException;
 import com.huobi.model.trade.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.trade.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
@@ -50,7 +51,11 @@ public class HuobiTradeService implements TradeClient {
 
   public HuobiTradeService(Options options) {
     this.options = options;
-    this.restConnection = new HuobiRestConnection(options);
+    if(options.getSign().equals("256")){
+      this.restConnection = new HuobiRestConnection(options);
+    }else if(options.getSign().equals("25519")){
+      this.restConnection = new HuobiRestConnection25519(options);
+    }
     this.huobiAccountService = new HuobiAccountService(options);
   }
 

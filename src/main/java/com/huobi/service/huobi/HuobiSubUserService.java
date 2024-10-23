@@ -25,6 +25,7 @@ import com.huobi.model.subuser.SubUserTransferabilityResult;
 import com.huobi.model.wallet.DeductModeResult;
 import com.huobi.model.wallet.DepositAddress;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import com.huobi.service.huobi.parser.account.AccountBalanceParser;
 import com.huobi.service.huobi.parser.account.SubuserAggregateBalanceParser;
 import com.huobi.service.huobi.parser.subuser.*;
@@ -61,7 +62,11 @@ public class HuobiSubUserService implements SubUserClient {
 
   public HuobiSubUserService(Options options) {
     this.options = options;
-    this.restConnection = new HuobiRestConnection(options);
+    if(options.getSign().equals("256")){
+      this.restConnection = new HuobiRestConnection(options);
+    }else if(options.getSign().equals("25519")){
+      this.restConnection = new HuobiRestConnection25519(options);
+    }
   }
 
   @Override

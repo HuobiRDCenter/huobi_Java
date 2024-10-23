@@ -1,9 +1,9 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.IsolatedMarginClient;
 import com.huobi.client.req.margin.*;
 import com.huobi.constant.HuobiOptions;
@@ -20,7 +20,7 @@ public class IsolatedMarginClientExample {
 
     IsolatedMarginClient marginService = IsolatedMarginClient.create(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
-        .secretKey(Constants.SECRET_KEY)
+        .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN)
         .build());
 
     String symbol = "xrpusdt";

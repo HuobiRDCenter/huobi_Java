@@ -1,5 +1,12 @@
 package com.huobi.service.huobi.signature;
 
+import com.alibaba.fastjson.JSONObject;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.crypto.signers.Ed25519Signer;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+
+import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -7,13 +14,21 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ApiSignature.class})
 @PowerMockIgnore({"javax.crypto.*"})
 public class ApiSignatureTest {
-
 
   @Test
   public void testSignature() {
@@ -29,4 +44,34 @@ public class ApiSignatureTest {
             + "&Timestamp=123",
         builder.buildSignature());
   }
+
+  @Test
+  public void testVerifySign() throws Exception {
+    Ed25519PrivateKeyParameters privateKey = (Ed25519PrivateKeyParameters) PrivateKeyFactory.createKey(Base64.getDecoder().decode(""));
+
+    Ed25519PublicKeyParameters publicKey = (Ed25519PublicKeyParameters) PublicKeyFactory.createKey(Base64.getDecoder().decode(""));
+
+    String data = "{\"method\":\"GET\",\"requestUrl\":\"/v2/settings/common/symbols11\",\"serverName\":\"dawn-broker-common-pro.global-base.tc-jp1.huobiapps11.com\",\"privilege\":\"WRITE\",\"params\":{\"SignatureVersion\":[\"2\"],\"AccessKeyId\":[\"ghxertfvbf-946bcb5b-689d6d30-73277\"],\"Signature\":[\"YFcOXnxeLTxZnM0ONUqaBc2NYJ6PdD26Ik+o9yzUZAU=\"],\"SignatureMethod\":[\"HmacSHA256\"],\"Timestamp\":[\"2024-06-26T06:35:16\"]}}";
+    byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+
+    Ed25519Signer signer = new Ed25519Signer();
+    signer.init(true, privateKey);
+    signer.update(dataBytes, 0, dataBytes.length);
+    byte[] signatureBytes = signer.generateSignature();
+    String signature = Base64.getEncoder().encodeToString(signatureBytes);
+
+    System.out.println(signature + " " + signature.length());
+    System.out.println(verifySign(publicKey, data, signature));
+  }
+
+  private boolean verifySign(Ed25519PublicKeyParameters publicKey, String data, String signature) {
+    //初始化签名器
+    Ed25519Signer verifier = new Ed25519Signer();
+    verifier.init(false, publicKey);
+    //执行验签
+    byte[] bytesMsg = data.getBytes(StandardCharsets.UTF_8);
+    verifier.update(bytesMsg, 0, bytesMsg.length);
+    return verifier.verifySignature(Base64.getDecoder().decode(signature));
+  }
+
 }

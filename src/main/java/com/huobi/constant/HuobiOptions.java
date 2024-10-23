@@ -14,7 +14,7 @@ import com.huobi.constant.enums.ExchangeEnum;
 public class HuobiOptions implements Options {
 
   @Builder.Default
-  private String restHost = "https://api.huobi.pro";
+  private String restHost = "http://api.huobi.pro";
 
   @Builder.Default
   private String websocketHost = "wss://api.huobi.pro";
@@ -22,6 +22,7 @@ public class HuobiOptions implements Options {
   private String apiKey;
 
   private String secretKey;
+  private String sign;
 
   @Builder.Default
   private boolean websocketAutoConnect = true;
@@ -30,6 +31,9 @@ public class HuobiOptions implements Options {
   public String getApiKey() {
     return this.apiKey;
   }
+
+  @Override
+  public String getSign() {return this.sign;}
 
   @Override
   public String getSecretKey() {

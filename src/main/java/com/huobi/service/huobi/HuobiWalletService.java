@@ -11,12 +11,12 @@ import com.huobi.client.req.wallet.DepositAddressRequest;
 import com.huobi.client.req.wallet.DepositWithdrawRequest;
 import com.huobi.client.req.wallet.WithdrawAddressRequest;
 import com.huobi.client.req.wallet.WithdrawQuotaRequest;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
+
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.DepositWithdrawTypeEnum;
 import com.huobi.model.wallet.*;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import com.huobi.service.huobi.parser.wallet.*;
 import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
@@ -38,7 +38,11 @@ public class HuobiWalletService implements WalletClient {
 
   public HuobiWalletService(Options options) {
     this.options = options;
-    this.restConnection = new HuobiRestConnection(options);
+    if(options.getSign().equals("256")){
+      this.restConnection = new HuobiRestConnection(options);
+    }else if(options.getSign().equals("25519")){
+      this.restConnection = new HuobiRestConnection25519(options);
+    }
   }
 
   @Override

@@ -7,8 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.huobi.client.IsolatedMarginClient;
 import com.huobi.client.req.margin.*;
-import com.huobi.constant.Constants;
-import com.huobi.constant.HuobiOptions;
+
 import com.huobi.constant.Options;
 import com.huobi.constant.enums.MarginTransferDirectionEnum;
 import com.huobi.model.isolatedmargin.IsolatedMarginAccount;
@@ -16,6 +15,7 @@ import com.huobi.model.isolatedmargin.IsolatedMarginLoadOrder;
 import com.huobi.model.isolatedmargin.IsolatedMarginSymbolInfo;
 import com.huobi.model.isolatedmargin.LeveragePositionLimitResult;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginAccountParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginLoadOrderParser;
 import com.huobi.service.huobi.parser.isolatedmargin.IsolatedMarginSymbolInfoParser;
@@ -41,7 +41,11 @@ public class HuobiIsolatedMarginService implements IsolatedMarginClient {
 
   public HuobiIsolatedMarginService(Options options) {
     this.options = options;
-    this.restConnection = new HuobiRestConnection(options);
+    if(options.getSign().equals("256")){
+      this.restConnection = new HuobiRestConnection(options);
+    }else if(options.getSign().equals("25519")){
+      this.restConnection = new HuobiRestConnection25519(options);
+    }
   }
 
 

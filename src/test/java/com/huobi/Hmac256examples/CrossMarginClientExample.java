@@ -1,9 +1,9 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.CrossMarginClient;
 import com.huobi.client.req.account.GetBalanceRequest;
 import com.huobi.client.req.crossmargin.CrossMarginApplyLoanRequest;
@@ -26,7 +26,7 @@ public class CrossMarginClientExample {
     public static void main(String[] args) {
         CrossMarginClient marginService = CrossMarginClient.create(HuobiOptions.builder()
                 .apiKey(Constants.API_KEY)
-                .secretKey(Constants.SECRET_KEY)
+                .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN)
                 .build());
 
         String currency = "usdt";
