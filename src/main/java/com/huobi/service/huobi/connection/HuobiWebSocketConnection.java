@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.huobi.constant.Constants;
+import com.huobi.service.huobi.signature.ApiSignatureED25519;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
@@ -35,10 +36,12 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
 
   public static final String HUOBI_TRADING_WEBSOCKET_PATH = "/ws/v1";
   public static final String HUOBI_TRADING_WEBSOCKET_V2_PATH = "/ws/v2";
+
   public static final String HUOBI_MARKET_WEBSOCKET_PATH = "/ws";
 
   public static final String AUTH_VERSION_V1 = "v1";
   public static final String AUTH_VERSION_V2 = "v2";
+
 
   private long lastReceivedTime;
 
@@ -67,6 +70,7 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
   private String host;
 
   private String authVersion = AUTH_VERSION_V1;
+
 
   private HuobiWebSocketConnection() {}
 
@@ -362,10 +366,20 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     if (authNeed) {
       if (AUTH_VERSION_V1.equals(this.getAuthVersion())) {
         // 老版本验签
-        sendAuthV2();
+        if(Constants.SIGN.equals("256")){
+          sendAuthV2();
+        }else{
+          sendAuthV2ED();
+        }
+
       } else if (AUTH_VERSION_V2.equals(this.getAuthVersion())) {
         // 新版本2.1验签
-        sendAuthV2_1();
+        if(Constants.SIGN.equals("256")){
+          sendAuthV2_1();
+        }else{
+          sendAuthV2ED();
+        }
+//        sendAuthV2_1();
       } else {
         onError("Unsupport signature version: " + this.getAuthVersion(), null);
         close();
@@ -429,6 +443,24 @@ public class HuobiWebSocketConnection extends WebSocketListener implements WebSo
     }
     builder.putToUrl(ApiSignature.op, ApiSignature.opValue)
         .putToUrl("cid", System.currentTimeMillis());
+    send(builder.buildUrlToJsonString());
+  }
+
+  private void sendAuthV2ED() {
+    // 需要验签的部分
+    ApiSignatureED25519 as = new ApiSignatureED25519();
+    UrlParamsBuilder builder = UrlParamsBuilder.build();
+    try {
+      as.ApiSignature(options.getApiKey(), options.getSecretKey()); // 确保顺序正确
+//      as.createSignature("GET", host, path, paramsBuilder, options.getApiKey());
+      as.createSignature("GET", this.getHost(), HUOBI_TRADING_WEBSOCKET_PATH, builder,options.getApiKey());
+    } catch (Exception e) {
+      onError("Unexpected error when create the signature: " + e.getMessage(), e);
+      close();
+      return;
+    }
+    builder.putToUrl(ApiSignatureED25519.op, ApiSignatureED25519.opValue)
+            .putToUrl("cid", System.currentTimeMillis());
     send(builder.buildUrlToJsonString());
   }
 }

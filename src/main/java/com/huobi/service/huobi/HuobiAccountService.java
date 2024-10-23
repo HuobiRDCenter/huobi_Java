@@ -20,6 +20,7 @@ import com.huobi.model.account.*;
 import com.huobi.model.trade.OrderUpdateV2Event;
 import com.huobi.model.trade.TradeClearingEvent;
 import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import com.huobi.service.huobi.connection.HuobiWebSocketConnection;
 import com.huobi.service.huobi.parser.account.*;
 import com.huobi.service.huobi.parser.trade.OrderUpdateEventV2Parser;
@@ -60,9 +61,15 @@ public class HuobiAccountService implements AccountClient {
 
   private HuobiRestConnection restConnection;
 
+
   public HuobiAccountService(Options options) {
     this.options = options;
-    this.restConnection = new HuobiRestConnection(options);
+     if(options.getSign().equals("256")){
+       this.restConnection = new HuobiRestConnection(options);
+     }else if(options.getSign().equals("25519")){
+       this.restConnection = new HuobiRestConnection25519(options);
+     }
+
   }
 
   @Override
