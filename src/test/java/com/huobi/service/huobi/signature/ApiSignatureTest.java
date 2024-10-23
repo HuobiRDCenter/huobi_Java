@@ -47,9 +47,9 @@ public class ApiSignatureTest {
 
   @Test
   public void testVerifySign() throws Exception {
-    Ed25519PrivateKeyParameters privateKey = (Ed25519PrivateKeyParameters) PrivateKeyFactory.createKey(Base64.getDecoder().decode("MC4CAQAwBQYDK2VwBCIEILHeu7fAq16wUfz/w91bQVEQO+J1dJ6HE4YGdyfYMPqt"));
+    Ed25519PrivateKeyParameters privateKey = (Ed25519PrivateKeyParameters) PrivateKeyFactory.createKey(Base64.getDecoder().decode(""));
 
-    Ed25519PublicKeyParameters publicKey = (Ed25519PublicKeyParameters) PublicKeyFactory.createKey(Base64.getDecoder().decode("MCowBQYDK2VwAyEAIQ3rnAT8JKIBLyitmADX7Xtj2F5TbCDqpWBnYWlZ5rU="));
+    Ed25519PublicKeyParameters publicKey = (Ed25519PublicKeyParameters) PublicKeyFactory.createKey(Base64.getDecoder().decode(""));
 
     String data = "{\"method\":\"GET\",\"requestUrl\":\"/v2/settings/common/symbols11\",\"serverName\":\"dawn-broker-common-pro.global-base.tc-jp1.huobiapps11.com\",\"privilege\":\"WRITE\",\"params\":{\"SignatureVersion\":[\"2\"],\"AccessKeyId\":[\"ghxertfvbf-946bcb5b-689d6d30-73277\"],\"Signature\":[\"YFcOXnxeLTxZnM0ONUqaBc2NYJ6PdD26Ik+o9yzUZAU=\"],\"SignatureMethod\":[\"HmacSHA256\"],\"Timestamp\":[\"2024-06-26T06:35:16\"]}}";
     byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);

@@ -10,15 +10,13 @@ package com.huobi.constant;
 * */
 public class Constants {
 
-  public static final String API_KEY = "2c47b6d2-ed2htwf5tf-eab8ce25-e441a";
-  public static final String SECRET_KEY = "e44fd253-1f451fc8-d5076472-fd4a0";
+  public static final String API_KEY = "";
+  public static final String SECRET_KEY = "";
 public static final String SIGN = "256";
 
 
-public static final String PUBLIC_KEY = "65078cb9-bvrge3rf7j-5b59ba25-22845";
-  public static final String PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\n" +
-          "MC4CAQAwBQYDK2VwBCIEIM+xKGLUEX92/bYpWD/U+nAOGMwm/I+TAOl34xZGp0+6\n" +
-          "-----END PRIVATE KEY-----";
+public static final String PUBLIC_KEY = "";
+  public static final String PRIVATE_KEY = "";
 
 
 
