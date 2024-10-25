@@ -1,9 +1,6 @@
-package com.huobi.examples;
+package com.huobi.ED25519Example;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AccountClient;
 import com.huobi.client.req.account.*;
 import com.huobi.client.req.trade.SubOrderUpdateV2Request;
@@ -12,20 +9,25 @@ import com.huobi.constant.HuobiOptions;
 import com.huobi.constant.enums.*;
 import com.huobi.model.account.*;
 
-public class AccountClientExample {
+import java.math.BigDecimal;
+import java.util.List;
+
+public class AccountClientExample_ED25519 {
 
   public static void main(String[] args) {
 
-    Long accountId = 59373420L;
-    AccountClient accountService = AccountClient.create(HuobiOptions.builder()
-        .apiKey(Constants.API_KEY)
-        .secretKey(Constants.SECRET_KEY)
+    Long accountId = 31252055L;
+//    Long accountId = 31278987L;
+    AccountClient accountService
+            = AccountClient.create(HuobiOptions.builder()
+        .apiKey(Constants.PUBLIC_KEY)
+        .secretKey(Constants.PRIVATE_KEY).sign(Constants.SIGN)
         .build());
 
-    List<Account> accountList = accountService.getAccounts();
-    accountList.forEach(account -> {
-      System.out.println(account.toString());
-    });
+//    List<Account> accountList = accountService.getAccounts();
+//    accountList.forEach(account -> {
+//      System.out.println(account.toString());
+//    });
 
 
     AccountBalance accountBalance = accountService.getAccountBalance(AccountBalanceRequest.builder()

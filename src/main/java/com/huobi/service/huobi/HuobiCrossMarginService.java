@@ -5,6 +5,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.huobi.client.req.account.GetBalanceRequest;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
 import org.apache.commons.lang.StringUtils;
 
 import com.huobi.client.CrossMarginClient;
@@ -50,7 +51,11 @@ public class HuobiCrossMarginService implements CrossMarginClient {
 
     public HuobiCrossMarginService(Options options) {
         this.options = options;
-        this.restConnection = new HuobiRestConnection(options);
+        if(options.getSign().equals("256")){
+            this.restConnection = new HuobiRestConnection(options);
+        }else if(options.getSign().equals("25519")){
+            this.restConnection = new HuobiRestConnection25519(options);
+        }
     }
 
     @Override

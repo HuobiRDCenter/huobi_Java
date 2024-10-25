@@ -7,6 +7,7 @@ public interface Options {
   String getApiKey();
 
   String getSecretKey();
+  String getSign();
 
   ExchangeEnum getExchange();
 

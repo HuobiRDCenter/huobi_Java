@@ -1,28 +1,22 @@
-package com.huobi.examples;
+package com.huobi.Hmac256examples;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.alibaba.fastjson.JSON;
 
-import com.huobi.Constants;
-import com.huobi.client.AccountClient;
+import com.huobi.constant.Constants;
 import com.huobi.client.SubUserClient;
-import com.huobi.client.req.account.AccountBalanceRequest;
-import com.huobi.client.req.account.SubAccountUpdateRequest;
 import com.huobi.client.req.account.TransferSubuserRequest;
 import com.huobi.client.req.subuser.*;
 import com.huobi.constant.HuobiOptions;
-import com.huobi.constant.enums.AccountUpdateModeEnum;
 import com.huobi.constant.enums.SubUserApiKeyPermissionEnums;
 import com.huobi.constant.enums.SubUserManagementActionEnum;
 import com.huobi.constant.enums.TradableMarketAccountTypeEnum;
 import com.huobi.constant.enums.TradableMarketActivationEnums;
 import com.huobi.constant.enums.TransferMasterTypeEnum;
 import com.huobi.constant.enums.TransferabilityAccountTypeEnum;
-import com.huobi.model.account.Account;
 import com.huobi.model.account.AccountBalance;
 import com.huobi.model.account.SubuserAggregateBalance;
 import com.huobi.model.subuser.GetApiKeyListResult;
@@ -49,7 +43,7 @@ public class SubUserClientExample {
     Long subUid = 120491258L;
     SubUserClient subUserClient = SubUserClient.create(HuobiOptions.builder()
         .apiKey(Constants.API_KEY)
-        .secretKey(Constants.SECRET_KEY)
+        .secretKey(Constants.SECRET_KEY).sign(Constants.SIGN)
         .build());
 
     System.out.println("===========transfer to subuser ===============");

@@ -2,7 +2,7 @@ package com.huobi.test;
 
 import java.math.BigDecimal;
 
-import com.huobi.Constants;
+import com.huobi.constant.Constants;
 import com.huobi.client.AccountClient;
 import com.huobi.client.GenericClient;
 import com.huobi.client.MarketClient;
@@ -43,14 +43,14 @@ public class PerformanceTest {
 
 
   public static void testCase() {
-    String symbol = "htusdt";
+    String symbol = "btcusdt";
     String currency = "usdt";
     Long accountId = 290082L;
     GenericClient genericClient = GenericClient.create(new HuobiOptions());
     MarketClient marketClient = MarketClient.create(new HuobiOptions());
-    AccountClient accountClient = AccountClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).build());
-    WalletClient walletClient = WalletClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).build());
-    TradeClient tradeClient = TradeClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).build());
+    AccountClient accountClient = AccountClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).sign(Constants.SIGN).build());
+    WalletClient walletClient = WalletClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).sign(Constants.SIGN).build());
+    TradeClient tradeClient = TradeClient.create(HuobiOptions.builder().apiKey(Constants.API_KEY).secretKey(Constants.SECRET_KEY).sign(Constants.SIGN).build());
     Long startNano = null;
     Long endNano = null;
     NetworkLatency networkLatency = null;

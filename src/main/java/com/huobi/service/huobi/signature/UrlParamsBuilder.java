@@ -65,7 +65,7 @@ public class UrlParamsBuilder {
     return new UrlParamsBuilder();
   }
 
-  private UrlParamsBuilder() {
+  public UrlParamsBuilder() {
   }
 
   public UrlParamsBuilder setPostMode(boolean mode) {
