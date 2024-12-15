@@ -74,7 +74,7 @@ public class HuobiGenericService implements GenericClient {
             .putToUrl("ts", ts);
     JSONObject jsonObject = restConnection.executeGet(GET_SYMBOLS_PATH_V2, builder);
     JSONArray data = jsonObject.getJSONArray("data");
-    return new SymbolV2Parser().parseArray(data);
+    return new SymbolV2Parser().parseArray(data).subList(0, Math.toIntExact(ts));
   }
 
   @Override
