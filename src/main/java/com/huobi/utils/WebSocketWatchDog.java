@@ -58,6 +58,6 @@ public class WebSocketWatchDog {
   }
 
   public static void onClosedNormally(WebSocketConnection connection) {
-    TIME_HELPER.remove(connection);
+    TIME_HELPER.remove(connection.getConnectionId());
   }
 }
