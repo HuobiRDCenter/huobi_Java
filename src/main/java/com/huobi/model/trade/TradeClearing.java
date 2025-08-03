@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 public class TradeClearing {
 
-  private String eventType;
+  private String event;
 
   private String symbol;
 
