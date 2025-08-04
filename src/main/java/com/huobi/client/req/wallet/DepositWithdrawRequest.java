@@ -24,6 +24,6 @@ public class DepositWithdrawRequest {
 
   private Integer size;
 
-  private QueryDirectionEnum direction;
+  private QueryDirectionEnum direction = QueryDirectionEnum.NEXT;
 
 }
