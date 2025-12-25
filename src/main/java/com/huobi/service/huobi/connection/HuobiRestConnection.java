@@ -2,9 +2,12 @@ package com.huobi.service.huobi.connection;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.regexp.internal.RE;
+import lombok.val;
 import okhttp3.Request;
 
 import com.huobi.constant.EtfResult;
@@ -35,33 +38,50 @@ public class HuobiRestConnection {
     }
 
     public JSONObject executeGet(String path, UrlParamsBuilder paramsBuilder) {
+        return executeGet(path, paramsBuilder, null);
+    }
+
+    public JSONObject executeGet(String path, UrlParamsBuilder paramsBuilder, Map<String, String> headers) {
 
         Options options = this.getOptions();
 
         String url = options.getRestHost() + path + paramsBuilder.buildUrl();
 
-        Request executeRequest = new Request.Builder()
+        Request.Builder builder = new Request.Builder()
                 .url(url)
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .build();
+                .addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        String resp = ConnectionFactory.execute(executeRequest);
+        if (headers != null && !headers.isEmpty()) {
+            headers.forEach(builder::addHeader);
+        }
+
+        String resp = ConnectionFactory.execute(builder.build());
         return checkAndGetResponse(resp);
     }
 
     public String executeGetString(String url, UrlParamsBuilder paramsBuilder) {
+        return executeGetString(url, paramsBuilder, null);
+    }
+
+    public String executeGetString(String url, UrlParamsBuilder paramsBuilder, Map<String, String> headers) {
         String realUrl = url + paramsBuilder.buildUrl();
-        Request executeRequest = new Request.Builder()
+        Request.Builder builder = new Request.Builder()
                 .url(realUrl)
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .build();
-        String resp = ConnectionFactory.execute(executeRequest);
+                .addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        if (headers != null && !headers.isEmpty()) {
+            headers.forEach(builder::addHeader);
+        }
+
+        String resp = ConnectionFactory.execute(builder.build());
         return resp;
     }
 
-  public JSONObject executeGetWithSignature(String path, UrlParamsBuilder paramsBuilder) {
+    public JSONObject executeGetWithSignature(String path, UrlParamsBuilder paramsBuilder) {
+        return executeGetWithSignature(path, paramsBuilder, null);
+    }
 
-
+  public JSONObject executeGetWithSignature(String path, UrlParamsBuilder paramsBuilder, Map<String, String> headers) {
     Options options = this.getOptions();
 
     String requestUrl =  options.getRestHost() + path;
@@ -69,23 +89,38 @@ public class HuobiRestConnection {
     requestUrl += paramsBuilder.buildUrl();
     System.out.println(requestUrl);
 
-    Request executeRequest = new Request.Builder().url(requestUrl)
-        .addHeader("Content-Type", "application/x-www-form-urlencoded").build();
+    Request.Builder builder = new Request.Builder()
+            .url(requestUrl)
+            .addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    String resp = ConnectionFactory.execute(executeRequest);
+    if (headers != null && !headers.isEmpty()) {
+      headers.forEach(builder::addHeader);
+    }
+
+    String resp = ConnectionFactory.execute(builder.build());
     return checkAndGetResponse(resp);
   }
 
+    public JSONObject executePostWithSignature(String path, UrlParamsBuilder paramsBuilder){
+        return executePostWithSignature(path, paramsBuilder, null);
+    }
 
-  public JSONObject executePostWithSignature(String path, UrlParamsBuilder paramsBuilder){
+  public JSONObject executePostWithSignature(String path, UrlParamsBuilder paramsBuilder, Map<String, String> headers){
     Options options = this.getOptions();
     String requestUrl =  options.getRestHost() + path;
     new ApiSignature().createSignature(options.getApiKey(), options.getSecretKey(), "POST", host, path, paramsBuilder);
     requestUrl += paramsBuilder.buildUrl();
-    Request executeRequest = new Request.Builder().url(requestUrl).post(paramsBuilder.buildPostBody())
-        .addHeader("Content-Type", "application/json").build();
 
-    String resp = ConnectionFactory.execute(executeRequest);
+    Request.Builder builder = new Request.Builder()
+            .url(requestUrl)
+            .post(paramsBuilder.buildPostBody())
+            .addHeader("Content-Type", "application/json");
+
+    if (headers != null && !headers.isEmpty()) {
+      headers.forEach(builder::addHeader);
+    }
+
+    String resp = ConnectionFactory.execute(builder.build());
     return checkAndGetResponse(resp);
   }
 
