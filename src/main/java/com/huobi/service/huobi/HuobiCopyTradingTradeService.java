@@ -1,0 +1,396 @@
+package com.huobi.service.huobi;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.huobi.client.CopyTradingTradeClient;
+import com.huobi.client.req.copyTradingTrade.*;
+import com.huobi.client.req.trade.*;
+import com.huobi.constant.Options;
+import com.huobi.constant.enums.OrderTypeEnum;
+import com.huobi.model.trade.*;
+import com.huobi.service.huobi.connection.HuobiRestConnection;
+import com.huobi.service.huobi.connection.HuobiRestConnection25519;
+import com.huobi.service.huobi.parser.trade.*;
+import com.huobi.service.huobi.signature.UrlParamsBuilder;
+import com.huobi.utils.InputChecker;
+
+import java.util.*;
+
+public class HuobiCopyTradingTradeService implements CopyTradingTradeClient {
+
+    public static final String  queryTraderInstruments = "/api/v6/copyTrading/trader/instruments";
+    public static final String  queryTraderStatistics = "/api/v6/copyTrading/trader/statistics";
+    public static final String  queryTraderProfitSharingHistory = "/api/v6/copyTrading/trader/profit-sharing-history";
+    public static final String  queryTraderProfitSharingHistorySummary = "/api/v6/copyTrading/trader/profit-sharing-history-summary";
+    public static final String  queryTraderUnrealizedProfitSharingSummary = "/api/v6/copyTrading/trader/unrealized-profit-sharing-summary";
+    public static final String  queryTraderFollowers = "/api/v6/copyTrading/trader/followers";
+    public static final String  deleteTraderFollower = "/api/v6/copyTrading/trader/follower";
+    public static final String  traderTransfer = "/api/v6/copyTrading/trader/transfer";
+    public static final String  traderFollowerSettings = "/api/v6/copyTrading/trader/follower-settings";
+    public static final String  traderConfig = "/api/v6/copyTrading/trader/config";
+    public static final String  traderApikey = "/api/v6/copyTrading/trader/apikey";
+
+    private Options options;
+
+    private HuobiRestConnection restConnection;
+
+    public HuobiCopyTradingTradeService(Options options) {
+        this.options = options;
+        if(options.getSign().equals("256")){
+            this.restConnection = new HuobiRestConnection(options);
+        }else if(options.getSign().equals("25519")){
+            this.restConnection = new HuobiRestConnection25519(options);
+        }
+    }
+
+    @Override
+    public JSONArray queryTraderInstruments(String instType) {
+        return null;
+    }
+
+    @Override
+    public JSONArray queryTraderStatistics(String instType) {
+        return null;
+    }
+
+    @Override
+    public JSONArray queryTraderProfitSharingHistory(TraderProfitSharingHistoryParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray queryTraderProfitSharingHistorySummary(String instType) {
+        return null;
+    }
+
+    @Override
+    public JSONArray queryTraderUnrealizedProfitSharingSummary(TraderUnrealizedProfitSharingSummaryParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray queryTraderFollowers(TraderFollowersParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray deleteTraderFollower(TraderFollowerDeleteParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray traderTransfer(TraderTransferParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray traderFollowerSettings(TraderFollowerSettingsParam param) {
+        return null;
+    }
+
+    @Override
+    public JSONArray traderConfig(String instType) {
+        return null;
+    }
+
+    @Override
+    public JSONArray traderApikey(TraderApikeyParam param) {
+        return null;
+    }
+
+//
+//  @Override
+//  public Long createOrder(CreateOrderRequest request) {
+//
+//    InputChecker.checker().checkSymbol(request.getSymbol())
+//        .shouldNotNull(request.getAccountId(), "Account-Id")
+//        .shouldNotNull(request.getAmount(), "Amount")
+//        .shouldNotNull(request.getType(), "Type")
+//        .shouldNotNull(request.getOrderSource(), "order source");
+//
+//    if (request.getType() == OrderTypeEnum.SELL_LIMIT
+//        || request.getType() == OrderTypeEnum.BUY_LIMIT
+//        || request.getType() == OrderTypeEnum.BUY_LIMIT_MAKER
+//        || request.getType() == OrderTypeEnum.SELL_LIMIT_MAKER) {
+//      InputChecker.checker()
+//          .shouldNotNull(request.getPrice(), "Price");
+//    }
+//    if (request.getType() == OrderTypeEnum.SELL_MARKET
+//        || request.getType() == OrderTypeEnum.BUY_MARKET) {
+//      InputChecker.checker()
+//          .shouldNull(request.getPrice(), "Price");
+//    }
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToPost("account-id", request.getAccountId())
+//        .putToPost("amount", request.getAmount())
+//        .putToPost("price", request.getPrice())
+//        .putToPost("symbol", request.getSymbol())
+//        .putToPost("type", request.getType().getCode())
+//        .putToPost("client-order-id", request.getClientOrderId())
+//        .putToPost("source", request.getOrderSource().getCode())
+//        .putToPost("stop-price", request.getStopPrice())
+//        .putToPost("operator", request.getOperator() == null ? null : request.getOperator().getOperator())
+//        .putToPost("self-match-prevent", request.getSelfMatchPrevent());
+//
+//    JSONObject jsonObject = restConnection.executePostWithSignature(CREATE_ORDER_PATH, builder);
+//    return jsonObject.getLong("data");
+//  }
+//
+//  @Override
+//  public Long cancelOrder(CancelOrderRequest request) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(request.getOrderId(), "order-id");
+//
+//    String path = CANCEL_ORDER_PATH.replace("{order-id}", request.getOrderId() + "");
+//    UrlParamsBuilder builder = UrlParamsBuilder.build();
+//    builder.putToPost("symbol", request.getSymbol());
+//    JSONObject jsonObject = restConnection.executePostWithSignature(path, builder);
+//    return jsonObject.getLong("data");
+//  }
+//
+//  @Override
+//  public Integer cancelOrder(String clientOrderId) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(clientOrderId, "client-order-id");
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build();
+//    builder.putToPost("client-order-id", clientOrderId);
+//
+//    JSONObject jsonObject = restConnection.executePostWithSignature(CANCEL_ORDER_BY_CLIENT_ORDER_ID_PATH, builder);
+//    return jsonObject.getInteger("data");
+//  }
+//
+//  @Override
+//  public BatchCancelOpenOrdersResult batchCancelOpenOrders(BatchCancelOpenOrdersRequest request) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(request.getAccountId(), "account-id");
+//    if (request.getSize() != null) {
+//      InputChecker.checker()
+//          .checkRange(request.getSize(), 1, 100, "size");
+//    }
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToPost("account-id", request.getAccountId())
+//        .putToPost("symbol", request.getSymbol())
+//        .putToPost("side", request.getSide() == null ? null : request.getSide().getCode())
+//        .putToPost("size", request.getSize())
+//        .putToPost("types", request.getTypes());
+//
+//    JSONObject jsonObject = restConnection.executePostWithSignature(BATCH_CANCEL_OPEN_ORDERS_PATH, builder);
+//    JSONObject data = jsonObject.getJSONObject("data");
+//    return new BatchCancelOpenOrdersResultParser().parse(data);
+//  }
+//
+//  @Override
+//  public BatchCancelOrderResult batchCancelOrder(List<Long> ids) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(ids, "order-ids")
+//        .checkList(ids, 1, 50, "orderIds");
+//
+//    List<String> stringList = new LinkedList<>();
+//    for (Object obj : ids) {
+//      stringList.add(obj.toString());
+//    }
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToPost("order-ids", stringList);
+//
+//    JSONObject jsonObject = restConnection.executePostWithSignature(BATCH_CANCEL_ORDERS_PATH, builder);
+//    JSONObject data = jsonObject.getJSONObject("data");
+//    return new BatchCancelOrderResultParser().parse(data);
+//  }
+//
+//  @Override
+//  public List<Order> getOpenOrders(OpenOrdersRequest request) {
+//
+//    InputChecker.checker()
+//        .checkSymbol(request.getSymbol())
+//        .shouldNotNull(request.getAccountId(), "account-id")
+//        .checkRange(request.getSize(), 1, 500, "size");
+//
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToUrl("account-id", request.getAccountId())
+//        .putToUrl("symbol", request.getSymbol())
+//        .putToUrl("side", request.getSide() == null ? null : request.getSide().getCode())
+//        .putToUrl("size", request.getSize())
+//        .putToUrl("direct", request.getDirect() == null ? null : request.getDirect().getCode())
+//        .putToUrl("from", request.getFrom())
+//        .putToUrl("types", request.getTypes());
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_OPEN_ORDERS_PATH, builder);
+//    JSONArray data = jsonObject.getJSONArray("data");
+//    return new OrderParser().parseArray(data);
+//  }
+//
+//  @Override
+//  public Order getOrder(Long orderId) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(orderId, "order-id");
+//
+//    String path = GET_ORDER_PATH.replace("{order-id}", orderId + "");
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(path, UrlParamsBuilder.build());
+//    JSONObject data = jsonObject.getJSONObject("data");
+//    return new OrderParser().parse(data);
+//  }
+//
+//  @Override
+//  public Order getOrder(String clientOrderId) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(clientOrderId, "client-order-id");
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build();
+//    builder.putToUrl("clientOrderId", clientOrderId);
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ORDER_BY_CLIENT_ORDER_ID_PATH, builder);
+//    JSONObject data = jsonObject.getJSONObject("data");
+//    return new OrderParser().parse(data);
+//  }
+//
+//  @Override
+//  public List<Order> getOrders(OrdersRequest request) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(request.getSymbol(), "symbol")
+//        .checkList(request.getStates(), 1, 100, "states");
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToUrl("symbol", request.getSymbol())
+//        .putToUrl("types", request.getTypesString())
+//        .putToUrl("start-date", request.getStartDate(), "yyyy-MM-dd")
+//        .putToUrl("end-date", request.getEndDate(), "yyyy-MM-dd")
+//        .putToUrl("from", request.getStartId())
+//        .putToUrl("states", request.getStatesString())
+//        .putToUrl("size", request.getSize())
+//        .putToUrl("direct", request.getDirect() == null ? null : request.getDirect().getCode());
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ORDERS_PATH, builder);
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new OrderParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public List<Order> getOrdersHistory(OrderHistoryRequest request) {
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToUrl("symbol", request.getSymbol())
+//        .putToUrl("start-time", request.getStartTime())
+//        .putToUrl("end-time", request.getEndTime())
+//        .putToUrl("size", request.getSize())
+//        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode());
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_ORDERS_HISTORY_PATH, builder);
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new OrderParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public List<MatchResult> getMatchResult(Long orderId) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(orderId, "order-id");
+//
+//    String path = GET_SINGLE_ORDER_MATCH_RESULT_PATH.replace("{order-id}", orderId + "");
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(path, UrlParamsBuilder.build());
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new MatchResultParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public List<MatchResult> getMatchResults(MatchResultRequest request) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(request.getSymbol(), "symbol");
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToUrl("symbol", request.getSymbol())
+//        .putToUrl("types", request.getTypeString())
+//        .putToUrl("start-date", request.getStartDate(), "yyyy-MM-dd")
+//        .putToUrl("end-date", request.getEndDate(), "yyyy-MM-dd")
+//        .putToUrl("from", request.getFrom())
+//        .putToUrl("direct", request.getDirection() == null ? null : request.getDirection().getCode())
+//        .putToUrl("size", request.getSize());
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_MATCH_RESULT_PATH, builder);
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new MatchResultParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public List<FeeRate> getFeeRate(FeeRateRequest request) {
+//
+//    InputChecker.checker()
+//        .shouldNotNull(request.getSymbols(), "symbol");
+//
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//        .putToUrl("symbols", request.getSymbols());
+//
+//    JSONObject jsonObject = restConnection.executeGetWithSignature(GET_FEE_RATE_PATH, builder);
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new FeeRateParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public List<BatchOrdersResult> batchOrders(List<BatchOrdersRequest> list) {
+//    for (BatchOrdersRequest request : list) {
+//      InputChecker.checker()
+//              .shouldNotNull(request.getAccountId(), "account-id")
+//              .shouldNotNull(request.getSymbol(), "symbol")
+//              .shouldNotNull(request.getType(), "type")
+//              .shouldNotNull(request.getAmount(), "amount");
+//    }
+//    List<Map<String, Object>> postList = new ArrayList<>();
+//    for (BatchOrdersRequest request : list) {
+//      HashMap<String, Object> postDataMap = new HashMap();
+//      postDataMap.put("account-id", request.getAccountId());
+//      postDataMap.put("symbol", request.getSymbol());
+//      postDataMap.put("type", request.getType());
+//      postDataMap.put("amount", request.getAmount());
+//      postDataMap.put("price", request.getPrice());
+//      postDataMap.put("source", request.getSource());
+//      postDataMap.put("client-order-id", request.getClientOrderId());
+//      postDataMap.put("self-match-prevent", request.getSelfMatchPrevent());
+//      postDataMap.put("stop-price", request.getStopPrice());
+//      postDataMap.put("operator", request.getOperator());
+//      postList.add(postDataMap);
+//    }
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//            .putToPost("data", list);
+//    JSONObject jsonObject = restConnection.executePostWithSignature(BATCH_ORDERS_PATH, builder);
+//    JSONArray array = jsonObject.getJSONArray("data");
+//    return new BatchOrdersResultParser().parseArray(array);
+//  }
+//
+//  @Override
+//  public OrderResp marginOrder(MarginOrderRequest request) {
+//    InputChecker.checker()
+//            .shouldNotNull(request.getSymbol(), "symbol")
+//            .shouldNotNull(request.getAccountId(), "account-id")
+//            .shouldNotNull(request.getType(), "type")
+//            .shouldNotNull(request.getTradePurpose(), "trade-purpose")
+//            .shouldNotNull(request.getSource(), "source");
+//    UrlParamsBuilder builder = UrlParamsBuilder.build()
+//            .putToPost("symbol", request.getSymbol())
+//            .putToPost("account-id", request.getAccountId())
+//            .putToPost("amount", request.getAmount())
+//            .putToPost("market-amount", request.getMarketAmount())
+//            .putToPost("borrow-amount", request.getBorrowAmount())
+//            .putToPost("type", request.getType())
+//            .putToPost("trade-purpose", request.getTradePurpose())
+//            .putToPost("price", request.getPrice())
+//            .putToPost("stop-price", request.getStopPrice())
+//            .putToPost("operator", request.getOperator())
+//            .putToPost("source", request.getSource());
+//    JSONObject jsonObject = restConnection.executePostWithSignature(MARGIN_ORDER_PATH, builder);
+//    JSONObject data = jsonObject.getJSONObject("data");
+//    return new OrderRespParser().parse(data);
+//  }
+
+}
