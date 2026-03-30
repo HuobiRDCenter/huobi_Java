@@ -1,5 +1,6 @@
 package com.huobi.client.req.trade;
 
+import com.huobi.constant.enums.AccountActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,10 @@ import lombok.ToString;
 @ToString
 public class SubTradeClearingRequest {
 
-  private String symbols;
+    private AccountActionEnum accountAction;
 
-  private int[] modes;
+    private String symbols;
+
+    private int[] modes;
 
 }

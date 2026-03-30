@@ -1,5 +1,6 @@
 package com.huobi.client.req.account;
 
+import com.huobi.constant.enums.AccountActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,8 @@ import com.huobi.constant.enums.BalanceModeEnum;
 @ToString
 public class SubAccountUpdateRequest {
 
-  private AccountUpdateModeEnum accountUpdateMode;
+    private AccountActionEnum accountAction;
+
+    private AccountUpdateModeEnum accountUpdateMode;
 
 }

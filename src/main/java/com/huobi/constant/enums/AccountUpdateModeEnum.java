@@ -16,7 +16,13 @@ public enum AccountUpdateModeEnum {
   /**
    * Subscribe TOTAL balance, total balance is the sum of available and frozen
    */
-  ACCOUNT_CHANGE("1");
+  ACCOUNT_CHANGE("1"),
+
+    /**
+     * 在账户余额发生变动或可用余额发生变动时均推送且一起推送。
+     */
+    AVAILABLE_OR_CHANGE("2"),
+    ;
 
   private final String code;
 

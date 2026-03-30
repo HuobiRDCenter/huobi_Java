@@ -16,6 +16,6 @@ import com.huobi.constant.enums.DepthStepEnum;
 public class SubMarketDepthRequest {
   private String symbol;
 
-  private DepthStepEnum step;
+  private String step;
 
 }
