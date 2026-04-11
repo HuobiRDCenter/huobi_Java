@@ -14,6 +14,7 @@ import com.huobi.client.req.trade.SubOrderUpdateV2Request;
 import com.huobi.client.req.trade.SubTradeClearingRequest;
 import com.huobi.constant.Options;
 import com.huobi.constant.WebSocketConstants;
+import com.huobi.constant.enums.AccountActionEnum;
 import com.huobi.constant.enums.AccountTypeEnum;
 import com.huobi.exception.SDKException;
 import com.huobi.model.account.*;
@@ -29,6 +30,7 @@ import com.huobi.service.huobi.signature.UrlParamsBuilder;
 import com.huobi.utils.InputChecker;
 import com.huobi.utils.ResponseCallback;
 import com.huobi.utils.SymbolUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class HuobiAccountService implements AccountClient {
 
@@ -284,8 +286,9 @@ public class HuobiAccountService implements AccountClient {
     InputChecker.checker()
         .shouldNotNull(request.getAccountUpdateMode(), "account update model");
 
+      AccountActionEnum accountActionEnum = request.getAccountAction() != null ? request.getAccountAction() : AccountActionEnum.ACTION_SUB;
     JSONObject command = new JSONObject();
-    command.put("action", WebSocketConstants.ACTION_SUB);
+    command.put("action", accountActionEnum.getCode());
     command.put("cid", System.currentTimeMillis() + "");
     command.put("ch", SUB_ACCOUNT_UPDATE_TOPIC.replace("${mode}", request.getAccountUpdateMode().getCode()));
     command.put("model", request.getAccountUpdateMode().getCode());
@@ -311,11 +314,12 @@ public class HuobiAccountService implements AccountClient {
     List<String> commandList = new ArrayList<>(symbolList.size());
     symbolList.forEach(symbol -> {
 
-      String topic = WEBSOCKET_ORDER_UPDATE_V2_TOPIC
-              .replace("${symbol}", symbol);
+    AccountActionEnum accountActionEnum = request.getAccountAction() != null ? request.getAccountAction() : AccountActionEnum.ACTION_SUB;
+
+    String topic = WEBSOCKET_ORDER_UPDATE_V2_TOPIC.replace("${symbol}", symbol);
 
       JSONObject command = new JSONObject();
-      command.put("action", WebSocketConstants.ACTION_SUB);
+      command.put("action", accountActionEnum.getCode());
       command.put("ch", topic);
       command.put("id", System.nanoTime());
       commandList.add(command.toJSONString());
@@ -338,13 +342,15 @@ public class HuobiAccountService implements AccountClient {
     if (symbolList.size() != modeArray.length) {
       throw new SDKException(SDKException.INPUT_ERROR, "[Input] The number of symbol and mode must be equal");
     }
+
+      AccountActionEnum accountActionEnum = request.getAccountAction() != null ? request.getAccountAction() : AccountActionEnum.ACTION_SUB;
     List<String> commandList = new ArrayList<>(symbolList.size());
     for (int i = 0; i < symbolList.size(); i++) {
       String topic = WEBSOCKET_TRADE_CLEARING_TOPIC
               .replace("${symbol}", symbolList.get(i))
               .replace("${mode}", String.valueOf(modeArray[i]));
       JSONObject command = new JSONObject();
-      command.put("action", WebSocketConstants.ACTION_SUB);
+      command.put("action", accountActionEnum.getCode());
       command.put("ch", topic);
       command.put("id", System.nanoTime());
       commandList.add(command.toJSONString());

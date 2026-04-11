@@ -17,6 +17,6 @@ public class ReqMarketDepthRequest {
 
   private String symbol;
 
-  private DepthStepEnum step;
+  private String step;
 
 }

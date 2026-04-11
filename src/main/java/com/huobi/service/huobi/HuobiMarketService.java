@@ -54,6 +54,8 @@ public class HuobiMarketService implements MarketClient {
   public static final String WEBSOCKET_MARKET_MBP_INCREMENT_TOPIC = "market.$symbol.mbp.$levels";//市场深度MBP行情数据（增量推送）
   public static final String WEBSOCKET_MARKET_TICKERS_PATH = "market.$symbol.ticker";//聚合行情（Ticker）数据
 
+
+
   @Override
   public List<Candlestick> getCandlestick(CandlestickRequest request) {
 
@@ -206,7 +208,7 @@ public class HuobiMarketService implements MarketClient {
     InputChecker.checker()
         .checkSymbolList(symbolList);
 
-    String step = request.getStep() == null ? DepthStepEnum.STEP0.getStep() : request.getStep().getStep();
+    String step = request.getStep() == null ? DepthStepEnum.STEP0.getStep() : request.getStep();
     List<String> commandList = new ArrayList<>(symbolList.size());
     symbolList.forEach(symbol -> {
 
@@ -469,7 +471,7 @@ public class HuobiMarketService implements MarketClient {
 
     String topic = WEBSOCKET_MARKET_DEPTH_TOPIC
         .replace("$symbol", request.getSymbol())
-        .replace("$type", request.getStep().getStep());
+        .replace("$type", request.getStep());
 
     JSONObject command = new JSONObject();
     command.put(WebSocketConstants.OP_REQ, topic);
